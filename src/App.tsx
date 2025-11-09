@@ -18,6 +18,8 @@ import { ServiceList } from './pages/ServiceList';
 import { ServiceForm } from './pages/ServiceForm';
 import { CostGroupList } from './pages/CostGroupList';
 import { CostGroupForm } from './pages/CostGroupForm';
+import { HolidayList } from './pages/HolidayList';
+import { HolidayForm } from './pages/HolidayForm';
 import { PendingApprovalScreen } from './pages/PendingApprovalScreen';
 import { memberAPI } from './services/api';
 
@@ -89,6 +91,9 @@ function App() {
             <Route path="/cost-groups" element={<ProtectedRoute><CostGroupList /></ProtectedRoute>} />
             <Route path="/cost-groups/new" element={<ProtectedRoute><CostGroupForm /></ProtectedRoute>} />
             <Route path="/cost-groups/edit/:id" element={<ProtectedRoute><CostGroupForm /></ProtectedRoute>} />
+            <Route path="/holidays" element={<ProtectedRoute><HolidayList /></ProtectedRoute>} />
+            <Route path="/holidays/new" element={<ProtectedRoute><HolidayForm /></ProtectedRoute>} />
+            <Route path="/holidays/:id" element={<ProtectedRoute><HolidayForm /></ProtectedRoute>} />
             <Route path="/test" element={<ProtectedRoute><TestPage /></ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

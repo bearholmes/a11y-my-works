@@ -940,6 +940,99 @@ export const businessAPI = {
   }
 };
 
+// 공휴일 관리 API
+export const holidayAPI = {
+  /**
+   * 공휴일 목록을 조회합니다.
+   */
+  async getHolidays(params?: { page?: number; pageSize?: number; year?: number }) {
+    const { page = 1, pageSize = 20, year } = params || {};
+
+    let query = supabase
+      .from('holidays')
+      .select('*', { count: 'exact' })
+      .order('holiday_date', { ascending: false });
+
+    if (year) {
+      const startDate = `${year}-01-01`;
+      const endDate = `${year}-12-31`;
+      query = query.gte('holiday_date', startDate).lte('holiday_date', endDate);
+    }
+
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize - 1;
+
+    const { data, error, count } = await query.range(start, end);
+
+    if (error) throw error;
+
+    return {
+      data: data || [],
+      pagination: {
+        total: count || 0,
+        page,
+        pageSize,
+        pageCount: Math.ceil((count || 0) / pageSize)
+      } as PaginationResponse
+    };
+  },
+
+  /**
+   * 특정 공휴일 정보를 조회합니다.
+   */
+  async getHoliday(holidayId: number) {
+    const { data, error } = await supabase
+      .from('holidays')
+      .select('*')
+      .eq('holiday_id', holidayId)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * 새로운 공휴일을 생성합니다.
+   */
+  async createHoliday(holiday: Database['public']['Tables']['holidays']['Insert']) {
+    const { data, error } = await supabase
+      .from('holidays')
+      .insert(holiday)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * 공휴일 정보를 수정합니다.
+   */
+  async updateHoliday(holidayId: number, updates: Database['public']['Tables']['holidays']['Update']) {
+    const { data, error } = await supabase
+      .from('holidays')
+      .update(updates)
+      .eq('holiday_id', holidayId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * 공휴일을 삭제합니다.
+   */
+  async deleteHoliday(holidayId: number) {
+    const { error } = await supabase
+      .from('holidays')
+      .delete()
+      .eq('holiday_id', holidayId);
+
+    if (error) throw error;
+  }
+};
+
 // 초대 관리 API (Supabase Auth 사용)
 export const invitationAPI = {
   /**

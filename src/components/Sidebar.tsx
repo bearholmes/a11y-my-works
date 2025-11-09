@@ -49,6 +49,13 @@ const MENU_ITEMS: MenuItem[] = [
     requireReadOnly: true
   },
   {
+    name: '공휴일',
+    href: '/holidays',
+    icon: '📅',
+    requiredPermission: 'project.read',
+    requireReadOnly: true
+  },
+  {
     name: '사용자 관리',
     href: '/members',
     icon: '👥',

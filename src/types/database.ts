@@ -48,6 +48,11 @@ export interface Database {
         Insert: Omit<Code, 'code_id' | 'created_at'>;
         Update: Partial<Omit<Code, 'code_id' | 'created_at'>>;
       };
+      holidays: {
+        Row: Holiday;
+        Insert: Omit<Holiday, 'holiday_id' | 'created_at'>;
+        Update: Partial<Omit<Holiday, 'holiday_id' | 'created_at'>>;
+      };
     };
   };
 }
@@ -147,6 +152,14 @@ export interface Code {
   value?: string;
   sort_order: number;
   is_active: boolean;
+  created_at: string;
+}
+
+export interface Holiday {
+  holiday_id: number;
+  holiday_date: string;
+  name: string;
+  description?: string;
   created_at: string;
 }
 
