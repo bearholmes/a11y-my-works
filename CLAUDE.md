@@ -3,7 +3,8 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## 정책
-답변은 한글을 우선시 한다.
+답변은 한글을 우선시 한다. 
+라이브러리는 호환성 이슈가 없다면 최대한 최신버전을 유지한다.
 
 ## Project Overview
 
