@@ -28,6 +28,20 @@ const MENU_ITEMS: MenuItem[] = [
     requireReadOnly: false
   },
   {
+    name: '청구 그룹',
+    href: '/cost-groups',
+    icon: '💰',
+    requiredPermission: 'project.read',
+    requireReadOnly: true
+  },
+  {
+    name: '서비스',
+    href: '/services',
+    icon: '🔧',
+    requiredPermission: 'project.read',
+    requireReadOnly: true
+  },
+  {
     name: '프로젝트',
     href: '/projects',
     icon: '📁',
@@ -114,7 +128,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           <nav className="flex-1 overflow-y-auto py-4">
             <ul className="space-y-1 px-3">
               {accessibleMenus.map((item) => {
-                const isActive = location.pathname === item.href;
+                // 정확히 일치하거나, 하위 경로인 경우 활성으로 표시
+                // 예: /projects 메뉴는 /projects, /projects/new, /projects/edit/1 에서 모두 활성
+                const isActive = item.href === '/'
+                  ? location.pathname === '/'
+                  : location.pathname.startsWith(item.href);
 
                 return (
                   <li key={item.href}>
