@@ -514,6 +514,114 @@ export const codeAPI = {
   }
 };
 
+// 프로젝트 관리 API
+export const projectAPI = {
+  /**
+   * 프로젝트 목록을 조회합니다.
+   */
+  async getProjects(params?: { page?: number; pageSize?: number; search?: string; platform?: string }) {
+    const { page = 1, pageSize = 20, search, platform } = params || {};
+
+    let query = supabase
+      .from('projects')
+      .select('*', { count: 'exact' })
+      .order('created_at', { ascending: false });
+
+    if (search) {
+      query = query.or(`name.ilike.%${search}%,code.ilike.%${search}%`);
+    }
+
+    if (platform) {
+      query = query.eq('platform', platform);
+    }
+
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize - 1;
+
+    const { data, error, count } = await query.range(start, end);
+
+    if (error) throw error;
+
+    return {
+      data: data || [],
+      pagination: {
+        total: count || 0,
+        page,
+        pageSize,
+        pageCount: Math.ceil((count || 0) / pageSize)
+      } as PaginationResponse
+    };
+  },
+
+  /**
+   * 특정 프로젝트 정보를 조회합니다.
+   */
+  async getProject(projectId: number) {
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('project_id', projectId)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * 새로운 프로젝트를 생성합니다.
+   */
+  async createProject(project: Database['public']['Tables']['projects']['Insert']) {
+    const { data, error } = await supabase
+      .from('projects')
+      .insert(project)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * 프로젝트 정보를 수정합니다.
+   */
+  async updateProject(projectId: number, updates: Database['public']['Tables']['projects']['Update']) {
+    const { data, error } = await supabase
+      .from('projects')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('project_id', projectId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * 프로젝트를 삭제합니다.
+   */
+  async deleteProject(projectId: number) {
+    // 먼저 해당 프로젝트를 사용하는 업무가 있는지 확인
+    const { data: tasks, error: checkError } = await supabase
+      .from('tasks')
+      .select('task_id')
+      .eq('project_id', projectId)
+      .limit(1);
+
+    if (checkError) throw checkError;
+
+    if (tasks && tasks.length > 0) {
+      throw new Error('이 프로젝트를 사용하는 업무가 있어 삭제할 수 없습니다.');
+    }
+
+    const { error } = await supabase
+      .from('projects')
+      .delete()
+      .eq('project_id', projectId);
+
+    if (error) throw error;
+  }
+};
+
 // 비즈니스 데이터 API
 export const businessAPI = {
   async getCostGroups() {

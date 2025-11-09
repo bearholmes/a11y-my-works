@@ -11,6 +11,8 @@ import { MemberList } from './pages/MemberList';
 import { MemberForm } from './pages/MemberForm';
 import { RoleList } from './pages/RoleList';
 import { RoleForm } from './pages/RoleForm';
+import { ProjectList } from './pages/ProjectList';
+import { ProjectForm } from './pages/ProjectForm';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -58,6 +60,9 @@ function App() {
             <Route path="/roles" element={<ProtectedRoute><RoleList /></ProtectedRoute>} />
             <Route path="/roles/new" element={<ProtectedRoute><RoleForm /></ProtectedRoute>} />
             <Route path="/roles/edit/:id" element={<ProtectedRoute><RoleForm /></ProtectedRoute>} />
+            <Route path="/projects" element={<ProtectedRoute><ProjectList /></ProtectedRoute>} />
+            <Route path="/projects/new" element={<ProtectedRoute><ProjectForm /></ProtectedRoute>} />
+            <Route path="/projects/edit/:id" element={<ProtectedRoute><ProjectForm /></ProtectedRoute>} />
             <Route path="/test" element={<ProtectedRoute><TestPage /></ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

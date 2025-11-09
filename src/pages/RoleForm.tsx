@@ -66,7 +66,7 @@ export function RoleForm() {
 
         setPermissions(
           allPermissions.map((p) => {
-            const existing = permissionMap.get(p.permission_id);
+            const existing = permissionMap.get(p.permission_id) as { readAccess?: boolean; writeAccess?: boolean } | undefined;
             return {
               permissionId: p.permission_id,
               key: p.key,
