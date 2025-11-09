@@ -15,6 +15,8 @@ import { ProjectList } from './pages/ProjectList';
 import { ProjectForm } from './pages/ProjectForm';
 import { ServiceList } from './pages/ServiceList';
 import { ServiceForm } from './pages/ServiceForm';
+import { CostGroupList } from './pages/CostGroupList';
+import { CostGroupForm } from './pages/CostGroupForm';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -68,6 +70,9 @@ function App() {
             <Route path="/services" element={<ProtectedRoute><ServiceList /></ProtectedRoute>} />
             <Route path="/services/new" element={<ProtectedRoute><ServiceForm /></ProtectedRoute>} />
             <Route path="/services/edit/:id" element={<ProtectedRoute><ServiceForm /></ProtectedRoute>} />
+            <Route path="/cost-groups" element={<ProtectedRoute><CostGroupList /></ProtectedRoute>} />
+            <Route path="/cost-groups/new" element={<ProtectedRoute><CostGroupForm /></ProtectedRoute>} />
+            <Route path="/cost-groups/edit/:id" element={<ProtectedRoute><CostGroupForm /></ProtectedRoute>} />
             <Route path="/test" element={<ProtectedRoute><TestPage /></ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

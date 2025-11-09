@@ -750,6 +750,110 @@ export const serviceAPI = {
   }
 };
 
+// 청구 그룹 관리 API
+export const costGroupAPI = {
+  /**
+   * 청구 그룹 목록을 조회합니다.
+   */
+  async getCostGroups(params?: { page?: number; pageSize?: number; search?: string }) {
+    const { page = 1, pageSize = 20, search } = params || {};
+
+    let query = supabase
+      .from('cost_groups')
+      .select('*', { count: 'exact' })
+      .order('created_at', { ascending: false });
+
+    if (search) {
+      query = query.or(`name.ilike.%${search}%,code.ilike.%${search}%`);
+    }
+
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize - 1;
+
+    const { data, error, count } = await query.range(start, end);
+
+    if (error) throw error;
+
+    return {
+      data: data || [],
+      pagination: {
+        total: count || 0,
+        page,
+        pageSize,
+        pageCount: Math.ceil((count || 0) / pageSize)
+      } as PaginationResponse
+    };
+  },
+
+  /**
+   * 특정 청구 그룹 정보를 조회합니다.
+   */
+  async getCostGroup(costGroupId: number) {
+    const { data, error } = await supabase
+      .from('cost_groups')
+      .select('*')
+      .eq('cost_group_id', costGroupId)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * 새로운 청구 그룹을 생성합니다.
+   */
+  async createCostGroup(costGroup: Database['public']['Tables']['cost_groups']['Insert']) {
+    const { data, error } = await supabase
+      .from('cost_groups')
+      .insert(costGroup)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * 청구 그룹 정보를 수정합니다.
+   */
+  async updateCostGroup(costGroupId: number, updates: Database['public']['Tables']['cost_groups']['Update']) {
+    const { data, error } = await supabase
+      .from('cost_groups')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('cost_group_id', costGroupId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * 청구 그룹을 삭제합니다.
+   */
+  async deleteCostGroup(costGroupId: number) {
+    // 먼저 해당 청구 그룹을 사용하는 서비스가 있는지 확인
+    const { data: services, error: checkError } = await supabase
+      .from('services')
+      .select('service_id')
+      .eq('cost_group_id', costGroupId)
+      .limit(1);
+
+    if (checkError) throw checkError;
+
+    if (services && services.length > 0) {
+      throw new Error('이 청구 그룹을 사용하는 서비스가 있어 삭제할 수 없습니다.');
+    }
+
+    const { error } = await supabase
+      .from('cost_groups')
+      .delete()
+      .eq('cost_group_id', costGroupId);
+
+    if (error) throw error;
+  }
+};
+
 // 비즈니스 데이터 API
 export const businessAPI = {
   async getCostGroups() {
