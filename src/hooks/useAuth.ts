@@ -9,24 +9,15 @@ export function useAuth() {
   const [loading, setLoading] = useAtom(loadingAtom);
 
   useEffect(() => {
-    setLoading(true);
-
-    // 현재 세션 확인
-    const getSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    // 초기 세션 확인
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-    };
-
-    getSession();
+    });
 
     // 인증 상태 변화 감지
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -36,30 +27,24 @@ export function useAuth() {
   }, [setUser, setSession, setLoading]);
 
   const signIn = async (email: string, password: string) => {
-    setLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    setLoading(false);
     return { data, error };
   };
 
   const signUp = async (email: string, password: string, profile?: { name: string; account_id: string }) => {
-    setLoading(true);
-    
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
       });
-      
+
       if (error) {
-        setLoading(false);
         return { data, error };
       }
-      
-      // 회원가입 성공 시 members 테이블에 프로필 생성
+
       if (data.user && profile) {
         const { memberAPI } = await import('../services/api');
         try {
@@ -70,22 +55,17 @@ export function useAuth() {
           });
         } catch (memberError) {
           console.error('Failed to create member profile:', memberError);
-          // 프로필 생성 실패해도 회원가입은 성공으로 처리
         }
       }
-      
-      setLoading(false);
+
       return { data, error };
     } catch (err) {
-      setLoading(false);
       return { data: null, error: err as any };
     }
   };
 
   const signOut = async () => {
-    setLoading(true);
     const { error } = await supabase.auth.signOut();
-    setLoading(false);
     return { error };
   };
 
