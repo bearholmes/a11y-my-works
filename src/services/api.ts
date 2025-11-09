@@ -622,6 +622,134 @@ export const projectAPI = {
   }
 };
 
+// 서비스 관리 API
+export const serviceAPI = {
+  /**
+   * 서비스 목록을 조회합니다.
+   */
+  async getServices(params?: { page?: number; pageSize?: number; search?: string; costGroupId?: number }) {
+    const { page = 1, pageSize = 20, search, costGroupId } = params || {};
+
+    let query = supabase
+      .from('services')
+      .select(`
+        *,
+        cost_groups(name)
+      `, { count: 'exact' })
+      .order('created_at', { ascending: false });
+
+    if (search) {
+      query = query.or(`name.ilike.%${search}%,code.ilike.%${search}%`);
+    }
+
+    if (costGroupId) {
+      query = query.eq('cost_group_id', costGroupId);
+    }
+
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize - 1;
+
+    const { data, error, count } = await query.range(start, end);
+
+    if (error) throw error;
+
+    return {
+      data: data || [],
+      pagination: {
+        total: count || 0,
+        page,
+        pageSize,
+        pageCount: Math.ceil((count || 0) / pageSize)
+      } as PaginationResponse
+    };
+  },
+
+  /**
+   * 특정 서비스 정보를 조회합니다.
+   */
+  async getService(serviceId: number) {
+    const { data, error } = await supabase
+      .from('services')
+      .select(`
+        *,
+        cost_groups(name)
+      `)
+      .eq('service_id', serviceId)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * 새로운 서비스를 생성합니다.
+   */
+  async createService(service: Database['public']['Tables']['services']['Insert']) {
+    const { data, error } = await supabase
+      .from('services')
+      .insert(service)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * 서비스 정보를 수정합니다.
+   */
+  async updateService(serviceId: number, updates: Database['public']['Tables']['services']['Update']) {
+    const { data, error } = await supabase
+      .from('services')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('service_id', serviceId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * 서비스를 삭제합니다.
+   */
+  async deleteService(serviceId: number) {
+    // 먼저 해당 서비스를 사용하는 프로젝트가 있는지 확인
+    const { data: projects, error: checkError } = await supabase
+      .from('projects')
+      .select('project_id')
+      .eq('service_id', serviceId)
+      .limit(1);
+
+    if (checkError) throw checkError;
+
+    if (projects && projects.length > 0) {
+      throw new Error('이 서비스를 사용하는 프로젝트가 있어 삭제할 수 없습니다.');
+    }
+
+    const { error } = await supabase
+      .from('services')
+      .delete()
+      .eq('service_id', serviceId);
+
+    if (error) throw error;
+  },
+
+  /**
+   * 청구 그룹 목록을 조회합니다. (필터용)
+   */
+  async getCostGroupsForFilter() {
+    const { data, error } = await supabase
+      .from('cost_groups')
+      .select('cost_group_id, name')
+      .eq('is_active', true)
+      .order('name');
+
+    if (error) throw error;
+    return data || [];
+  }
+};
+
 // 비즈니스 데이터 API
 export const businessAPI = {
   async getCostGroups() {
