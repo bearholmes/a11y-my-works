@@ -617,11 +617,25 @@ export const projectAPI = {
   },
 
   /**
+   * 필터용 서비스 목록을 조회합니다.
+   */
+  async getServicesForFilter() {
+    const { data, error } = await supabase
+      .from('services')
+      .select('service_id, name, cost_group_id')
+      .eq('is_active', true)
+      .order('name');
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  /**
    * 프로젝트를 삭제합니다.
    */
   async deleteProject(projectId: number) {
     // 먼저 해당 프로젝트를 사용하는 업무가 있는지 확인
-    const { data: tasks, error: checkError } = await supabase
+    const { data: tasks, error: checkError} = await supabase
       .from('tasks')
       .select('task_id')
       .eq('project_id', projectId)

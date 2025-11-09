@@ -8,6 +8,7 @@ import { projectAPI } from '../services/api';
 
 const projectSchema = z.object({
   name: z.string().min(1, '프로젝트명을 입력해주세요'),
+  service_id: z.number().min(1, '서비스를 선택해주세요'),
   code: z.string().min(1, '프로젝트 코드를 입력해주세요').regex(/^[A-Z0-9_]+$/, '대문자, 숫자, 언더스코어만 사용 가능합니다'),
   description: z.string().optional(),
   platform: z.enum(['WEB', 'APP', 'BOTH']),
@@ -32,6 +33,12 @@ export function ProjectForm() {
     resolver: zodResolver(projectSchema),
   });
 
+  // 서비스 목록 조회
+  const { data: services } = useQuery({
+    queryKey: ['services'],
+    queryFn: () => projectAPI.getServicesForFilter(),
+  });
+
   // 수정 모드일 때 프로젝트 정보 조회
   const { data: project, isLoading: projectLoading } = useQuery({
     queryKey: ['project', id],
@@ -44,6 +51,7 @@ export function ProjectForm() {
     if (project) {
       reset({
         name: project.name,
+        service_id: project.service_id || 0,
         code: project.code,
         description: project.description || '',
         platform: project.platform,
@@ -124,6 +132,29 @@ export function ProjectForm() {
           {errors.name && (
             <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
           )}
+        </div>
+
+        <div>
+          <label htmlFor="service_id" className="block text-sm font-medium text-gray-700">
+            서비스 <span className="text-red-500">*</span>
+          </label>
+          <select
+            {...register('service_id', { valueAsNumber: true })}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value={0}>서비스 선택</option>
+            {services?.map((service: any) => (
+              <option key={service.service_id} value={service.service_id}>
+                {service.name}
+              </option>
+            ))}
+          </select>
+          {errors.service_id && (
+            <p className="mt-1 text-sm text-red-600">{errors.service_id.message}</p>
+          )}
+          <p className="mt-1 text-sm text-gray-500">
+            이 프로젝트가 속한 서비스를 선택하세요
+          </p>
         </div>
 
         <div>
