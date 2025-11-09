@@ -7,6 +7,10 @@ import { Dashboard } from './pages/Dashboard';
 import { TaskList } from './pages/TaskList';
 import { TaskForm } from './pages/TaskForm';
 import { TestPage } from './pages/TestPage';
+import { MemberList } from './pages/MemberList';
+import { MemberForm } from './pages/MemberForm';
+import { RoleList } from './pages/RoleList';
+import { RoleForm } from './pages/RoleForm';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,6 +53,11 @@ function App() {
             <Route path="/tasks" element={<ProtectedRoute><TaskList /></ProtectedRoute>} />
             <Route path="/tasks/new" element={<ProtectedRoute><TaskForm /></ProtectedRoute>} />
             <Route path="/tasks/edit/:id" element={<ProtectedRoute><TaskForm /></ProtectedRoute>} />
+            <Route path="/members" element={<ProtectedRoute><MemberList /></ProtectedRoute>} />
+            <Route path="/members/edit/:id" element={<ProtectedRoute><MemberForm /></ProtectedRoute>} />
+            <Route path="/roles" element={<ProtectedRoute><RoleList /></ProtectedRoute>} />
+            <Route path="/roles/new" element={<ProtectedRoute><RoleForm /></ProtectedRoute>} />
+            <Route path="/roles/edit/:id" element={<ProtectedRoute><RoleForm /></ProtectedRoute>} />
             <Route path="/test" element={<ProtectedRoute><TestPage /></ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

@@ -152,6 +152,331 @@ export const memberAPI = {
 
     if (error) throw error;
     return data;
+  },
+
+  /**
+   * 현재 사용자의 권한 목록을 조회합니다.
+   * @returns 사용자 권한 목록 (권한 키, 읽기/쓰기 권한 포함)
+   */
+  async getCurrentMemberPermissions() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+
+    // 사용자 정보와 역할 조회
+    const { data: member, error: memberError } = await supabase
+      .from('members')
+      .select('role_id')
+      .eq('auth_id', user.id)
+      .single();
+
+    if (memberError) throw memberError;
+    if (!member) throw new Error('Member not found');
+
+    // 역할에 할당된 권한 조회
+    const { data: rolePermissions, error: permError } = await supabase
+      .from('role_permissions')
+      .select(`
+        read_access,
+        write_access,
+        permissions!inner(key, name)
+      `)
+      .eq('role_id', member.role_id);
+
+    if (permError) throw permError;
+
+    // 권한 데이터 변환
+    return (rolePermissions || []).map((rp: any) => ({
+      key: rp.permissions.key,
+      name: rp.permissions.name,
+      canRead: rp.read_access,
+      canWrite: rp.write_access
+    }));
+  },
+
+  /**
+   * 전체 사용자 목록을 조회합니다.
+   */
+  async getMembers(params?: { page?: number; pageSize?: number; search?: string; isActive?: boolean }) {
+    const { page = 1, pageSize = 20, search, isActive } = params || {};
+
+    let query = supabase
+      .from('members')
+      .select(`
+        *,
+        roles(role_id, name, description)
+      `, { count: 'exact' })
+      .order('created_at', { ascending: false });
+
+    if (search) {
+      query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%,account_id.ilike.%${search}%`);
+    }
+
+    if (isActive !== undefined) {
+      query = query.eq('is_active', isActive);
+    }
+
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize - 1;
+
+    const { data, error, count } = await query.range(start, end);
+
+    if (error) throw error;
+
+    return {
+      data: data || [],
+      pagination: {
+        total: count || 0,
+        page,
+        pageSize,
+        pageCount: Math.ceil((count || 0) / pageSize)
+      } as PaginationResponse
+    };
+  },
+
+  /**
+   * 특정 사용자 정보를 조회합니다.
+   */
+  async getMember(memberId: number) {
+    const { data, error } = await supabase
+      .from('members')
+      .select(`
+        *,
+        roles(role_id, name, description)
+      `)
+      .eq('member_id', memberId)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * 사용자 정보를 수정합니다.
+   */
+  async updateMember(memberId: number, updates: Database['public']['Tables']['members']['Update']) {
+    const { data, error } = await supabase
+      .from('members')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('member_id', memberId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * 사용자를 비활성화합니다. (소프트 삭제)
+   */
+  async deactivateMember(memberId: number) {
+    return this.updateMember(memberId, { is_active: false });
+  },
+
+  /**
+   * 사용자를 활성화합니다.
+   */
+  async activateMember(memberId: number) {
+    return this.updateMember(memberId, { is_active: true });
+  }
+};
+
+// 역할 관리 API
+export const roleAPI = {
+  /**
+   * 전체 역할 목록을 조회합니다.
+   */
+  async getRoles(params?: { page?: number; pageSize?: number; isActive?: boolean }) {
+    const { page = 1, pageSize = 50, isActive } = params || {};
+
+    let query = supabase
+      .from('roles')
+      .select('*', { count: 'exact' })
+      .order('role_id');
+
+    if (isActive !== undefined) {
+      query = query.eq('is_active', isActive);
+    }
+
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize - 1;
+
+    const { data, error, count } = await query.range(start, end);
+
+    if (error) throw error;
+
+    return {
+      data: data || [],
+      pagination: {
+        total: count || 0,
+        page,
+        pageSize,
+        pageCount: Math.ceil((count || 0) / pageSize)
+      } as PaginationResponse
+    };
+  },
+
+  /**
+   * 특정 역할의 상세 정보와 권한을 조회합니다.
+   */
+  async getRole(roleId: number) {
+    const { data: role, error: roleError } = await supabase
+      .from('roles')
+      .select('*')
+      .eq('role_id', roleId)
+      .single();
+
+    if (roleError) throw roleError;
+
+    // 역할의 권한 조회
+    const { data: rolePermissions, error: permError } = await supabase
+      .from('role_permissions')
+      .select(`
+        read_access,
+        write_access,
+        permissions(permission_id, key, name)
+      `)
+      .eq('role_id', roleId);
+
+    if (permError) throw permError;
+
+    return {
+      ...role,
+      permissions: (rolePermissions || []).map((rp: any) => ({
+        permissionId: rp.permissions.permission_id,
+        key: rp.permissions.key,
+        name: rp.permissions.name,
+        readAccess: rp.read_access,
+        writeAccess: rp.write_access
+      }))
+    };
+  },
+
+  /**
+   * 새로운 역할을 생성합니다.
+   */
+  async createRole(role: Database['public']['Tables']['roles']['Insert'], permissions?: Array<{ permissionId: number; readAccess: boolean; writeAccess: boolean }>) {
+    const { data, error } = await supabase
+      .from('roles')
+      .insert(role)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // 권한 할당
+    if (permissions && permissions.length > 0) {
+      const rolePermissions = permissions.map(p => ({
+        role_id: data.role_id,
+        permission_id: p.permissionId,
+        read_access: p.readAccess,
+        write_access: p.writeAccess
+      }));
+
+      const { error: permError } = await supabase
+        .from('role_permissions')
+        .insert(rolePermissions);
+
+      if (permError) throw permError;
+    }
+
+    return data;
+  },
+
+  /**
+   * 역할 정보를 수정합니다.
+   */
+  async updateRole(
+    roleId: number,
+    updates: Database['public']['Tables']['roles']['Update'],
+    permissions?: Array<{ permissionId: number; readAccess: boolean; writeAccess: boolean }>
+  ) {
+    const { data, error } = await supabase
+      .from('roles')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('role_id', roleId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // 권한 업데이트
+    if (permissions) {
+      // 기존 권한 삭제
+      const { error: deleteError } = await supabase
+        .from('role_permissions')
+        .delete()
+        .eq('role_id', roleId);
+
+      if (deleteError) throw deleteError;
+
+      // 새 권한 추가
+      if (permissions.length > 0) {
+        const rolePermissions = permissions.map(p => ({
+          role_id: roleId,
+          permission_id: p.permissionId,
+          read_access: p.readAccess,
+          write_access: p.writeAccess
+        }));
+
+        const { error: insertError } = await supabase
+          .from('role_permissions')
+          .insert(rolePermissions);
+
+        if (insertError) throw insertError;
+      }
+    }
+
+    return data;
+  },
+
+  /**
+   * 역할을 삭제합니다.
+   */
+  async deleteRole(roleId: number) {
+    // 먼저 해당 역할을 사용하는 사용자가 있는지 확인
+    const { data: members, error: checkError } = await supabase
+      .from('members')
+      .select('member_id')
+      .eq('role_id', roleId)
+      .limit(1);
+
+    if (checkError) throw checkError;
+
+    if (members && members.length > 0) {
+      throw new Error('이 역할을 사용하는 사용자가 있어 삭제할 수 없습니다.');
+    }
+
+    // 역할 권한 삭제
+    const { error: permError } = await supabase
+      .from('role_permissions')
+      .delete()
+      .eq('role_id', roleId);
+
+    if (permError) throw permError;
+
+    // 역할 삭제
+    const { error } = await supabase
+      .from('roles')
+      .delete()
+      .eq('role_id', roleId);
+
+    if (error) throw error;
+  }
+};
+
+// 권한 API
+export const permissionAPI = {
+  /**
+   * 전체 권한 목록을 조회합니다.
+   */
+  async getPermissions() {
+    const { data, error } = await supabase
+      .from('permissions')
+      .select('*')
+      .order('permission_id');
+
+    if (error) throw error;
+    return data || [];
   }
 };
 
