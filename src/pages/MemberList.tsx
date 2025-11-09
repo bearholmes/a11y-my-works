@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { memberAPI } from '../services/api';
+import { memberAPI, roleAPI, invitationAPI } from '../services/api';
 import { format } from 'date-fns';
 
 export function MemberList() {
@@ -10,11 +10,27 @@ export function MemberList() {
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [isActiveFilter, setIsActiveFilter] = useState<boolean | undefined>(undefined);
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<any>(null);
+  const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
+
+  // 초대 관련 상태
+  const [showInvitationModal, setShowInvitationModal] = useState(false);
+  const [invitationEmail, setInvitationEmail] = useState('');
+  const [invitationName, setInvitationName] = useState('');
+  const [invitationRoleId, setInvitationRoleId] = useState<number | null>(null);
+  const [invitationSuccess, setInvitationSuccess] = useState(false);
 
   // 사용자 목록 조회
   const { data, isLoading, error } = useQuery({
     queryKey: ['members', { page, search, isActive: isActiveFilter }],
     queryFn: () => memberAPI.getMembers({ page, pageSize: 20, search, isActive: isActiveFilter }),
+  });
+
+  // 역할 목록 조회
+  const { data: rolesData } = useQuery({
+    queryKey: ['roles'],
+    queryFn: () => roleAPI.getRoles({ isActive: true }),
   });
 
   // 사용자 활성화/비활성화 mutation
@@ -32,6 +48,30 @@ export function MemberList() {
     },
   });
 
+  // 사용자 승인 mutation
+  const approveMutation = useMutation({
+    mutationFn: ({ memberId, roleId }: { memberId: number; roleId: number }) =>
+      memberAPI.approveMember(memberId, roleId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['members'] });
+      setShowApprovalModal(false);
+      setSelectedMember(null);
+      setSelectedRoleId(null);
+    },
+  });
+
+  // 초대 생성 mutation (Supabase Auth 사용)
+  const inviteUserMutation = useMutation({
+    mutationFn: (params: { email: string; role_id: number; name?: string }) =>
+      invitationAPI.inviteUser(params),
+    onSuccess: () => {
+      setInvitationSuccess(true);
+    },
+    onError: (error: Error) => {
+      alert(error.message);
+    }
+  });
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setSearch(searchInput);
@@ -46,6 +86,62 @@ export function MemberList() {
         activateMutation.mutate(memberId);
       }
     }
+  };
+
+  const handleApprove = (member: any) => {
+    setSelectedMember(member);
+    setShowApprovalModal(true);
+  };
+
+  const handleApprovalSubmit = () => {
+    if (!selectedMember || !selectedRoleId) {
+      alert('역할을 선택해주세요.');
+      return;
+    }
+
+    if (confirm(`${selectedMember.name}님을 승인하시겠습니까?`)) {
+      approveMutation.mutate({
+        memberId: selectedMember.member_id,
+        roleId: selectedRoleId
+      });
+    }
+  };
+
+  const isPendingUser = (member: any) => {
+    return !member.role_id || !member.is_active;
+  };
+
+  const handleInvite = () => {
+    setShowInvitationModal(true);
+    setInvitationSuccess(false);
+  };
+
+  const handleInvitationSubmit = () => {
+    if (!invitationEmail || !invitationRoleId) {
+      alert('이메일과 역할을 모두 입력해주세요.');
+      return;
+    }
+
+    // 이메일 형식 검증
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(invitationEmail)) {
+      alert('올바른 이메일 형식이 아닙니다.');
+      return;
+    }
+
+    inviteUserMutation.mutate({
+      email: invitationEmail,
+      role_id: invitationRoleId,
+      name: invitationName
+    });
+  };
+
+  const handleCloseInvitationModal = () => {
+    setShowInvitationModal(false);
+    setInvitationEmail('');
+    setInvitationName('');
+    setInvitationRoleId(null);
+    setInvitationSuccess(false);
   };
 
   if (error) {
@@ -65,6 +161,12 @@ export function MemberList() {
           <h1 className="text-2xl font-bold text-gray-900">사용자 관리</h1>
           <p className="mt-1 text-sm text-gray-500">시스템 사용자를 관리합니다.</p>
         </div>
+        <button
+          onClick={handleInvite}
+          className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+        >
+          사용자 초대
+        </button>
       </div>
 
       {/* 검색 및 필터 */}
@@ -92,6 +194,11 @@ export function MemberList() {
             <option value="active">활성</option>
             <option value="inactive">비활성</option>
           </select>
+          {isActiveFilter === false && (
+            <div className="px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-md text-sm text-yellow-800">
+              승인 대기 중인 사용자만 표시됩니다
+            </div>
+          )}
           <button
             type="submit"
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -154,9 +261,20 @@ export function MemberList() {
                         <div className="text-sm text-gray-500">{member.email}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                          {member.roles?.name || '역할 없음'}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            member.roles?.name
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}>
+                            {member.roles?.name || '역할 없음'}
+                          </span>
+                          {isPendingUser(member) && (
+                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                              승인 대기
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -171,23 +289,35 @@ export function MemberList() {
                         {format(new Date(member.created_at), 'yyyy-MM-dd')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                        <Link
-                          to={`/members/edit/${member.member_id}`}
-                          className="text-blue-600 hover:text-blue-900"
-                        >
-                          수정
-                        </Link>
-                        <button
-                          onClick={() => handleToggleActive(member.member_id, member.is_active)}
-                          className={`${
-                            member.is_active
-                              ? 'text-red-600 hover:text-red-900'
-                              : 'text-green-600 hover:text-green-900'
-                          }`}
-                          disabled={activateMutation.isPending || deactivateMutation.isPending}
-                        >
-                          {member.is_active ? '비활성화' : '활성화'}
-                        </button>
+                        {isPendingUser(member) ? (
+                          <button
+                            onClick={() => handleApprove(member)}
+                            className="text-green-600 hover:text-green-900 font-semibold"
+                            disabled={approveMutation.isPending}
+                          >
+                            승인
+                          </button>
+                        ) : (
+                          <>
+                            <Link
+                              to={`/members/edit/${member.member_id}`}
+                              className="text-blue-600 hover:text-blue-900"
+                            >
+                              수정
+                            </Link>
+                            <button
+                              onClick={() => handleToggleActive(member.member_id, member.is_active)}
+                              className={`${
+                                member.is_active
+                                  ? 'text-red-600 hover:text-red-900'
+                                  : 'text-green-600 hover:text-green-900'
+                              }`}
+                              disabled={activateMutation.isPending || deactivateMutation.isPending}
+                            >
+                              {member.is_active ? '비활성화' : '활성화'}
+                            </button>
+                          </>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -264,6 +394,166 @@ export function MemberList() {
           </>
         )}
       </div>
+
+      {/* 승인 모달 */}
+      {showApprovalModal && selectedMember && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">사용자 승인</h2>
+
+            <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+              <div className="text-sm text-gray-500 mb-1">이름</div>
+              <div className="text-gray-900 font-medium">{selectedMember.name}</div>
+              <div className="text-sm text-gray-500 mt-2 mb-1">이메일</div>
+              <div className="text-gray-900">{selectedMember.email}</div>
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                역할 선택 *
+              </label>
+              <select
+                value={selectedRoleId || ''}
+                onChange={(e) => setSelectedRoleId(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">역할을 선택하세요</option>
+                {rolesData?.data.map((role: any) => (
+                  <option key={role.role_id} value={role.role_id}>
+                    {role.name}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-sm text-gray-500">
+                승인 후 이 역할의 권한으로 시스템을 이용할 수 있습니다.
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleApprovalSubmit}
+                disabled={!selectedRoleId || approveMutation.isPending}
+                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {approveMutation.isPending ? '처리 중...' : '승인'}
+              </button>
+              <button
+                onClick={() => {
+                  setShowApprovalModal(false);
+                  setSelectedMember(null);
+                  setSelectedRoleId(null);
+                }}
+                disabled={approveMutation.isPending}
+                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              >
+                취소
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 초대 모달 (Supabase Auth 사용) */}
+      {showInvitationModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">사용자 초대</h2>
+
+            {!invitationSuccess ? (
+              <>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    이메일 *
+                  </label>
+                  <input
+                    type="email"
+                    value={invitationEmail}
+                    onChange={(e) => setInvitationEmail(e.target.value)}
+                    placeholder="user@example.com"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                  <p className="mt-1 text-sm text-gray-500">
+                    초대할 사용자의 이메일 주소를 입력하세요.
+                  </p>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    이름
+                  </label>
+                  <input
+                    type="text"
+                    value={invitationName}
+                    onChange={(e) => setInvitationName(e.target.value)}
+                    placeholder="홍길동"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                  <p className="mt-1 text-sm text-gray-500">
+                    사용자 이름 (선택사항)
+                  </p>
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    역할 선택 *
+                  </label>
+                  <select
+                    value={invitationRoleId || ''}
+                    onChange={(e) => setInvitationRoleId(Number(e.target.value))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="">역할을 선택하세요</option>
+                    {rolesData?.data.map((role: any) => (
+                      <option key={role.role_id} value={role.role_id}>
+                        {role.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-1 text-sm text-gray-500">
+                    초대받은 사용자에게 할당될 역할입니다.
+                  </p>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleInvitationSubmit}
+                    disabled={!invitationEmail || !invitationRoleId || inviteUserMutation.isPending}
+                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {inviteUserMutation.isPending ? '초대 중...' : '초대 보내기'}
+                  </button>
+                  <button
+                    onClick={handleCloseInvitationModal}
+                    disabled={inviteUserMutation.isPending}
+                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  >
+                    취소
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-green-800 font-medium mb-2">초대 이메일이 발송되었습니다!</p>
+                  <p className="text-sm text-green-700 mb-2">
+                    {invitationEmail}님에게 초대 이메일이 발송되었습니다.
+                  </p>
+                  <p className="text-sm text-green-700">
+                    사용자가 이메일의 링크를 클릭하면 가입 절차를 진행할 수 있습니다.
+                  </p>
+                </div>
+
+                <button
+                  onClick={handleCloseInvitationModal}
+                  className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  닫기
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

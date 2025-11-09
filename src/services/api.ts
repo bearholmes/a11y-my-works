@@ -135,7 +135,17 @@ export const memberAPI = {
     return data;
   },
 
-  async createMemberProfile(authId: string, profile: Partial<Member>) {
+  /**
+   * 회원 프로필을 생성합니다.
+   * @param authId Supabase Auth ID
+   * @param profile 회원 프로필 정보
+   * @param autoApprove true면 즉시 활성화 (초대 가입), false면 승인 대기 (일반 가입)
+   */
+  async createMemberProfile(
+    authId: string,
+    profile: Partial<Member>,
+    autoApprove: boolean = false
+  ) {
     const { data, error } = await supabase
       .from('members')
       .insert({
@@ -144,8 +154,8 @@ export const memberAPI = {
         name: profile.name || '',
         email: profile.email || '',
         mobile: profile.mobile,
-        role_id: profile.role_id || 3, // 기본값: 직원
-        is_active: true
+        role_id: autoApprove ? (profile.role_id || 3) : null, // 자동승인: 역할 부여, 일반가입: null
+        is_active: autoApprove // 자동승인: true, 일반가입: false
       })
       .select()
       .single();
@@ -277,6 +287,16 @@ export const memberAPI = {
    */
   async activateMember(memberId: number) {
     return this.updateMember(memberId, { is_active: true });
+  },
+
+  /**
+   * 대기 중인 사용자를 승인하고 역할을 할당합니다.
+   */
+  async approveMember(memberId: number, roleId: number) {
+    return this.updateMember(memberId, {
+      role_id: roleId,
+      is_active: true
+    });
   }
 };
 
@@ -903,5 +923,46 @@ export const businessAPI = {
     const { data, error } = await query;
     if (error) throw error;
     return data || [];
+  }
+};
+
+// 초대 관리 API (Supabase Auth 사용)
+export const invitationAPI = {
+  /**
+   * Supabase Auth의 inviteUserByEmail을 사용하여 사용자를 초대합니다.
+   * Supabase가 자동으로 초대 이메일을 발송합니다.
+   */
+  async inviteUser(params: {
+    email: string;
+    role_id: number;
+    name?: string;
+  }) {
+    const { email, role_id, name } = params;
+
+    // 이미 가입된 이메일인지 확인
+    const { data: existingMember } = await supabase
+      .from('members')
+      .select('member_id')
+      .eq('email', email)
+      .maybeSingle();
+
+    if (existingMember) {
+      throw new Error('이미 가입된 이메일입니다.');
+    }
+
+    // Supabase Auth를 통해 사용자 초대
+    // 주의: 이 API는 service_role 키가 필요합니다.
+    // 프로덕션에서는 반드시 백엔드에서 호출해야 합니다.
+    const { data, error } = await supabase.auth.admin.inviteUserByEmail(email, {
+      data: {
+        role_id,
+        name: name || '',
+        invited: true
+      },
+      redirectTo: `${window.location.origin}/auth/callback`
+    });
+
+    if (error) throw error;
+    return data;
   }
 };

@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { AuthProvider, useAuthContext } from './providers/AuthProvider';
 import { LoginForm } from './components/LoginForm';
 import { Layout } from './components/Layout';
@@ -17,6 +18,8 @@ import { ServiceList } from './pages/ServiceList';
 import { ServiceForm } from './pages/ServiceForm';
 import { CostGroupList } from './pages/CostGroupList';
 import { CostGroupForm } from './pages/CostGroupForm';
+import { PendingApprovalScreen } from './pages/PendingApprovalScreen';
+import { memberAPI } from './services/api';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,7 +33,15 @@ const queryClient = new QueryClient({
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthContext();
 
-  if (loading) {
+  // 회원 정보 조회 (승인 상태 확인용)
+  const { data: member, isLoading: memberLoading } = useQuery({
+    queryKey: ['currentMember', user?.id],
+    queryFn: () => memberAPI.getCurrentMember(),
+    enabled: !!user,
+    retry: 1,
+  });
+
+  if (loading || memberLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -43,6 +54,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  // 회원 정보가 없거나 비활성 상태이거나 역할이 없거나 Pending User(role_id=4)면 승인 대기 화면
+  if (!member || !member.is_active || !member.role_id || member.role_id === 4) {
+    return <PendingApprovalScreen />;
   }
 
   return <Layout>{children}</Layout>;

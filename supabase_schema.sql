@@ -280,3 +280,61 @@ FOR SELECT USING (
         SELECT member_id FROM members WHERE auth_id = auth.uid()
     )
 );
+
+-- ============================================
+-- Auth 트리거: 사용자 생성 시 members 자동 생성
+-- ============================================
+
+-- 1. auth.users 생성 시 members 레코드 자동 생성 함수
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger AS $$
+DECLARE
+  user_role_id INTEGER;
+  user_is_active BOOLEAN;
+BEGIN
+  -- user_metadata에서 role_id와 invited 플래그 확인
+  user_role_id := (NEW.raw_user_meta_data->>'role_id')::INTEGER;
+
+  -- invited가 true면 초대된 사용자 (자동 승인)
+  -- invited가 false/null이면 자체 가입 사용자 (승인 대기)
+  IF (NEW.raw_user_meta_data->>'invited')::BOOLEAN = true THEN
+    user_is_active := true;
+  ELSE
+    -- 자체 가입은 Pending User 역할(role_id=4) 자동 할당 및 비활성화
+    user_is_active := false;
+    user_role_id := 4; -- Pending User 역할 고정
+  END IF;
+
+  -- members 테이블에 레코드 생성
+  INSERT INTO public.members (
+    auth_id,
+    email,
+    name,
+    account_id,
+    role_id,
+    is_active,
+    created_at,
+    updated_at
+  ) VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'name', ''),
+    COALESCE(NEW.raw_user_meta_data->>'account_id', ''),
+    user_role_id,
+    user_is_active,
+    NOW(),
+    NOW()
+  );
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 2. 트리거 생성
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_new_user();
+
+COMMENT ON FUNCTION public.handle_new_user() IS 'Supabase Auth 사용자 생성 시 members 테이블에 자동으로 레코드를 생성합니다. invited=true면 초대된 사용자(자동 승인), false/null이면 자체 가입(Pending User 역할, 승인 대기)';

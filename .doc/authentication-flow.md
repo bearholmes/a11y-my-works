@@ -209,7 +209,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 ## 가입 방식 비교
 
-### 방식 1: 이메일/비밀번호 가입 (현재 구현)
+### 방식 1: 자체 가입 (현재 구현)
+
+**특징**:
+- 누구나 이메일/비밀번호로 가입 가능
+- 가입 시 Pending User 역할(role_id=4) 자동 할당
+- `is_active=false`로 설정되어 승인 대기 상태
+- 관리자 승인 전까지 모든 기능 차단
 
 **장점**:
 - 구현이 간단함
@@ -217,69 +223,40 @@ export function AuthProvider({ children }: AuthProviderProps) {
 - 이메일 확인 자동화
 
 **단점**:
-- 초대 시스템 없음
-- 누구나 가입 가능 (스팸 위험)
+- 누구나 가입 가능 (스팸 가능성)
+- 관리자 승인 필요
 
-**적합한 상황**:
-- 소규모 팀
-- 신뢰할 수 있는 사용자만 접근
+### 방식 2: Supabase Auth 초대 (현재 구현)
 
-### 방식 2: 초대 기반 가입 (구현 필요)
+**특징**:
+- 관리자가 `inviteUserByEmail` API로 초대
+- Supabase가 초대 이메일 자동 발송
+- 역할 사전 할당 (`invited=true`, role_id 지정)
+- `is_active=true`로 설정되어 즉시 활성화
 
 **장점**:
 - 관리자가 통제 가능
 - 스팸 방지
 - 역할 사전 할당 가능
+- Supabase가 보안 토큰 및 이메일 자동 처리
 
 **단점**:
-- 구현 복잡도 증가
-- 초대 이메일 발송 필요
+- 이메일 발송 필수 (SMTP 설정 필요)
 
 **구현 방법**:
 ```typescript
-// 1. 관리자가 초대 생성
-async function createInvitation({
-  email: string,
-  roleId: number
-}) {
-  // INVITATION_TBL에 레코드 생성
-  const token = generateUniqueToken();
-  await db.invitations.insert({
-    email,
-    role_id: roleId,
-    token,
-    expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7일
-  });
-
-  // 초대 이메일 발송
-  await sendInvitationEmail(email, token);
-}
-
-// 2. 사용자가 초대 링크로 가입
-async function signUpWithInvitation(token: string) {
-  const invitation = await db.invitations.findByToken(token);
-
-  if (!invitation || invitation.expires_at < new Date()) {
-    throw new Error('유효하지 않은 초대입니다.');
+// 관리자가 초대
+const { data, error } = await supabase.auth.admin.inviteUserByEmail(
+  'user@example.com',
+  {
+    data: {
+      role_id: 3,
+      name: '홍길동',
+      invited: true
+    },
+    redirectTo: `${window.location.origin}/auth/callback`
   }
-
-  // Supabase 계정 생성
-  const { user } = await supabase.auth.signUp({
-    email: invitation.email,
-    password: userPassword
-  });
-
-  // 회원 정보 생성 (역할 사전 할당)
-  await memberAPI.createMember({
-    auth_id: user.id,
-    email: invitation.email,
-    role_id: invitation.role_id,
-    is_active: true // 초대된 사용자는 바로 활성화
-  });
-
-  // 초대 무효화
-  await db.invitations.markAsUsed(token);
-}
+);
 ```
 
 ### 방식 3: 소셜 로그인 (구현 가능)
@@ -306,27 +283,31 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 });
 ```
 
-## 권장 구현 방안
+## 현재 구현 상태 (완료)
 
-### Phase 1: 현재 상태 (구현 완료)
+### ✅ Phase 1: 인증 시스템
 - ✅ Supabase Email/Password 인증
-- ✅ 역할 기반 권한 시스템
+- ✅ 역할 기반 권한 시스템 (RBAC)
 - ✅ 권한 기반 메뉴 필터링
 
-### Phase 2: 승인 프로세스 추가 (즉시 필요)
-- [ ] 신규 사용자 대기 화면 (`PendingApprovalScreen`)
-- [ ] 관리자 승인 UI
-- [ ] 이메일 알림 (선택)
+### ✅ Phase 2: 자체 가입 및 승인 프로세스
+- ✅ 신규 사용자 대기 화면 (`PendingApprovalScreen`)
+- ✅ Pending User 역할 (role_id=4) 생성
+- ✅ 자체 가입 시 Pending User 자동 할당
+- ✅ 관리자 승인 UI (MemberList)
+- ✅ Auth 트리거로 members 자동 생성
 
-### Phase 3: 초대 시스템 (선택)
-- [ ] 초대 테이블 설계
-- [ ] 초대 생성/발송 기능
-- [ ] 초대 링크 검증
+### ✅ Phase 3: Supabase Auth 초대 시스템
+- ✅ `inviteUserByEmail` API 사용
+- ✅ 역할 사전 할당
+- ✅ 초대 생성 UI (MemberList)
+- ✅ 이메일 자동 발송
 
-### Phase 4: 추가 기능 (선택)
-- [ ] 소셜 로그인
+### 📋 Phase 4: 추가 기능 (선택)
+- [ ] 소셜 로그인 (Google, GitHub 등)
 - [ ] 2단계 인증 (2FA)
 - [ ] 비밀번호 정책 강화
+- [ ] 이메일 템플릿 커스터마이징
 
 ## Database Schema
 
@@ -353,16 +334,20 @@ created_at      TIMESTAMP DEFAULT NOW()
 updated_at      TIMESTAMP DEFAULT NOW()
 ```
 
-### invitations (선택적, 구현 시)
+### roles (역할 테이블)
 ```sql
-invitation_id   SERIAL PRIMARY KEY
-email           VARCHAR NOT NULL
-role_id         INTEGER REFERENCES roles(role_id)
-token           VARCHAR UNIQUE NOT NULL
-created_by      INTEGER REFERENCES members(member_id)
-expires_at      TIMESTAMP NOT NULL
-used_at         TIMESTAMP
+role_id         SERIAL PRIMARY KEY
+name            VARCHAR NOT NULL
+description     TEXT
+is_active       BOOLEAN DEFAULT true
 created_at      TIMESTAMP DEFAULT NOW()
+updated_at      TIMESTAMP DEFAULT NOW()
+
+-- 기본 역할
+1: Admin (관리자)
+2: Manager (매니저)
+3: Employee (직원)
+4: Pending User (승인 대기, 권한 없음)
 ```
 
 ## 보안 고려사항
