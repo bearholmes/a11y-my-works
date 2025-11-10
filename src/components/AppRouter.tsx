@@ -94,6 +94,11 @@ const TestPage = lazy(() =>
   import('../pages/TestPage').then((m) => ({ default: m.TestPage }))
 );
 
+// 팀 관리
+const TeamTaskList = lazy(() =>
+  import('../pages/TeamTaskList').then((m) => ({ default: m.TeamTaskList }))
+);
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
@@ -192,6 +197,18 @@ export function AppRouter() {
           element={
             <ProtectedRoute>
               <ChangePassword />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 팀 관리 */}
+        <Route
+          path="/team/tasks"
+          element={
+            <ProtectedRoute>
+              <PermissionGuard permission="TASK_READ">
+                <TeamTaskList />
+              </PermissionGuard>
             </ProtectedRoute>
           }
         />

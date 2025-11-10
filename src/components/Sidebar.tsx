@@ -28,6 +28,13 @@ const MENU_ITEMS: MenuItem[] = [
     requireReadOnly: false,
   },
   {
+    name: '팀 업무 조회',
+    href: '/team/tasks',
+    icon: '👨‍👩‍👧‍👦',
+    requiredPermission: 'task.read',
+    requireReadOnly: true,
+  },
+  {
     name: '청구 그룹',
     href: '/cost-groups',
     icon: '💰',
