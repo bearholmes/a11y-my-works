@@ -1,15 +1,17 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { serviceAPI } from '../services/api';
-import { format } from 'date-fns';
 
 export function ServiceList() {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
-  const [costGroupFilter, setCostGroupFilter] = useState<number | undefined>(undefined);
+  const [costGroupFilter, setCostGroupFilter] = useState<number | undefined>(
+    undefined
+  );
 
   // 청구 그룹 목록 조회 (필터용)
   const { data: costGroups } = useQuery({
@@ -20,12 +22,13 @@ export function ServiceList() {
   // 서비스 목록 조회
   const { data, isLoading, error } = useQuery({
     queryKey: ['services', { page, search, costGroupId: costGroupFilter }],
-    queryFn: () => serviceAPI.getServices({
-      page,
-      pageSize: 20,
-      search,
-      costGroupId: costGroupFilter
-    }),
+    queryFn: () =>
+      serviceAPI.getServices({
+        page,
+        pageSize: 20,
+        search,
+        costGroupId: costGroupFilter,
+      }),
   });
 
   // 서비스 삭제 mutation
@@ -37,7 +40,7 @@ export function ServiceList() {
     },
     onError: (error) => {
       alert(`삭제 실패: ${(error as Error).message}`);
-    }
+    },
   });
 
   const handleSearch = (e: React.FormEvent) => {
@@ -92,7 +95,9 @@ export function ServiceList() {
           <select
             value={costGroupFilter || ''}
             onChange={(e) => {
-              setCostGroupFilter(e.target.value ? Number(e.target.value) : undefined);
+              setCostGroupFilter(
+                e.target.value ? Number(e.target.value) : undefined
+              );
               setPage(1);
             }}
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -154,9 +159,13 @@ export function ServiceList() {
                   {data?.data.map((service: any) => (
                     <tr key={service.service_id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-gray-900">{service.name}</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {service.name}
+                        </div>
                         {service.description && (
-                          <div className="text-sm text-gray-500">{service.description}</div>
+                          <div className="text-sm text-gray-500">
+                            {service.description}
+                          </div>
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -170,11 +179,13 @@ export function ServiceList() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          service.is_active
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            service.is_active
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
                           {service.is_active ? '활성' : '비활성'}
                         </span>
                       </td>
@@ -189,7 +200,9 @@ export function ServiceList() {
                           수정
                         </Link>
                         <button
-                          onClick={() => handleDelete(service.service_id, service.name)}
+                          onClick={() =>
+                            handleDelete(service.service_id, service.name)
+                          }
                           className="text-red-600 hover:text-red-900"
                           disabled={deleteMutation.isPending}
                         >
@@ -207,14 +220,16 @@ export function ServiceList() {
               <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
                 <div className="flex-1 flex justify-between sm:hidden">
                   <button
-                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
                     className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                   >
                     이전
                   </button>
                   <button
-                    onClick={() => setPage(p => Math.min(data.pagination.pageCount, p + 1))}
+                    onClick={() =>
+                      setPage((p) => Math.min(data.pagination.pageCount, p + 1))
+                    }
                     disabled={page === data.pagination.pageCount}
                     className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                   >
@@ -224,8 +239,13 @@ export function ServiceList() {
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm text-gray-700">
-                      전체 <span className="font-medium">{data.pagination.total}</span>개 중{' '}
-                      <span className="font-medium">{(page - 1) * 20 + 1}</span> -{' '}
+                      전체{' '}
+                      <span className="font-medium">
+                        {data.pagination.total}
+                      </span>
+                      개 중{' '}
+                      <span className="font-medium">{(page - 1) * 20 + 1}</span>{' '}
+                      -{' '}
                       <span className="font-medium">
                         {Math.min(page * 20, data.pagination.total)}
                       </span>
@@ -234,30 +254,37 @@ export function ServiceList() {
                   <div>
                     <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                       <button
-                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
                         disabled={page === 1}
                         className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                       >
                         이전
                       </button>
-                      {Array.from({ length: Math.min(5, data.pagination.pageCount) }, (_, i) => {
-                        const pageNum = i + 1;
-                        return (
-                          <button
-                            key={pageNum}
-                            onClick={() => setPage(pageNum)}
-                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                              page === pageNum
-                                ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                            }`}
-                          >
-                            {pageNum}
-                          </button>
-                        );
-                      })}
+                      {Array.from(
+                        { length: Math.min(5, data.pagination.pageCount) },
+                        (_, i) => {
+                          const pageNum = i + 1;
+                          return (
+                            <button
+                              key={pageNum}
+                              onClick={() => setPage(pageNum)}
+                              className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                                page === pageNum
+                                  ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                                  : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                              }`}
+                            >
+                              {pageNum}
+                            </button>
+                          );
+                        }
+                      )}
                       <button
-                        onClick={() => setPage(p => Math.min(data.pagination.pageCount, p + 1))}
+                        onClick={() =>
+                          setPage((p) =>
+                            Math.min(data.pagination.pageCount, p + 1)
+                          )
+                        }
                         disabled={page === data.pagination.pageCount}
                         className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                       >

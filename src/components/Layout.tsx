@@ -1,5 +1,8 @@
-import { useState, type ReactNode } from 'react';
+import { type ReactNode, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuthContext } from '../providers/AuthProvider';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
+import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 import { Sidebar } from './Sidebar';
 
 interface LayoutProps {
@@ -9,6 +12,44 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const { signOut, user } = useAuthContext();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState(false);
+
+  // 키보드 단축키 활성화
+  useKeyboardShortcuts();
+
+  // Esc 키로 드롭다운 닫기 및 Alt + / 로 도움말 열기
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Esc 키로 닫기
+      if (event.key === 'Escape') {
+        setIsDropdownOpen(false);
+        setIsSidebarOpen(false);
+      }
+
+      // Alt + / 로 단축키 도움말 열기
+      if (
+        event.altKey &&
+        !event.ctrlKey &&
+        !event.metaKey &&
+        (event.key === '/' || event.key === '?')
+      ) {
+        const target = event.target as HTMLElement;
+        // 입력 필드가 아닐 때만
+        if (
+          target.tagName !== 'INPUT' &&
+          target.tagName !== 'TEXTAREA' &&
+          !target.isContentEditable
+        ) {
+          event.preventDefault();
+          setIsShortcutsModalOpen(true);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -16,6 +57,14 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
+      {/* Skip to main content 링크 */}
+      <a
+        href="#main-content"
+        className="sr-only-focusable absolute top-0 left-0 z-[100] bg-blue-600 text-white px-4 py-2 rounded-br-md focus:not-sr-only"
+      >
+        본문으로 바로가기
+      </a>
+
       {/* 사이드바 */}
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
@@ -28,15 +77,19 @@ export function Layout({ children }: LayoutProps) {
               <div className="flex items-center gap-4">
                 {/* 모바일 메뉴 버튼 */}
                 <button
+                  type="button"
                   onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                   className="lg:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                  aria-label="메뉴 열기"
+                  aria-label={isSidebarOpen ? '메뉴 닫기' : '메뉴 열기'}
+                  aria-expanded={isSidebarOpen}
+                  aria-controls="sidebar"
                 >
                   <svg
                     className="w-6 h-6"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
@@ -49,30 +102,99 @@ export function Layout({ children }: LayoutProps) {
 
                 {/* 사용자 정보 */}
                 <div className="hidden sm:block">
-                  <p className="text-sm text-gray-600">
-                    {user?.email}
-                  </p>
+                  <p className="text-sm text-gray-600">{user?.email}</p>
                 </div>
               </div>
 
-              {/* 로그아웃 버튼 */}
-              <button
-                onClick={handleSignOut}
-                className="text-sm text-gray-600 hover:text-gray-900 px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50 transition-colors"
-              >
-                로그아웃
-              </button>
+              {/* 사용자 메뉴 */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                  aria-label="사용자 메뉴"
+                  aria-expanded={isDropdownOpen}
+                  aria-haspopup="true"
+                >
+                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold" aria-hidden="true">
+                    {user?.email?.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="hidden sm:block">{user?.email}</span>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {isDropdownOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setIsDropdownOpen(false)}
+                      aria-hidden="true"
+                    />
+                    <div
+                      className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 border border-gray-200"
+                      role="menu"
+                      aria-orientation="vertical"
+                      aria-labelledby="user-menu-button"
+                    >
+                      <Link
+                        to="/profile"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsDropdownOpen(false)}
+                        role="menuitem"
+                      >
+                        내 프로필
+                      </Link>
+                      <Link
+                        to="/change-password"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsDropdownOpen(false)}
+                        role="menuitem"
+                      >
+                        비밀번호 변경
+                      </Link>
+                      <hr className="my-1" aria-hidden="true" />
+                      <button
+                        type="button"
+                        onClick={handleSignOut}
+                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                        role="menuitem"
+                      >
+                        로그아웃
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </header>
 
         {/* 메인 컨텐츠 */}
-        <main className="flex-1 overflow-y-auto">
+        <main id="main-content" className="flex-1 overflow-y-auto" tabIndex={-1}>
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
             {children}
           </div>
         </main>
       </div>
+
+      {/* 키보드 단축키 도움말 모달 */}
+      <KeyboardShortcutsModal
+        isOpen={isShortcutsModalOpen}
+        onClose={() => setIsShortcutsModalOpen(false)}
+      />
     </div>
   );
 }

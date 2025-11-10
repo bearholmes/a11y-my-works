@@ -7,7 +7,11 @@ import type { MenuItem } from '../types/permission';
  * @returns 권한 목록과 권한 확인 함수
  */
 export function usePermissions() {
-  const { data: permissions = [], isLoading, error } = useQuery({
+  const {
+    data: permissions = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['permissions'],
     queryFn: () => memberAPI.getCurrentMemberPermissions(),
     staleTime: 1000 * 60 * 5, // 5분간 캐시 유지
@@ -19,7 +23,7 @@ export function usePermissions() {
    * @returns 읽기 권한 여부
    */
   const canRead = (permissionKey: string): boolean => {
-    const permission = permissions.find(p => p.key === permissionKey);
+    const permission = permissions.find((p) => p.key === permissionKey);
     return permission?.canRead ?? false;
   };
 
@@ -29,7 +33,7 @@ export function usePermissions() {
    * @returns 쓰기 권한 여부
    */
   const canWrite = (permissionKey: string): boolean => {
-    const permission = permissions.find(p => p.key === permissionKey);
+    const permission = permissions.find((p) => p.key === permissionKey);
     return permission?.canWrite ?? false;
   };
 
@@ -39,7 +43,9 @@ export function usePermissions() {
    * @returns 접근 권한 여부
    */
   const canAccessMenu = (menuItem: MenuItem): boolean => {
-    const permission = permissions.find(p => p.key === menuItem.requiredPermission);
+    const permission = permissions.find(
+      (p) => p.key === menuItem.requiredPermission
+    );
 
     if (!permission) return false;
 
@@ -59,10 +65,12 @@ export function usePermissions() {
    */
   const filterAccessibleMenus = (menuItems: MenuItem[]): MenuItem[] => {
     return menuItems
-      .filter(item => canAccessMenu(item))
-      .map(item => ({
+      .filter((item) => canAccessMenu(item))
+      .map((item) => ({
         ...item,
-        children: item.children ? filterAccessibleMenus(item.children) : undefined
+        children: item.children
+          ? filterAccessibleMenus(item.children)
+          : undefined,
       }));
   };
 
@@ -73,6 +81,6 @@ export function usePermissions() {
     canRead,
     canWrite,
     canAccessMenu,
-    filterAccessibleMenus
+    filterAccessibleMenus,
   };
 }

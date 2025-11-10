@@ -1,0 +1,103 @@
+import { useQuery } from '@tanstack/react-query';
+import { memberAPI } from '../services/api';
+import { useAuthContext } from '../providers/AuthProvider';
+
+/**
+ * 사용자의 특정 권한 보유 여부를 확인하는 훅
+ * @param permissionKey 확인할 권한 키
+ * @param requireWrite true면 쓰기 권한까지 확인, false면 읽기 권한만 확인
+ */
+export function usePermission(permissionKey: string, requireWrite = false) {
+  const { user } = useAuthContext();
+
+  const { data: permissions } = useQuery({
+    queryKey: ['permissions', user?.id],
+    queryFn: () => memberAPI.getCurrentMemberPermissions(),
+    enabled: !!user,
+  });
+
+  const permission = permissions?.find((p) => p.key === permissionKey);
+
+  const hasPermission = permission
+    ? requireWrite
+      ? permission.canWrite
+      : permission.canRead
+    : false;
+
+  return {
+    hasPermission,
+    permission,
+    isLoading: !permissions && !!user,
+  };
+}
+
+/**
+ * 여러 권한 중 하나라도 있는지 확인하는 훅
+ * @param permissionKeys 확인할 권한 키 배열
+ * @param requireWrite true면 쓰기 권한까지 확인
+ */
+export function useAnyPermission(
+  permissionKeys: string[],
+  requireWrite = false
+) {
+  const { user } = useAuthContext();
+
+  const { data: permissions } = useQuery({
+    queryKey: ['permissions', user?.id],
+    queryFn: () => memberAPI.getCurrentMemberPermissions(),
+    enabled: !!user,
+  });
+
+  const hasPermission = permissionKeys.some((key) => {
+    const permission = permissions?.find((p) => p.key === key);
+    return permission
+      ? requireWrite
+        ? permission.canWrite
+        : permission.canRead
+      : false;
+  });
+
+  return {
+    hasPermission,
+    isLoading: !permissions && !!user,
+  };
+}
+
+/**
+ * 모든 권한을 가지고 있는지 확인하는 훅
+ * @param permissionKeys 확인할 권한 키 배열
+ * @param requireWrite true면 쓰기 권한까지 확인
+ */
+export function useAllPermissions(
+  permissionKeys: string[],
+  requireWrite = false
+) {
+  const { user } = useAuthContext();
+
+  const { data: permissions } = useQuery({
+    queryKey: ['permissions', user?.id],
+    queryFn: () => memberAPI.getCurrentMemberPermissions(),
+    enabled: !!user,
+  });
+
+  const hasPermission = permissionKeys.every((key) => {
+    const permission = permissions?.find((p) => p.key === key);
+    return permission
+      ? requireWrite
+        ? permission.canWrite
+        : permission.canRead
+      : false;
+  });
+
+  return {
+    hasPermission,
+    isLoading: !permissions && !!user,
+  };
+}
+
+/**
+ * 관리자 권한 확인 (시스템 설정 권한 보유 여부)
+ */
+export function useIsAdmin() {
+  return usePermission('SYSTEM_SETTINGS', false);
+}

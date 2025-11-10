@@ -7,18 +7,23 @@ export function TestPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const addResult = (message: string) => {
-    setTestResults(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
+    setTestResults((prev) => [
+      ...prev,
+      `${new Date().toLocaleTimeString()}: ${message}`,
+    ]);
   };
 
   const runTests = async () => {
     setIsLoading(true);
     setTestResults([]);
-    
+
     try {
       // 1. Supabase 연결 테스트
       addResult('🔗 Supabase 연결 테스트 시작...');
       const { data: session } = await supabase.auth.getSession();
-      addResult(`✅ Supabase 연결 성공 - 현재 세션: ${session.session ? '로그인됨' : '로그아웃됨'}`);
+      addResult(
+        `✅ Supabase 연결 성공 - 현재 세션: ${session.session ? '로그인됨' : '로그아웃됨'}`
+      );
 
       // 2. 테스트 계정 생성
       addResult('👤 테스트 계정 생성 시작...');
@@ -26,13 +31,14 @@ export function TestPage() {
       const testPassword = 'test123456';
       const testProfile = {
         name: '테스트 사용자',
-        account_id: `test-${Date.now()}`
+        account_id: `test-${Date.now()}`,
       };
 
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: testEmail,
-        password: testPassword,
-      });
+      const { data: signUpData, error: signUpError } =
+        await supabase.auth.signUp({
+          email: testEmail,
+          password: testPassword,
+        });
 
       if (signUpError) {
         addResult(`❌ 회원가입 실패: ${signUpError.message}`);
@@ -58,27 +64,30 @@ export function TestPage() {
 
       // 4. 로그인 테스트
       addResult('🔐 로그인 테스트 시작...');
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: testEmail,
-        password: testPassword,
-      });
+      const { data: signInData, error: signInError } =
+        await supabase.auth.signInWithPassword({
+          email: testEmail,
+          password: testPassword,
+        });
 
       if (signInError) {
         addResult(`❌ 로그인 실패: ${signInError.message}`);
         return;
       }
 
-      addResult(`✅ 로그인 성공 - Session: ${signInData.session?.access_token ? '활성' : '비활성'}`);
+      addResult(
+        `✅ 로그인 성공 - Session: ${signInData.session?.access_token ? '활성' : '비활성'}`
+      );
 
       // 5. 데이터베이스 테이블 확인
       addResult('🗃️ 데이터베이스 테이블 확인 시작...');
-      
+
       // Roles 테이블 확인
       const { data: roles, error: rolesError } = await supabase
         .from('roles')
         .select('*')
         .limit(3);
-      
+
       if (rolesError) {
         addResult(`❌ Roles 테이블 조회 실패: ${rolesError.message}`);
       } else {
@@ -90,11 +99,13 @@ export function TestPage() {
         .from('members')
         .select('*')
         .eq('email', testEmail);
-      
+
       if (membersError) {
         addResult(`❌ Members 테이블 조회 실패: ${membersError.message}`);
       } else {
-        addResult(`✅ Members 테이블 조회 성공 - 생성된 프로필: ${members?.[0]?.name || 'N/A'}`);
+        addResult(
+          `✅ Members 테이블 조회 성공 - 생성된 프로필: ${members?.[0]?.name || 'N/A'}`
+        );
       }
 
       // 6. 테스트 업무 생성
@@ -116,7 +127,6 @@ export function TestPage() {
       // 7. 정리 (테스트 계정 삭제는 보안상 생략)
       addResult('🧹 테스트 완료');
       addResult('⚠️ 주의: 테스트 계정은 수동으로 정리가 필요합니다.');
-
     } catch (error) {
       addResult(`❌ 전체 테스트 실패: ${error}`);
     } finally {
@@ -130,7 +140,7 @@ export function TestPage() {
         <h2 className="text-lg font-medium text-gray-900 mb-6">
           실제 데이터 연동 테스트
         </h2>
-        
+
         <div className="mb-6">
           <button
             onClick={runTests}
@@ -142,20 +152,24 @@ export function TestPage() {
         </div>
 
         <div className="bg-gray-50 rounded-md p-4">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">테스트 결과:</h3>
+          <h3 className="text-sm font-medium text-gray-700 mb-3">
+            테스트 결과:
+          </h3>
           <div className="space-y-1 max-h-96 overflow-y-auto">
             {testResults.length === 0 ? (
-              <p className="text-gray-500 text-sm">테스트를 실행하려면 위의 버튼을 클릭하세요.</p>
+              <p className="text-gray-500 text-sm">
+                테스트를 실행하려면 위의 버튼을 클릭하세요.
+              </p>
             ) : (
               testResults.map((result, index) => (
                 <div
                   key={index}
                   className={`text-sm font-mono ${
-                    result.includes('❌') 
-                      ? 'text-red-600' 
-                      : result.includes('✅') 
-                      ? 'text-green-600' 
-                      : 'text-gray-600'
+                    result.includes('❌')
+                      ? 'text-red-600'
+                      : result.includes('✅')
+                        ? 'text-green-600'
+                        : 'text-gray-600'
                   }`}
                 >
                   {result}
@@ -166,7 +180,9 @@ export function TestPage() {
         </div>
 
         <div className="mt-6 text-sm text-gray-600">
-          <p><strong>테스트 항목:</strong></p>
+          <p>
+            <strong>테스트 항목:</strong>
+          </p>
           <ul className="list-disc list-inside space-y-1 mt-2">
             <li>Supabase 클라이언트 연결 확인</li>
             <li>사용자 회원가입 (Supabase Auth)</li>

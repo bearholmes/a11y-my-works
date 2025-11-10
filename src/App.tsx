@@ -1,26 +1,29 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { AuthProvider, useAuthContext } from './providers/AuthProvider';
-import { LoginForm } from './components/LoginForm';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from '@tanstack/react-query';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
-import { Dashboard } from './pages/Dashboard';
-import { TaskList } from './pages/TaskList';
-import { TaskForm } from './pages/TaskForm';
-import { TestPage } from './pages/TestPage';
-import { MemberList } from './pages/MemberList';
-import { MemberForm } from './pages/MemberForm';
-import { RoleList } from './pages/RoleList';
-import { RoleForm } from './pages/RoleForm';
-import { ProjectList } from './pages/ProjectList';
-import { ProjectForm } from './pages/ProjectForm';
-import { ServiceList } from './pages/ServiceList';
-import { ServiceForm } from './pages/ServiceForm';
-import { CostGroupList } from './pages/CostGroupList';
+import { LoginForm } from './components/LoginForm';
 import { CostGroupForm } from './pages/CostGroupForm';
-import { HolidayList } from './pages/HolidayList';
+import { CostGroupList } from './pages/CostGroupList';
+import { Dashboard } from './pages/Dashboard';
 import { HolidayForm } from './pages/HolidayForm';
+import { HolidayList } from './pages/HolidayList';
+import { MemberForm } from './pages/MemberForm';
+import { MemberList } from './pages/MemberList';
 import { PendingApprovalScreen } from './pages/PendingApprovalScreen';
+import { ProjectForm } from './pages/ProjectForm';
+import { ProjectList } from './pages/ProjectList';
+import { RoleForm } from './pages/RoleForm';
+import { RoleList } from './pages/RoleList';
+import { ServiceForm } from './pages/ServiceForm';
+import { ServiceList } from './pages/ServiceList';
+import { TaskForm } from './pages/TaskForm';
+import { TaskList } from './pages/TaskList';
+import { TestPage } from './pages/TestPage';
+import { AuthProvider, useAuthContext } from './providers/AuthProvider';
 import { memberAPI } from './services/api';
 
 const queryClient = new QueryClient({
@@ -73,28 +76,182 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<LoginForm />} />
-            <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/tasks" element={<ProtectedRoute><TaskList /></ProtectedRoute>} />
-            <Route path="/tasks/new" element={<ProtectedRoute><TaskForm /></ProtectedRoute>} />
-            <Route path="/tasks/edit/:id" element={<ProtectedRoute><TaskForm /></ProtectedRoute>} />
-            <Route path="/members" element={<ProtectedRoute><MemberList /></ProtectedRoute>} />
-            <Route path="/members/edit/:id" element={<ProtectedRoute><MemberForm /></ProtectedRoute>} />
-            <Route path="/roles" element={<ProtectedRoute><RoleList /></ProtectedRoute>} />
-            <Route path="/roles/new" element={<ProtectedRoute><RoleForm /></ProtectedRoute>} />
-            <Route path="/roles/edit/:id" element={<ProtectedRoute><RoleForm /></ProtectedRoute>} />
-            <Route path="/projects" element={<ProtectedRoute><ProjectList /></ProtectedRoute>} />
-            <Route path="/projects/new" element={<ProtectedRoute><ProjectForm /></ProtectedRoute>} />
-            <Route path="/projects/edit/:id" element={<ProtectedRoute><ProjectForm /></ProtectedRoute>} />
-            <Route path="/services" element={<ProtectedRoute><ServiceList /></ProtectedRoute>} />
-            <Route path="/services/new" element={<ProtectedRoute><ServiceForm /></ProtectedRoute>} />
-            <Route path="/services/edit/:id" element={<ProtectedRoute><ServiceForm /></ProtectedRoute>} />
-            <Route path="/cost-groups" element={<ProtectedRoute><CostGroupList /></ProtectedRoute>} />
-            <Route path="/cost-groups/new" element={<ProtectedRoute><CostGroupForm /></ProtectedRoute>} />
-            <Route path="/cost-groups/edit/:id" element={<ProtectedRoute><CostGroupForm /></ProtectedRoute>} />
-            <Route path="/holidays" element={<ProtectedRoute><HolidayList /></ProtectedRoute>} />
-            <Route path="/holidays/new" element={<ProtectedRoute><HolidayForm /></ProtectedRoute>} />
-            <Route path="/holidays/:id" element={<ProtectedRoute><HolidayForm /></ProtectedRoute>} />
-            <Route path="/test" element={<ProtectedRoute><TestPage /></ProtectedRoute>} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tasks"
+              element={
+                <ProtectedRoute>
+                  <TaskList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tasks/new"
+              element={
+                <ProtectedRoute>
+                  <TaskForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tasks/edit/:id"
+              element={
+                <ProtectedRoute>
+                  <TaskForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/members"
+              element={
+                <ProtectedRoute>
+                  <MemberList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/members/edit/:id"
+              element={
+                <ProtectedRoute>
+                  <MemberForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/roles"
+              element={
+                <ProtectedRoute>
+                  <RoleList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/roles/new"
+              element={
+                <ProtectedRoute>
+                  <RoleForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/roles/edit/:id"
+              element={
+                <ProtectedRoute>
+                  <RoleForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/projects"
+              element={
+                <ProtectedRoute>
+                  <ProjectList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/projects/new"
+              element={
+                <ProtectedRoute>
+                  <ProjectForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/projects/edit/:id"
+              element={
+                <ProtectedRoute>
+                  <ProjectForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/services"
+              element={
+                <ProtectedRoute>
+                  <ServiceList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/services/new"
+              element={
+                <ProtectedRoute>
+                  <ServiceForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/services/edit/:id"
+              element={
+                <ProtectedRoute>
+                  <ServiceForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cost-groups"
+              element={
+                <ProtectedRoute>
+                  <CostGroupList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cost-groups/new"
+              element={
+                <ProtectedRoute>
+                  <CostGroupForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cost-groups/edit/:id"
+              element={
+                <ProtectedRoute>
+                  <CostGroupForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/holidays"
+              element={
+                <ProtectedRoute>
+                  <HolidayList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/holidays/new"
+              element={
+                <ProtectedRoute>
+                  <HolidayForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/holidays/:id"
+              element={
+                <ProtectedRoute>
+                  <HolidayForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/test"
+              element={
+                <ProtectedRoute>
+                  <TestPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>

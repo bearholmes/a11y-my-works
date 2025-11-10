@@ -1,8 +1,8 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { roleAPI } from '../services/api';
-import { format } from 'date-fns';
 
 export function RoleList() {
   const queryClient = useQueryClient();
@@ -27,7 +27,11 @@ export function RoleList() {
   });
 
   const handleDelete = (roleId: number, roleName: string) => {
-    if (confirm(`"${roleName}" 역할을 삭제하시겠습니까?\n이 역할을 사용하는 사용자가 있으면 삭제할 수 없습니다.`)) {
+    if (
+      confirm(
+        `"${roleName}" 역할을 삭제하시겠습니까?\n이 역할을 사용하는 사용자가 있으면 삭제할 수 없습니다.`
+      )
+    ) {
       deleteMutation.mutate(roleId);
     }
   };
@@ -47,7 +51,9 @@ export function RoleList() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">역할 관리</h1>
-          <p className="mt-1 text-sm text-gray-500">시스템 역할과 권한을 관리합니다.</p>
+          <p className="mt-1 text-sm text-gray-500">
+            시스템 역할과 권한을 관리합니다.
+          </p>
         </div>
         <Link
           to="/roles/new"
@@ -65,9 +71,7 @@ export function RoleList() {
             <p className="mt-2 text-gray-600">로딩 중...</p>
           </div>
         ) : data?.data.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            역할이 없습니다.
-          </div>
+          <div className="p-8 text-center text-gray-500">역할이 없습니다.</div>
         ) : (
           <>
             <div className="overflow-x-auto">
@@ -95,17 +99,23 @@ export function RoleList() {
                   {data?.data.map((role) => (
                     <tr key={role.role_id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{role.name}</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {role.name}
+                        </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-500">{role.description || '-'}</div>
+                        <div className="text-sm text-gray-500">
+                          {role.description || '-'}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          role.is_active
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            role.is_active
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
                           {role.is_active ? '활성' : '비활성'}
                         </span>
                       </td>
@@ -138,14 +148,16 @@ export function RoleList() {
               <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
                 <div className="flex-1 flex justify-between sm:hidden">
                   <button
-                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
                     className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                   >
                     이전
                   </button>
                   <button
-                    onClick={() => setPage(p => Math.min(data.pagination.pageCount, p + 1))}
+                    onClick={() =>
+                      setPage((p) => Math.min(data.pagination.pageCount, p + 1))
+                    }
                     disabled={page === data.pagination.pageCount}
                     className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                   >
@@ -155,20 +167,28 @@ export function RoleList() {
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm text-gray-700">
-                      전체 <span className="font-medium">{data.pagination.total}</span>개
+                      전체{' '}
+                      <span className="font-medium">
+                        {data.pagination.total}
+                      </span>
+                      개
                     </p>
                   </div>
                   <div>
                     <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                       <button
-                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
                         disabled={page === 1}
                         className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                       >
                         이전
                       </button>
                       <button
-                        onClick={() => setPage(p => Math.min(data.pagination.pageCount, p + 1))}
+                        onClick={() =>
+                          setPage((p) =>
+                            Math.min(data.pagination.pageCount, p + 1)
+                          )
+                        }
                         disabled={page === data.pagination.pageCount}
                         className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                       >

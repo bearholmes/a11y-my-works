@@ -1,14 +1,17 @@
-import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { costGroupAPI } from '../services/api';
 
 const costGroupSchema = z.object({
   name: z.string().min(1, '청구 그룹명을 입력해주세요'),
-  code: z.string().min(1, '청구 그룹 코드를 입력해주세요').regex(/^[A-Z0-9_]+$/, '대문자, 숫자, 언더스코어만 사용 가능합니다'),
+  code: z
+    .string()
+    .min(1, '청구 그룹 코드를 입력해주세요')
+    .regex(/^[A-Z0-9_]+$/, '대문자, 숫자, 언더스코어만 사용 가능합니다'),
   description: z.string().optional(),
 });
 
@@ -49,7 +52,8 @@ export function CostGroupForm() {
 
   // 청구 그룹 생성 mutation
   const createMutation = useMutation({
-    mutationFn: (data: CostGroupFormData) => costGroupAPI.createCostGroup({ ...data, is_active: true }),
+    mutationFn: (data: CostGroupFormData) =>
+      costGroupAPI.createCostGroup({ ...data, is_active: true }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['costGroups'] });
       alert('청구 그룹이 생성되었습니다.');
@@ -62,8 +66,13 @@ export function CostGroupForm() {
 
   // 청구 그룹 수정 mutation
   const updateMutation = useMutation({
-    mutationFn: ({ costGroupId, data }: { costGroupId: number; data: CostGroupFormData }) =>
-      costGroupAPI.updateCostGroup(costGroupId, data),
+    mutationFn: ({
+      costGroupId,
+      data,
+    }: {
+      costGroupId: number;
+      data: CostGroupFormData;
+    }) => costGroupAPI.updateCostGroup(costGroupId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['costGroups'] });
       queryClient.invalidateQueries({ queryKey: ['costGroup', id] });
@@ -105,9 +114,15 @@ export function CostGroupForm() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white shadow-sm rounded-lg border p-6 space-y-6">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="bg-white shadow-sm rounded-lg border p-6 space-y-6"
+      >
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700"
+          >
             청구 그룹명 <span className="text-red-500">*</span>
           </label>
           <input
@@ -121,7 +136,10 @@ export function CostGroupForm() {
         </div>
 
         <div>
-          <label htmlFor="code" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="code"
+            className="block text-sm font-medium text-gray-700"
+          >
             청구 그룹 코드 <span className="text-red-500">*</span>
           </label>
           <input
@@ -135,12 +153,16 @@ export function CostGroupForm() {
             <p className="mt-1 text-sm text-red-600">{errors.code.message}</p>
           )}
           <p className="mt-1 text-sm text-gray-500">
-            대문자, 숫자, 언더스코어만 사용 가능합니다. {isEditMode && '(코드는 수정할 수 없습니다)'}
+            대문자, 숫자, 언더스코어만 사용 가능합니다.{' '}
+            {isEditMode && '(코드는 수정할 수 없습니다)'}
           </p>
         </div>
 
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-gray-700"
+          >
             설명
           </label>
           <textarea
@@ -149,7 +171,9 @@ export function CostGroupForm() {
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
           {errors.description && (
-            <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
+            <p className="mt-1 text-sm text-red-600">
+              {errors.description.message}
+            </p>
           )}
         </div>
 
@@ -159,7 +183,11 @@ export function CostGroupForm() {
             disabled={createMutation.isPending || updateMutation.isPending}
             className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            {(createMutation.isPending || updateMutation.isPending) ? '처리 중...' : isEditMode ? '수정' : '등록'}
+            {createMutation.isPending || updateMutation.isPending
+              ? '처리 중...'
+              : isEditMode
+                ? '수정'
+                : '등록'}
           </button>
           <button
             type="button"

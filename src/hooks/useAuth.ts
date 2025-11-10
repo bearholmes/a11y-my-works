@@ -17,7 +17,9 @@ export function useAuth() {
     });
 
     // 인증 상태 변화 감지
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -34,7 +36,11 @@ export function useAuth() {
     return { data, error };
   };
 
-  const signUp = async (email: string, password: string, profile?: { name: string; account_id: string }) => {
+  const signUp = async (
+    email: string,
+    password: string,
+    profile?: { name: string; account_id: string }
+  ) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -60,13 +66,27 @@ export function useAuth() {
 
       return { data, error };
     } catch (err) {
-      return { data: null, error: err as any };
+      return { data: null, error: err as Error };
     }
   };
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     return { error };
+  };
+
+  const resetPasswordForEmail = async (email: string) => {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    return { data, error };
+  };
+
+  const updatePassword = async (newPassword: string) => {
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+    return { data, error };
   };
 
   return {
@@ -76,5 +96,7 @@ export function useAuth() {
     signIn,
     signUp,
     signOut,
+    resetPasswordForEmail,
+    updatePassword,
   };
 }

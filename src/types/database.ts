@@ -16,7 +16,9 @@ export interface Database {
       role_permissions: {
         Row: RolePermission;
         Insert: Omit<RolePermission, 'created_at'>;
-        Update: Partial<Omit<RolePermission, 'role_id' | 'permission_id' | 'created_at'>>;
+        Update: Partial<
+          Omit<RolePermission, 'role_id' | 'permission_id' | 'created_at'>
+        >;
       };
       members: {
         Row: Member;

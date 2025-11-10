@@ -1,15 +1,17 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
-import { memberAPI, roleAPI, invitationAPI } from '../services/api';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { invitationAPI, memberAPI, roleAPI } from '../services/api';
 
 export function MemberList() {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
-  const [isActiveFilter, setIsActiveFilter] = useState<boolean | undefined>(undefined);
+  const [isActiveFilter, setIsActiveFilter] = useState<boolean | undefined>(
+    undefined
+  );
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState<any>(null);
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
@@ -24,7 +26,13 @@ export function MemberList() {
   // 사용자 목록 조회
   const { data, isLoading, error } = useQuery({
     queryKey: ['members', { page, search, isActive: isActiveFilter }],
-    queryFn: () => memberAPI.getMembers({ page, pageSize: 20, search, isActive: isActiveFilter }),
+    queryFn: () =>
+      memberAPI.getMembers({
+        page,
+        pageSize: 20,
+        search,
+        isActive: isActiveFilter,
+      }),
   });
 
   // 역할 목록 조회
@@ -69,7 +77,18 @@ export function MemberList() {
     },
     onError: (error: Error) => {
       alert(error.message);
-    }
+    },
+  });
+
+  // 비밀번호 초기화 mutation
+  const resetPasswordMutation = useMutation({
+    mutationFn: (email: string) => memberAPI.resetUserPassword(email),
+    onSuccess: () => {
+      alert('비밀번호 재설정 이메일을 발송했습니다.');
+    },
+    onError: (error: Error) => {
+      alert(`비밀번호 초기화 실패: ${error.message}`);
+    },
   });
 
   const handleSearch = (e: React.FormEvent) => {
@@ -79,7 +98,11 @@ export function MemberList() {
   };
 
   const handleToggleActive = (memberId: number, currentStatus: boolean) => {
-    if (confirm(`이 사용자를 ${currentStatus ? '비활성화' : '활성화'}하시겠습니까?`)) {
+    if (
+      confirm(
+        `이 사용자를 ${currentStatus ? '비활성화' : '활성화'}하시겠습니까?`
+      )
+    ) {
       if (currentStatus) {
         deactivateMutation.mutate(memberId);
       } else {
@@ -102,7 +125,7 @@ export function MemberList() {
     if (confirm(`${selectedMember.name}님을 승인하시겠습니까?`)) {
       approveMutation.mutate({
         memberId: selectedMember.member_id,
-        roleId: selectedRoleId
+        roleId: selectedRoleId,
       });
     }
   };
@@ -132,7 +155,7 @@ export function MemberList() {
     inviteUserMutation.mutate({
       email: invitationEmail,
       role_id: invitationRoleId,
-      name: invitationName
+      name: invitationName,
     });
   };
 
@@ -142,6 +165,16 @@ export function MemberList() {
     setInvitationName('');
     setInvitationRoleId(null);
     setInvitationSuccess(false);
+  };
+
+  const handleResetPassword = (member: any) => {
+    if (
+      confirm(
+        `${member.name}님의 비밀번호를 초기화하시겠습니까?\n비밀번호 재설정 이메일이 발송됩니다.`
+      )
+    ) {
+      resetPasswordMutation.mutate(member.email);
+    }
   };
 
   if (error) {
@@ -159,7 +192,9 @@ export function MemberList() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">사용자 관리</h1>
-          <p className="mt-1 text-sm text-gray-500">시스템 사용자를 관리합니다.</p>
+          <p className="mt-1 text-sm text-gray-500">
+            시스템 사용자를 관리합니다.
+          </p>
         </div>
         <button
           onClick={handleInvite}
@@ -182,10 +217,18 @@ export function MemberList() {
             />
           </div>
           <select
-            value={isActiveFilter === undefined ? 'all' : isActiveFilter ? 'active' : 'inactive'}
+            value={
+              isActiveFilter === undefined
+                ? 'all'
+                : isActiveFilter
+                  ? 'active'
+                  : 'inactive'
+            }
             onChange={(e) => {
               const value = e.target.value;
-              setIsActiveFilter(value === 'all' ? undefined : value === 'active');
+              setIsActiveFilter(
+                value === 'all' ? undefined : value === 'active'
+              );
               setPage(1);
             }}
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -252,21 +295,29 @@ export function MemberList() {
                   {data?.data.map((member: any) => (
                     <tr key={member.member_id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{member.name}</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {member.name}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{member.account_id}</div>
+                        <div className="text-sm text-gray-500">
+                          {member.account_id}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{member.email}</div>
+                        <div className="text-sm text-gray-500">
+                          {member.email}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            member.roles?.name
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-gray-100 text-gray-600'
-                          }`}>
+                          <span
+                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              member.roles?.name
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-gray-100 text-gray-600'
+                            }`}
+                          >
                             {member.roles?.name || '역할 없음'}
                           </span>
                           {isPendingUser(member) && (
@@ -277,47 +328,66 @@ export function MemberList() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          member.is_active
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            member.is_active
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
                           {member.is_active ? '활성' : '비활성'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {format(new Date(member.created_at), 'yyyy-MM-dd')}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                        {isPendingUser(member) ? (
-                          <button
-                            onClick={() => handleApprove(member)}
-                            className="text-green-600 hover:text-green-900 font-semibold"
-                            disabled={approveMutation.isPending}
-                          >
-                            승인
-                          </button>
-                        ) : (
-                          <>
-                            <Link
-                              to={`/members/edit/${member.member_id}`}
-                              className="text-blue-600 hover:text-blue-900"
-                            >
-                              수정
-                            </Link>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex items-center justify-end gap-2">
+                          {isPendingUser(member) ? (
                             <button
-                              onClick={() => handleToggleActive(member.member_id, member.is_active)}
-                              className={`${
-                                member.is_active
-                                  ? 'text-red-600 hover:text-red-900'
-                                  : 'text-green-600 hover:text-green-900'
-                              }`}
-                              disabled={activateMutation.isPending || deactivateMutation.isPending}
+                              onClick={() => handleApprove(member)}
+                              className="text-green-600 hover:text-green-900 font-semibold"
+                              disabled={approveMutation.isPending}
                             >
-                              {member.is_active ? '비활성화' : '활성화'}
+                              승인
                             </button>
-                          </>
-                        )}
+                          ) : (
+                            <>
+                              <Link
+                                to={`/members/edit/${member.member_id}`}
+                                className="text-blue-600 hover:text-blue-900"
+                              >
+                                수정
+                              </Link>
+                              <button
+                                onClick={() => handleResetPassword(member)}
+                                className="text-purple-600 hover:text-purple-900"
+                                disabled={resetPasswordMutation.isPending}
+                              >
+                                비밀번호 초기화
+                              </button>
+                              <button
+                                onClick={() =>
+                                  handleToggleActive(
+                                    member.member_id,
+                                    member.is_active
+                                  )
+                                }
+                                className={`${
+                                  member.is_active
+                                    ? 'text-red-600 hover:text-red-900'
+                                    : 'text-green-600 hover:text-green-900'
+                                }`}
+                                disabled={
+                                  activateMutation.isPending ||
+                                  deactivateMutation.isPending
+                                }
+                              >
+                                {member.is_active ? '비활성화' : '활성화'}
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -330,14 +400,16 @@ export function MemberList() {
               <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
                 <div className="flex-1 flex justify-between sm:hidden">
                   <button
-                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
                     className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                   >
                     이전
                   </button>
                   <button
-                    onClick={() => setPage(p => Math.min(data.pagination.pageCount, p + 1))}
+                    onClick={() =>
+                      setPage((p) => Math.min(data.pagination.pageCount, p + 1))
+                    }
                     disabled={page === data.pagination.pageCount}
                     className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                   >
@@ -347,8 +419,13 @@ export function MemberList() {
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm text-gray-700">
-                      전체 <span className="font-medium">{data.pagination.total}</span>개 중{' '}
-                      <span className="font-medium">{(page - 1) * 20 + 1}</span> -{' '}
+                      전체{' '}
+                      <span className="font-medium">
+                        {data.pagination.total}
+                      </span>
+                      개 중{' '}
+                      <span className="font-medium">{(page - 1) * 20 + 1}</span>{' '}
+                      -{' '}
                       <span className="font-medium">
                         {Math.min(page * 20, data.pagination.total)}
                       </span>
@@ -357,30 +434,37 @@ export function MemberList() {
                   <div>
                     <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                       <button
-                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
                         disabled={page === 1}
                         className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                       >
                         이전
                       </button>
-                      {Array.from({ length: Math.min(5, data.pagination.pageCount) }, (_, i) => {
-                        const pageNum = i + 1;
-                        return (
-                          <button
-                            key={pageNum}
-                            onClick={() => setPage(pageNum)}
-                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                              page === pageNum
-                                ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                            }`}
-                          >
-                            {pageNum}
-                          </button>
-                        );
-                      })}
+                      {Array.from(
+                        { length: Math.min(5, data.pagination.pageCount) },
+                        (_, i) => {
+                          const pageNum = i + 1;
+                          return (
+                            <button
+                              key={pageNum}
+                              onClick={() => setPage(pageNum)}
+                              className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                                page === pageNum
+                                  ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                                  : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                              }`}
+                            >
+                              {pageNum}
+                            </button>
+                          );
+                        }
+                      )}
                       <button
-                        onClick={() => setPage(p => Math.min(data.pagination.pageCount, p + 1))}
+                        onClick={() =>
+                          setPage((p) =>
+                            Math.min(data.pagination.pageCount, p + 1)
+                          )
+                        }
                         disabled={page === data.pagination.pageCount}
                         className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                       >
@@ -399,11 +483,15 @@ export function MemberList() {
       {showApprovalModal && selectedMember && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">사용자 승인</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
+              사용자 승인
+            </h2>
 
             <div className="mb-4 p-4 bg-gray-50 rounded-lg">
               <div className="text-sm text-gray-500 mb-1">이름</div>
-              <div className="text-gray-900 font-medium">{selectedMember.name}</div>
+              <div className="text-gray-900 font-medium">
+                {selectedMember.name}
+              </div>
               <div className="text-sm text-gray-500 mt-2 mb-1">이메일</div>
               <div className="text-gray-900">{selectedMember.email}</div>
             </div>
@@ -457,7 +545,9 @@ export function MemberList() {
       {showInvitationModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">사용자 초대</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
+              사용자 초대
+            </h2>
 
             {!invitationSuccess ? (
               <>
@@ -499,7 +589,9 @@ export function MemberList() {
                   </label>
                   <select
                     value={invitationRoleId || ''}
-                    onChange={(e) => setInvitationRoleId(Number(e.target.value))}
+                    onChange={(e) =>
+                      setInvitationRoleId(Number(e.target.value))
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option value="">역할을 선택하세요</option>
@@ -517,10 +609,16 @@ export function MemberList() {
                 <div className="flex gap-3">
                   <button
                     onClick={handleInvitationSubmit}
-                    disabled={!invitationEmail || !invitationRoleId || inviteUserMutation.isPending}
+                    disabled={
+                      !invitationEmail ||
+                      !invitationRoleId ||
+                      inviteUserMutation.isPending
+                    }
                     className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {inviteUserMutation.isPending ? '초대 중...' : '초대 보내기'}
+                    {inviteUserMutation.isPending
+                      ? '초대 중...'
+                      : '초대 보내기'}
                   </button>
                   <button
                     onClick={handleCloseInvitationModal}
@@ -534,12 +632,15 @@ export function MemberList() {
             ) : (
               <>
                 <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-green-800 font-medium mb-2">초대 이메일이 발송되었습니다!</p>
+                  <p className="text-green-800 font-medium mb-2">
+                    초대 이메일이 발송되었습니다!
+                  </p>
                   <p className="text-sm text-green-700 mb-2">
                     {invitationEmail}님에게 초대 이메일이 발송되었습니다.
                   </p>
                   <p className="text-sm text-green-700">
-                    사용자가 이메일의 링크를 클릭하면 가입 절차를 진행할 수 있습니다.
+                    사용자가 이메일의 링크를 클릭하면 가입 절차를 진행할 수
+                    있습니다.
                   </p>
                 </div>
 

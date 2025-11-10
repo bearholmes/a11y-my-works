@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { holidayAPI } from '../services/api';
 
@@ -62,8 +62,13 @@ export function HolidayForm() {
 
   // 공휴일 수정 mutation
   const updateMutation = useMutation({
-    mutationFn: ({ holidayId, data }: { holidayId: number; data: HolidayFormData }) =>
-      holidayAPI.updateHoliday(holidayId, data),
+    mutationFn: ({
+      holidayId,
+      data,
+    }: {
+      holidayId: number;
+      data: HolidayFormData;
+    }) => holidayAPI.updateHoliday(holidayId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['holidays'] });
       queryClient.invalidateQueries({ queryKey: ['holiday', id] });
@@ -105,9 +110,15 @@ export function HolidayForm() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white shadow-sm rounded-lg border p-6 space-y-6">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="bg-white shadow-sm rounded-lg border p-6 space-y-6"
+      >
         <div>
-          <label htmlFor="holiday_date" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="holiday_date"
+            className="block text-sm font-medium text-gray-700"
+          >
             날짜 <span className="text-red-500">*</span>
           </label>
           <input
@@ -116,12 +127,17 @@ export function HolidayForm() {
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
           {errors.holiday_date && (
-            <p className="mt-1 text-sm text-red-600">{errors.holiday_date.message}</p>
+            <p className="mt-1 text-sm text-red-600">
+              {errors.holiday_date.message}
+            </p>
           )}
         </div>
 
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700"
+          >
             공휴일명 <span className="text-red-500">*</span>
           </label>
           <input
@@ -136,7 +152,10 @@ export function HolidayForm() {
         </div>
 
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-gray-700"
+          >
             설명
           </label>
           <textarea
@@ -146,7 +165,9 @@ export function HolidayForm() {
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
           {errors.description && (
-            <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
+            <p className="mt-1 text-sm text-red-600">
+              {errors.description.message}
+            </p>
           )}
         </div>
 
@@ -156,7 +177,11 @@ export function HolidayForm() {
             disabled={createMutation.isPending || updateMutation.isPending}
             className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            {(createMutation.isPending || updateMutation.isPending) ? '처리 중...' : isEditMode ? '수정' : '등록'}
+            {createMutation.isPending || updateMutation.isPending
+              ? '처리 중...'
+              : isEditMode
+                ? '수정'
+                : '등록'}
           </button>
           <button
             type="button"

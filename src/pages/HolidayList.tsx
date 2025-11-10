@@ -1,5 +1,5 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { holidayAPI } from '../services/api';
 
@@ -73,7 +73,10 @@ export function HolidayList() {
       {/* 필터 */}
       <div className="mb-4 flex gap-4">
         <div>
-          <label htmlFor="year" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="year"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             연도
           </label>
           <select
@@ -134,13 +137,17 @@ export function HolidayList() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
-                      onClick={() => navigate(`/holidays/${holiday.holiday_id}`)}
+                      onClick={() =>
+                        navigate(`/holidays/${holiday.holiday_id}`)
+                      }
                       className="text-blue-600 hover:text-blue-900 mr-4"
                     >
                       수정
                     </button>
                     <button
-                      onClick={() => handleDelete(holiday.holiday_id, holiday.name)}
+                      onClick={() =>
+                        handleDelete(holiday.holiday_id, holiday.name)
+                      }
                       className="text-red-600 hover:text-red-900"
                     >
                       삭제

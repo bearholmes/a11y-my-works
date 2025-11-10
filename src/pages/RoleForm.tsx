@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
-import { roleAPI, permissionAPI } from '../services/api';
+import { permissionAPI, roleAPI } from '../services/api';
 
 const roleSchema = z.object({
   name: z.string().min(1, '역할명을 입력해주세요'),
   description: z.string().optional(),
-  is_active: z.boolean()
+  is_active: z.boolean(),
 });
 
 type RoleFormData = z.infer<typeof roleSchema>;
@@ -66,7 +66,9 @@ export function RoleForm() {
 
         setPermissions(
           allPermissions.map((p) => {
-            const existing = permissionMap.get(p.permission_id) as { readAccess?: boolean; writeAccess?: boolean } | undefined;
+            const existing = permissionMap.get(p.permission_id) as
+              | { readAccess?: boolean; writeAccess?: boolean }
+              | undefined;
             return {
               permissionId: p.permission_id,
               key: p.key,
@@ -104,8 +106,17 @@ export function RoleForm() {
 
   // 역할 생성 mutation
   const createMutation = useMutation({
-    mutationFn: ({ data, permissions }: { data: RoleFormData; permissions: PermissionState[] }) =>
-      roleAPI.createRole(data, permissions.filter(p => p.readAccess || p.writeAccess)),
+    mutationFn: ({
+      data,
+      permissions,
+    }: {
+      data: RoleFormData;
+      permissions: PermissionState[];
+    }) =>
+      roleAPI.createRole(
+        data,
+        permissions.filter((p) => p.readAccess || p.writeAccess)
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['roles'] });
       alert('역할이 생성되었습니다.');
@@ -118,8 +129,15 @@ export function RoleForm() {
 
   // 역할 수정 mutation
   const updateMutation = useMutation({
-    mutationFn: ({ roleId, data, permissions }: { roleId: number; data: RoleFormData; permissions: PermissionState[] }) =>
-      roleAPI.updateRole(roleId, data, permissions),
+    mutationFn: ({
+      roleId,
+      data,
+      permissions,
+    }: {
+      roleId: number;
+      data: RoleFormData;
+      permissions: PermissionState[];
+    }) => roleAPI.updateRole(roleId, data, permissions),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['roles'] });
       queryClient.invalidateQueries({ queryKey: ['role', id] });
@@ -131,7 +149,11 @@ export function RoleForm() {
     },
   });
 
-  const handlePermissionChange = (permissionId: number, field: 'readAccess' | 'writeAccess', value: boolean) => {
+  const handlePermissionChange = (
+    permissionId: number,
+    field: 'readAccess' | 'writeAccess',
+    value: boolean
+  ) => {
     setPermissions((prev) =>
       prev.map((p) =>
         p.permissionId === permissionId ? { ...p, [field]: value } : p
@@ -175,7 +197,10 @@ export function RoleForm() {
           <h2 className="text-lg font-semibold text-gray-900">기본 정보</h2>
 
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700"
+            >
               역할명 <span className="text-red-500">*</span>
             </label>
             <input
@@ -189,7 +214,10 @@ export function RoleForm() {
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700"
+            >
               설명
             </label>
             <textarea
@@ -205,7 +233,10 @@ export function RoleForm() {
               type="checkbox"
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
-            <label htmlFor="is_active" className="ml-2 block text-sm text-gray-900">
+            <label
+              htmlFor="is_active"
+              className="ml-2 block text-sm text-gray-900"
+            >
               활성 상태
             </label>
           </div>
@@ -213,7 +244,9 @@ export function RoleForm() {
 
         {/* 권한 설정 */}
         <div className="bg-white shadow-sm rounded-lg border p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">권한 설정</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            권한 설정
+          </h2>
 
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -234,15 +267,23 @@ export function RoleForm() {
                 {permissions.map((permission) => (
                   <tr key={permission.permissionId}>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{permission.name}</div>
-                      <div className="text-xs text-gray-500">{permission.key}</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {permission.name}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {permission.key}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <input
                         type="checkbox"
                         checked={permission.readAccess}
                         onChange={(e) =>
-                          handlePermissionChange(permission.permissionId, 'readAccess', e.target.checked)
+                          handlePermissionChange(
+                            permission.permissionId,
+                            'readAccess',
+                            e.target.checked
+                          )
                         }
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       />
@@ -252,7 +293,11 @@ export function RoleForm() {
                         type="checkbox"
                         checked={permission.writeAccess}
                         onChange={(e) =>
-                          handlePermissionChange(permission.permissionId, 'writeAccess', e.target.checked)
+                          handlePermissionChange(
+                            permission.permissionId,
+                            'writeAccess',
+                            e.target.checked
+                          )
                         }
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       />
@@ -274,8 +319,8 @@ export function RoleForm() {
             {createMutation.isPending || updateMutation.isPending
               ? '처리 중...'
               : isEditMode
-              ? '수정'
-              : '생성'}
+                ? '수정'
+                : '생성'}
           </button>
           <button
             type="button"

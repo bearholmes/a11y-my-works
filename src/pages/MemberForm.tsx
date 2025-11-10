@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { memberAPI, roleAPI } from '../services/api';
 
@@ -12,7 +12,7 @@ const memberSchema = z.object({
   email: z.string().email('올바른 이메일을 입력해주세요'),
   mobile: z.string().optional(),
   role_id: z.number().min(1, '역할을 선택해주세요'),
-  is_active: z.boolean()
+  is_active: z.boolean(),
 });
 
 type MemberFormData = z.infer<typeof memberSchema>;
@@ -64,8 +64,13 @@ export function MemberForm() {
 
   // 사용자 수정 mutation
   const updateMutation = useMutation({
-    mutationFn: ({ memberId, data }: { memberId: number; data: MemberFormData }) =>
-      memberAPI.updateMember(memberId, data),
+    mutationFn: ({
+      memberId,
+      data,
+    }: {
+      memberId: number;
+      data: MemberFormData;
+    }) => memberAPI.updateMember(memberId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['members'] });
       queryClient.invalidateQueries({ queryKey: ['member', id] });
@@ -105,9 +110,15 @@ export function MemberForm() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white shadow-sm rounded-lg border p-6 space-y-6">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="bg-white shadow-sm rounded-lg border p-6 space-y-6"
+      >
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700"
+          >
             이름 <span className="text-red-500">*</span>
           </label>
           <input
@@ -121,7 +132,10 @@ export function MemberForm() {
         </div>
 
         <div>
-          <label htmlFor="account_id" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="account_id"
+            className="block text-sm font-medium text-gray-700"
+          >
             계정 ID <span className="text-red-500">*</span>
           </label>
           <input
@@ -131,15 +145,22 @@ export function MemberForm() {
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
           />
           {errors.account_id && (
-            <p className="mt-1 text-sm text-red-600">{errors.account_id.message}</p>
+            <p className="mt-1 text-sm text-red-600">
+              {errors.account_id.message}
+            </p>
           )}
           {isEditMode && (
-            <p className="mt-1 text-sm text-gray-500">계정 ID는 수정할 수 없습니다.</p>
+            <p className="mt-1 text-sm text-gray-500">
+              계정 ID는 수정할 수 없습니다.
+            </p>
           )}
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700"
+          >
             이메일 <span className="text-red-500">*</span>
           </label>
           <input
@@ -152,12 +173,17 @@ export function MemberForm() {
             <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
           )}
           {isEditMode && (
-            <p className="mt-1 text-sm text-gray-500">이메일은 수정할 수 없습니다.</p>
+            <p className="mt-1 text-sm text-gray-500">
+              이메일은 수정할 수 없습니다.
+            </p>
           )}
         </div>
 
         <div>
-          <label htmlFor="mobile" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="mobile"
+            className="block text-sm font-medium text-gray-700"
+          >
             휴대폰 번호
           </label>
           <input
@@ -172,7 +198,10 @@ export function MemberForm() {
         </div>
 
         <div>
-          <label htmlFor="role_id" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="role_id"
+            className="block text-sm font-medium text-gray-700"
+          >
             역할 <span className="text-red-500">*</span>
           </label>
           <select
@@ -187,7 +216,9 @@ export function MemberForm() {
             ))}
           </select>
           {errors.role_id && (
-            <p className="mt-1 text-sm text-red-600">{errors.role_id.message}</p>
+            <p className="mt-1 text-sm text-red-600">
+              {errors.role_id.message}
+            </p>
           )}
         </div>
 
@@ -197,7 +228,10 @@ export function MemberForm() {
             type="checkbox"
             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
           />
-          <label htmlFor="is_active" className="ml-2 block text-sm text-gray-900">
+          <label
+            htmlFor="is_active"
+            className="ml-2 block text-sm text-gray-900"
+          >
             활성 상태
           </label>
         </div>
@@ -208,7 +242,11 @@ export function MemberForm() {
             disabled={updateMutation.isPending}
             className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            {updateMutation.isPending ? '처리 중...' : isEditMode ? '수정' : '등록'}
+            {updateMutation.isPending
+              ? '처리 중...'
+              : isEditMode
+                ? '수정'
+                : '등록'}
           </button>
           <button
             type="button"

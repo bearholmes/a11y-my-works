@@ -1,9 +1,9 @@
 import { supabase } from '../lib/supabase';
 import type {
   Database,
-  TaskQuery,
-  PaginationResponse,
   Member,
+  PaginationResponse,
+  TaskQuery,
 } from '../types/database';
 
 // 업무 보고 API
@@ -25,14 +25,17 @@ export const taskAPI = {
 
     let queryBuilder = supabase
       .from('tasks')
-      .select(`
+      .select(
+        `
         *,
         members!inner(name, account_id),
         cost_groups(name),
         services(name),
         projects(name),
         platform_codes:codes!tasks_platform_id_fkey(name)
-      `, { count: 'exact' })
+      `,
+        { count: 'exact' }
+      )
       .order('created_at', { ascending: false });
 
     // 필터 적용
@@ -43,7 +46,9 @@ export const taskAPI = {
       queryBuilder = queryBuilder.lte('task_date', endDate);
     }
     if (keyword) {
-      queryBuilder = queryBuilder.or(`task_name.ilike.%${keyword}%,task_detail.ilike.%${keyword}%`);
+      queryBuilder = queryBuilder.or(
+        `task_name.ilike.%${keyword}%,task_detail.ilike.%${keyword}%`
+      );
     }
     if (memberId) {
       queryBuilder = queryBuilder.eq('member_id', memberId);
@@ -67,7 +72,7 @@ export const taskAPI = {
     // 페이지네이션
     const start = (page - 1) * pageSize;
     const end = start + pageSize - 1;
-    
+
     const { data, error, count } = await queryBuilder.range(start, end);
 
     if (error) throw error;
@@ -78,8 +83,8 @@ export const taskAPI = {
         total: count || 0,
         page,
         pageSize,
-        pageCount: Math.ceil((count || 0) / pageSize)
-      } as PaginationResponse
+        pageCount: Math.ceil((count || 0) / pageSize),
+      } as PaginationResponse,
     };
   },
 
@@ -94,7 +99,10 @@ export const taskAPI = {
     return data;
   },
 
-  async updateTask(taskId: number, updates: Database['public']['Tables']['tasks']['Update']) {
+  async updateTask(
+    taskId: number,
+    updates: Database['public']['Tables']['tasks']['Update']
+  ) {
     const { data, error } = await supabase
       .from('tasks')
       .update({ ...updates, updated_at: new Date().toISOString() })
@@ -113,13 +121,15 @@ export const taskAPI = {
       .eq('task_id', taskId);
 
     if (error) throw error;
-  }
+  },
 };
 
 // 사용자 API
 export const memberAPI = {
   async getCurrentMember() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
 
     const { data, error } = await supabase
@@ -154,8 +164,8 @@ export const memberAPI = {
         name: profile.name || '',
         email: profile.email || '',
         mobile: profile.mobile,
-        role_id: autoApprove ? (profile.role_id || 3) : null, // 자동승인: 역할 부여, 일반가입: null
-        is_active: autoApprove // 자동승인: true, 일반가입: false
+        role_id: autoApprove ? profile.role_id || 3 : null, // 자동승인: 역할 부여, 일반가입: null
+        is_active: autoApprove, // 자동승인: true, 일반가입: false
       })
       .select()
       .single();
@@ -169,7 +179,9 @@ export const memberAPI = {
    * @returns 사용자 권한 목록 (권한 키, 읽기/쓰기 권한 포함)
    */
   async getCurrentMemberPermissions() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
 
     // 사용자 정보와 역할 조회
@@ -199,26 +211,36 @@ export const memberAPI = {
       key: rp.permissions.key,
       name: rp.permissions.name,
       canRead: rp.read_access,
-      canWrite: rp.write_access
+      canWrite: rp.write_access,
     }));
   },
 
   /**
    * 전체 사용자 목록을 조회합니다.
    */
-  async getMembers(params?: { page?: number; pageSize?: number; search?: string; isActive?: boolean }) {
+  async getMembers(params?: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    isActive?: boolean;
+  }) {
     const { page = 1, pageSize = 20, search, isActive } = params || {};
 
     let query = supabase
       .from('members')
-      .select(`
+      .select(
+        `
         *,
         roles(role_id, name, description)
-      `, { count: 'exact' })
+      `,
+        { count: 'exact' }
+      )
       .order('created_at', { ascending: false });
 
     if (search) {
-      query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%,account_id.ilike.%${search}%`);
+      query = query.or(
+        `name.ilike.%${search}%,email.ilike.%${search}%,account_id.ilike.%${search}%`
+      );
     }
 
     if (isActive !== undefined) {
@@ -238,8 +260,8 @@ export const memberAPI = {
         total: count || 0,
         page,
         pageSize,
-        pageCount: Math.ceil((count || 0) / pageSize)
-      } as PaginationResponse
+        pageCount: Math.ceil((count || 0) / pageSize),
+      } as PaginationResponse,
     };
   },
 
@@ -263,7 +285,10 @@ export const memberAPI = {
   /**
    * 사용자 정보를 수정합니다.
    */
-  async updateMember(memberId: number, updates: Database['public']['Tables']['members']['Update']) {
+  async updateMember(
+    memberId: number,
+    updates: Database['public']['Tables']['members']['Update']
+  ) {
     const { data, error } = await supabase
       .from('members')
       .update({ ...updates, updated_at: new Date().toISOString() })
@@ -295,9 +320,22 @@ export const memberAPI = {
   async approveMember(memberId: number, roleId: number) {
     return this.updateMember(memberId, {
       role_id: roleId,
-      is_active: true
+      is_active: true,
     });
-  }
+  },
+
+  /**
+   * 관리자가 사용자의 비밀번호 재설정 이메일을 발송합니다.
+   * @param email 사용자 이메일
+   */
+  async resetUserPassword(email: string) {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    if (error) throw error;
+    return data;
+  },
 };
 
 // 역할 관리 API
@@ -305,7 +343,11 @@ export const roleAPI = {
   /**
    * 전체 역할 목록을 조회합니다.
    */
-  async getRoles(params?: { page?: number; pageSize?: number; isActive?: boolean }) {
+  async getRoles(params?: {
+    page?: number;
+    pageSize?: number;
+    isActive?: boolean;
+  }) {
     const { page = 1, pageSize = 50, isActive } = params || {};
 
     let query = supabase
@@ -330,8 +372,8 @@ export const roleAPI = {
         total: count || 0,
         page,
         pageSize,
-        pageCount: Math.ceil((count || 0) / pageSize)
-      } as PaginationResponse
+        pageCount: Math.ceil((count || 0) / pageSize),
+      } as PaginationResponse,
     };
   },
 
@@ -366,15 +408,22 @@ export const roleAPI = {
         key: rp.permissions.key,
         name: rp.permissions.name,
         readAccess: rp.read_access,
-        writeAccess: rp.write_access
-      }))
+        writeAccess: rp.write_access,
+      })),
     };
   },
 
   /**
    * 새로운 역할을 생성합니다.
    */
-  async createRole(role: Database['public']['Tables']['roles']['Insert'], permissions?: Array<{ permissionId: number; readAccess: boolean; writeAccess: boolean }>) {
+  async createRole(
+    role: Database['public']['Tables']['roles']['Insert'],
+    permissions?: Array<{
+      permissionId: number;
+      readAccess: boolean;
+      writeAccess: boolean;
+    }>
+  ) {
     const { data, error } = await supabase
       .from('roles')
       .insert(role)
@@ -385,11 +434,11 @@ export const roleAPI = {
 
     // 권한 할당
     if (permissions && permissions.length > 0) {
-      const rolePermissions = permissions.map(p => ({
+      const rolePermissions = permissions.map((p) => ({
         role_id: data.role_id,
         permission_id: p.permissionId,
         read_access: p.readAccess,
-        write_access: p.writeAccess
+        write_access: p.writeAccess,
       }));
 
       const { error: permError } = await supabase
@@ -408,7 +457,11 @@ export const roleAPI = {
   async updateRole(
     roleId: number,
     updates: Database['public']['Tables']['roles']['Update'],
-    permissions?: Array<{ permissionId: number; readAccess: boolean; writeAccess: boolean }>
+    permissions?: Array<{
+      permissionId: number;
+      readAccess: boolean;
+      writeAccess: boolean;
+    }>
   ) {
     const { data, error } = await supabase
       .from('roles')
@@ -431,11 +484,11 @@ export const roleAPI = {
 
       // 새 권한 추가
       if (permissions.length > 0) {
-        const rolePermissions = permissions.map(p => ({
+        const rolePermissions = permissions.map((p) => ({
           role_id: roleId,
           permission_id: p.permissionId,
           read_access: p.readAccess,
-          write_access: p.writeAccess
+          write_access: p.writeAccess,
         }));
 
         const { error: insertError } = await supabase
@@ -481,7 +534,7 @@ export const roleAPI = {
       .eq('role_id', roleId);
 
     if (error) throw error;
-  }
+  },
 };
 
 // 권한 API
@@ -497,7 +550,7 @@ export const permissionAPI = {
 
     if (error) throw error;
     return data || [];
-  }
+  },
 };
 
 // 코드 관리 API
@@ -531,7 +584,7 @@ export const codeAPI = {
 
   async getCategories() {
     return this.getCodes('CATEGORY');
-  }
+  },
 };
 
 // 프로젝트 관리 API
@@ -539,7 +592,12 @@ export const projectAPI = {
   /**
    * 프로젝트 목록을 조회합니다.
    */
-  async getProjects(params?: { page?: number; pageSize?: number; search?: string; platform?: string }) {
+  async getProjects(params?: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    platform?: string;
+  }) {
     const { page = 1, pageSize = 20, search, platform } = params || {};
 
     let query = supabase
@@ -568,8 +626,8 @@ export const projectAPI = {
         total: count || 0,
         page,
         pageSize,
-        pageCount: Math.ceil((count || 0) / pageSize)
-      } as PaginationResponse
+        pageCount: Math.ceil((count || 0) / pageSize),
+      } as PaginationResponse,
     };
   },
 
@@ -590,7 +648,9 @@ export const projectAPI = {
   /**
    * 새로운 프로젝트를 생성합니다.
    */
-  async createProject(project: Database['public']['Tables']['projects']['Insert']) {
+  async createProject(
+    project: Database['public']['Tables']['projects']['Insert']
+  ) {
     const { data, error } = await supabase
       .from('projects')
       .insert(project)
@@ -604,7 +664,10 @@ export const projectAPI = {
   /**
    * 프로젝트 정보를 수정합니다.
    */
-  async updateProject(projectId: number, updates: Database['public']['Tables']['projects']['Update']) {
+  async updateProject(
+    projectId: number,
+    updates: Database['public']['Tables']['projects']['Update']
+  ) {
     const { data, error } = await supabase
       .from('projects')
       .update({ ...updates, updated_at: new Date().toISOString() })
@@ -635,7 +698,7 @@ export const projectAPI = {
    */
   async deleteProject(projectId: number) {
     // 먼저 해당 프로젝트를 사용하는 업무가 있는지 확인
-    const { data: tasks, error: checkError} = await supabase
+    const { data: tasks, error: checkError } = await supabase
       .from('tasks')
       .select('task_id')
       .eq('project_id', projectId)
@@ -653,7 +716,7 @@ export const projectAPI = {
       .eq('project_id', projectId);
 
     if (error) throw error;
-  }
+  },
 };
 
 // 서비스 관리 API
@@ -661,15 +724,23 @@ export const serviceAPI = {
   /**
    * 서비스 목록을 조회합니다.
    */
-  async getServices(params?: { page?: number; pageSize?: number; search?: string; costGroupId?: number }) {
+  async getServices(params?: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    costGroupId?: number;
+  }) {
     const { page = 1, pageSize = 20, search, costGroupId } = params || {};
 
     let query = supabase
       .from('services')
-      .select(`
+      .select(
+        `
         *,
         cost_groups(name)
-      `, { count: 'exact' })
+      `,
+        { count: 'exact' }
+      )
       .order('created_at', { ascending: false });
 
     if (search) {
@@ -693,8 +764,8 @@ export const serviceAPI = {
         total: count || 0,
         page,
         pageSize,
-        pageCount: Math.ceil((count || 0) / pageSize)
-      } as PaginationResponse
+        pageCount: Math.ceil((count || 0) / pageSize),
+      } as PaginationResponse,
     };
   },
 
@@ -718,7 +789,9 @@ export const serviceAPI = {
   /**
    * 새로운 서비스를 생성합니다.
    */
-  async createService(service: Database['public']['Tables']['services']['Insert']) {
+  async createService(
+    service: Database['public']['Tables']['services']['Insert']
+  ) {
     const { data, error } = await supabase
       .from('services')
       .insert(service)
@@ -732,7 +805,10 @@ export const serviceAPI = {
   /**
    * 서비스 정보를 수정합니다.
    */
-  async updateService(serviceId: number, updates: Database['public']['Tables']['services']['Update']) {
+  async updateService(
+    serviceId: number,
+    updates: Database['public']['Tables']['services']['Update']
+  ) {
     const { data, error } = await supabase
       .from('services')
       .update({ ...updates, updated_at: new Date().toISOString() })
@@ -758,7 +834,9 @@ export const serviceAPI = {
     if (checkError) throw checkError;
 
     if (projects && projects.length > 0) {
-      throw new Error('이 서비스를 사용하는 프로젝트가 있어 삭제할 수 없습니다.');
+      throw new Error(
+        '이 서비스를 사용하는 프로젝트가 있어 삭제할 수 없습니다.'
+      );
     }
 
     const { error } = await supabase
@@ -781,7 +859,7 @@ export const serviceAPI = {
 
     if (error) throw error;
     return data || [];
-  }
+  },
 };
 
 // 청구 그룹 관리 API
@@ -789,7 +867,11 @@ export const costGroupAPI = {
   /**
    * 청구 그룹 목록을 조회합니다.
    */
-  async getCostGroups(params?: { page?: number; pageSize?: number; search?: string }) {
+  async getCostGroups(params?: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+  }) {
     const { page = 1, pageSize = 20, search } = params || {};
 
     let query = supabase
@@ -814,8 +896,8 @@ export const costGroupAPI = {
         total: count || 0,
         page,
         pageSize,
-        pageCount: Math.ceil((count || 0) / pageSize)
-      } as PaginationResponse
+        pageCount: Math.ceil((count || 0) / pageSize),
+      } as PaginationResponse,
     };
   },
 
@@ -836,7 +918,9 @@ export const costGroupAPI = {
   /**
    * 새로운 청구 그룹을 생성합니다.
    */
-  async createCostGroup(costGroup: Database['public']['Tables']['cost_groups']['Insert']) {
+  async createCostGroup(
+    costGroup: Database['public']['Tables']['cost_groups']['Insert']
+  ) {
     const { data, error } = await supabase
       .from('cost_groups')
       .insert(costGroup)
@@ -850,7 +934,10 @@ export const costGroupAPI = {
   /**
    * 청구 그룹 정보를 수정합니다.
    */
-  async updateCostGroup(costGroupId: number, updates: Database['public']['Tables']['cost_groups']['Update']) {
+  async updateCostGroup(
+    costGroupId: number,
+    updates: Database['public']['Tables']['cost_groups']['Update']
+  ) {
     const { data, error } = await supabase
       .from('cost_groups')
       .update({ ...updates, updated_at: new Date().toISOString() })
@@ -876,7 +963,9 @@ export const costGroupAPI = {
     if (checkError) throw checkError;
 
     if (services && services.length > 0) {
-      throw new Error('이 청구 그룹을 사용하는 서비스가 있어 삭제할 수 없습니다.');
+      throw new Error(
+        '이 청구 그룹을 사용하는 서비스가 있어 삭제할 수 없습니다.'
+      );
     }
 
     const { error } = await supabase
@@ -885,7 +974,7 @@ export const costGroupAPI = {
       .eq('cost_group_id', costGroupId);
 
     if (error) throw error;
-  }
+  },
 };
 
 // 비즈니스 데이터 API
@@ -937,7 +1026,7 @@ export const businessAPI = {
     const { data, error } = await query;
     if (error) throw error;
     return data || [];
-  }
+  },
 };
 
 // 공휴일 관리 API
@@ -945,7 +1034,11 @@ export const holidayAPI = {
   /**
    * 공휴일 목록을 조회합니다.
    */
-  async getHolidays(params?: { page?: number; pageSize?: number; year?: number }) {
+  async getHolidays(params?: {
+    page?: number;
+    pageSize?: number;
+    year?: number;
+  }) {
     const { page = 1, pageSize = 20, year } = params || {};
 
     let query = supabase
@@ -972,8 +1065,8 @@ export const holidayAPI = {
         total: count || 0,
         page,
         pageSize,
-        pageCount: Math.ceil((count || 0) / pageSize)
-      } as PaginationResponse
+        pageCount: Math.ceil((count || 0) / pageSize),
+      } as PaginationResponse,
     };
   },
 
@@ -994,7 +1087,9 @@ export const holidayAPI = {
   /**
    * 새로운 공휴일을 생성합니다.
    */
-  async createHoliday(holiday: Database['public']['Tables']['holidays']['Insert']) {
+  async createHoliday(
+    holiday: Database['public']['Tables']['holidays']['Insert']
+  ) {
     const { data, error } = await supabase
       .from('holidays')
       .insert(holiday)
@@ -1008,7 +1103,10 @@ export const holidayAPI = {
   /**
    * 공휴일 정보를 수정합니다.
    */
-  async updateHoliday(holidayId: number, updates: Database['public']['Tables']['holidays']['Update']) {
+  async updateHoliday(
+    holidayId: number,
+    updates: Database['public']['Tables']['holidays']['Update']
+  ) {
     const { data, error } = await supabase
       .from('holidays')
       .update(updates)
@@ -1030,7 +1128,7 @@ export const holidayAPI = {
       .eq('holiday_id', holidayId);
 
     if (error) throw error;
-  }
+  },
 };
 
 // 초대 관리 API (Supabase Auth 사용)
@@ -1039,11 +1137,7 @@ export const invitationAPI = {
    * Supabase Auth의 inviteUserByEmail을 사용하여 사용자를 초대합니다.
    * Supabase가 자동으로 초대 이메일을 발송합니다.
    */
-  async inviteUser(params: {
-    email: string;
-    role_id: number;
-    name?: string;
-  }) {
+  async inviteUser(params: { email: string; role_id: number; name?: string }) {
     const { email, role_id, name } = params;
 
     // 이미 가입된 이메일인지 확인
@@ -1064,12 +1158,227 @@ export const invitationAPI = {
       data: {
         role_id,
         name: name || '',
-        invited: true
+        invited: true,
       },
-      redirectTo: `${window.location.origin}/auth/callback`
+      redirectTo: `${window.location.origin}/auth/callback`,
     });
 
     if (error) throw error;
     return data;
-  }
+  },
+};
+
+// 대시보드 통계 API
+export const dashboardAPI = {
+  /**
+   * 대시보드 전체 통계를 조회합니다.
+   */
+  async getDashboardStats(params?: { startDate?: string; endDate?: string }) {
+    const { startDate, endDate } = params || {};
+
+    // 1. 총 업무 수
+    let taskCountQuery = supabase
+      .from('tasks')
+      .select('task_id', { count: 'exact', head: true });
+
+    if (startDate) taskCountQuery = taskCountQuery.gte('task_date', startDate);
+    if (endDate) taskCountQuery = taskCountQuery.lte('task_date', endDate);
+
+    const { count: totalTasks } = await taskCountQuery;
+
+    // 2. 총 작업 시간
+    let taskTimeQuery = supabase.from('tasks').select('task_hours, ot_hours');
+
+    if (startDate) taskTimeQuery = taskTimeQuery.gte('task_date', startDate);
+    if (endDate) taskTimeQuery = taskTimeQuery.lte('task_date', endDate);
+
+    const { data: tasks } = await taskTimeQuery;
+
+    const totalHours =
+      tasks?.reduce(
+        (sum, task) => sum + (task.task_hours || 0) + (task.ot_hours || 0),
+        0
+      ) || 0;
+
+    // 3. 활성 사용자 수
+    const { count: activeMembers } = await supabase
+      .from('members')
+      .select('member_id', { count: 'exact', head: true })
+      .eq('is_active', true);
+
+    // 4. 진행 중인 프로젝트 수
+    const { count: activeProjects } = await supabase
+      .from('projects')
+      .select('project_id', { count: 'exact', head: true })
+      .eq('is_active', true);
+
+    return {
+      totalTasks: totalTasks || 0,
+      totalHours: Math.round(totalHours * 10) / 10,
+      activeMembers: activeMembers || 0,
+      activeProjects: activeProjects || 0,
+    };
+  },
+
+  /**
+   * 일별 업무 통계를 조회합니다.
+   */
+  async getDailyTaskStats(params?: { startDate?: string; endDate?: string }) {
+    const { startDate, endDate } = params || {};
+
+    let query = supabase
+      .from('tasks')
+      .select('task_date, task_hours, ot_hours')
+      .order('task_date', { ascending: true });
+
+    if (startDate) query = query.gte('task_date', startDate);
+    if (endDate) query = query.lte('task_date', endDate);
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    // 날짜별로 그룹화
+    const dailyStats = (data || []).reduce((acc: any, task: any) => {
+      const date = task.task_date;
+      if (!acc[date]) {
+        acc[date] = {
+          date,
+          totalHours: 0,
+          taskCount: 0,
+        };
+      }
+      acc[date].totalHours += (task.task_hours || 0) + (task.ot_hours || 0);
+      acc[date].taskCount += 1;
+      return acc;
+    }, {});
+
+    return Object.values(dailyStats).map((stat: any) => ({
+      date: stat.date,
+      totalHours: Math.round(stat.totalHours * 10) / 10,
+      taskCount: stat.taskCount,
+    }));
+  },
+
+  /**
+   * 프로젝트별 업무 통계를 조회합니다.
+   */
+  async getProjectStats(params?: { startDate?: string; endDate?: string }) {
+    const { startDate, endDate } = params || {};
+
+    let query = supabase.from('tasks').select(
+      `
+        project_id,
+        task_hours,
+        ot_hours,
+        projects(name)
+      `
+    );
+
+    if (startDate) query = query.gte('task_date', startDate);
+    if (endDate) query = query.lte('task_date', endDate);
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    // 프로젝트별로 그룹화
+    const projectStats = (data || []).reduce((acc: any, task: any) => {
+      const projectId = task.project_id || 0;
+      const projectName = task.projects?.name || '미지정';
+
+      if (!acc[projectId]) {
+        acc[projectId] = {
+          projectId,
+          projectName,
+          totalHours: 0,
+          taskCount: 0,
+        };
+      }
+      acc[projectId].totalHours +=
+        (task.task_hours || 0) + (task.ot_hours || 0);
+      acc[projectId].taskCount += 1;
+      return acc;
+    }, {});
+
+    return Object.values(projectStats)
+      .map((stat: any) => ({
+        projectId: stat.projectId,
+        projectName: stat.projectName,
+        totalHours: Math.round(stat.totalHours * 10) / 10,
+        taskCount: stat.taskCount,
+      }))
+      .sort((a: any, b: any) => b.totalHours - a.totalHours);
+  },
+
+  /**
+   * 사용자별 업무 통계를 조회합니다.
+   */
+  async getMemberStats(params?: { startDate?: string; endDate?: string }) {
+    const { startDate, endDate } = params || {};
+
+    let query = supabase.from('tasks').select(
+      `
+        member_id,
+        task_hours,
+        ot_hours,
+        members!inner(name, account_id)
+      `
+    );
+
+    if (startDate) query = query.gte('task_date', startDate);
+    if (endDate) query = query.lte('task_date', endDate);
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    // 사용자별로 그룹화
+    const memberStats = (data || []).reduce((acc: any, task: any) => {
+      const memberId = task.member_id;
+      const memberName = task.members?.name || '알 수 없음';
+
+      if (!acc[memberId]) {
+        acc[memberId] = {
+          memberId,
+          memberName,
+          totalHours: 0,
+          taskCount: 0,
+        };
+      }
+      acc[memberId].totalHours += (task.task_hours || 0) + (task.ot_hours || 0);
+      acc[memberId].taskCount += 1;
+      return acc;
+    }, {});
+
+    return Object.values(memberStats)
+      .map((stat: any) => ({
+        memberId: stat.memberId,
+        memberName: stat.memberName,
+        totalHours: Math.round(stat.totalHours * 10) / 10,
+        taskCount: stat.taskCount,
+      }))
+      .sort((a: any, b: any) => b.totalHours - a.totalHours);
+  },
+
+  /**
+   * 최근 업무 목록을 조회합니다.
+   */
+  async getRecentTasks(limit = 10) {
+    const { data, error } = await supabase
+      .from('tasks')
+      .select(
+        `
+        *,
+        members!inner(name, account_id),
+        projects(name),
+        services(name)
+      `
+      )
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return data || [];
+  },
 };
