@@ -9,15 +9,18 @@ export function CostGroupList() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
+  const [isActive, setIsActive] = useState<boolean | undefined>(undefined);
+  const [isActiveInput, setIsActiveInput] = useState<boolean | undefined>(undefined);
 
   // 청구 그룹 목록 조회
   const { data, isLoading, error } = useQuery({
-    queryKey: ['costGroups', { page, search }],
+    queryKey: ['costGroups', { page, search, isActive }],
     queryFn: () =>
       costGroupAPI.getCostGroups({
         page,
         pageSize: 20,
         search,
+        isActive,
       }),
   });
 
@@ -37,6 +40,7 @@ export function CostGroupList() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setSearch(searchInput);
+    setIsActive(isActiveInput);
     setPage(1);
   };
 
@@ -75,22 +79,36 @@ export function CostGroupList() {
 
       {/* 검색 */}
       <div className="bg-white p-4 rounded-lg shadow-sm border">
-        <form onSubmit={handleSearch} className="flex gap-4">
-          <div className="flex-1">
-            <input
-              type="text"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="청구 그룹명으로 검색"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+        <form onSubmit={handleSearch} className="space-y-4">
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <input
+                type="text"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="청구 그룹명 또는 설명으로 검색"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <select
+              value={isActiveInput === undefined ? 'all' : isActiveInput ? 'active' : 'inactive'}
+              onChange={(e) => {
+                const value = e.target.value;
+                setIsActiveInput(value === 'all' ? undefined : value === 'active');
+              }}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">전체</option>
+              <option value="active">활성</option>
+              <option value="inactive">비활성</option>
+            </select>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              검색
+            </button>
           </div>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            검색
-          </button>
         </form>
       </div>
 

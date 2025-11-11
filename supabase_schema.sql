@@ -357,25 +357,303 @@ CREATE POLICY "cost_groups_select_all" ON cost_groups
 FOR SELECT TO authenticated
 USING (true);
 
+-- 관리자/매니저만 청구 그룹 생성 가능
+CREATE POLICY "cost_groups_insert_admin" ON cost_groups
+FOR INSERT TO authenticated
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+);
+
+-- 관리자/매니저만 청구 그룹 수정 가능
+CREATE POLICY "cost_groups_update_admin" ON cost_groups
+FOR UPDATE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+)
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+);
+
+-- 관리자/매니저만 청구 그룹 삭제 가능
+CREATE POLICY "cost_groups_delete_admin" ON cost_groups
+FOR DELETE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+);
+
 CREATE POLICY "services_select_all" ON services
 FOR SELECT TO authenticated
 USING (true);
+
+-- 관리자/매니저만 서비스 생성/수정/삭제 가능
+CREATE POLICY "services_insert_admin" ON services
+FOR INSERT TO authenticated
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+);
+
+CREATE POLICY "services_update_admin" ON services
+FOR UPDATE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+)
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+);
+
+CREATE POLICY "services_delete_admin" ON services
+FOR DELETE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+);
 
 CREATE POLICY "projects_select_all" ON projects
 FOR SELECT TO authenticated
 USING (true);
 
+-- 관리자/매니저만 프로젝트 생성/수정/삭제 가능
+CREATE POLICY "projects_insert_admin" ON projects
+FOR INSERT TO authenticated
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+);
+
+CREATE POLICY "projects_update_admin" ON projects
+FOR UPDATE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+)
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+);
+
+CREATE POLICY "projects_delete_admin" ON projects
+FOR DELETE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+);
+
 CREATE POLICY "project_urls_select_all" ON project_urls
 FOR SELECT TO authenticated
 USING (true);
+
+-- 관리자/매니저만 프로젝트 URL 생성/수정/삭제 가능
+CREATE POLICY "project_urls_insert_admin" ON project_urls
+FOR INSERT TO authenticated
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+);
+
+CREATE POLICY "project_urls_update_admin" ON project_urls
+FOR UPDATE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+)
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+);
+
+CREATE POLICY "project_urls_delete_admin" ON project_urls
+FOR DELETE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+);
 
 CREATE POLICY "holidays_select_all" ON holidays
 FOR SELECT TO authenticated
 USING (true);
 
+-- 관리자만 공휴일 생성/수정/삭제 가능
+CREATE POLICY "holidays_insert_admin" ON holidays
+FOR INSERT TO authenticated
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name = '관리자'
+      AND m.is_active = true
+  )
+);
+
+CREATE POLICY "holidays_update_admin" ON holidays
+FOR UPDATE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name = '관리자'
+      AND m.is_active = true
+  )
+)
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name = '관리자'
+      AND m.is_active = true
+  )
+);
+
+CREATE POLICY "holidays_delete_admin" ON holidays
+FOR DELETE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name = '관리자'
+      AND m.is_active = true
+  )
+);
+
 CREATE POLICY "roles_select_all" ON roles
 FOR SELECT TO authenticated
 USING (true);
+
+-- 관리자만 역할 생성/수정/삭제 가능
+CREATE POLICY "roles_insert_admin" ON roles
+FOR INSERT TO authenticated
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name = '관리자'
+      AND m.is_active = true
+  )
+);
+
+CREATE POLICY "roles_update_admin" ON roles
+FOR UPDATE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name = '관리자'
+      AND m.is_active = true
+  )
+)
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name = '관리자'
+      AND m.is_active = true
+  )
+);
+
+CREATE POLICY "roles_delete_admin" ON roles
+FOR DELETE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name = '관리자'
+      AND m.is_active = true
+  )
+);
 
 CREATE POLICY "permissions_select_all" ON permissions
 FOR SELECT TO authenticated

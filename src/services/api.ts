@@ -871,8 +871,9 @@ export const costGroupAPI = {
     page?: number;
     pageSize?: number;
     search?: string;
+    isActive?: boolean;
   }) {
-    const { page = 1, pageSize = 20, search } = params || {};
+    const { page = 1, pageSize = 20, search, isActive } = params || {};
 
     let query = supabase
       .from('cost_groups')
@@ -880,7 +881,11 @@ export const costGroupAPI = {
       .order('created_at', { ascending: false });
 
     if (search) {
-      query = query.or(`name.ilike.%${search}%,code.ilike.%${search}%`);
+      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
+    }
+
+    if (isActive !== undefined) {
+      query = query.eq('is_active', isActive);
     }
 
     const start = (page - 1) * pageSize;
