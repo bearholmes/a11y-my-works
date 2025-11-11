@@ -55,6 +55,9 @@ const NotFound = lazy(() =>
 const ServerError = lazy(() =>
   import('../pages/ServerError').then((m) => ({ default: m.ServerError }))
 );
+const Licenses = lazy(() =>
+  import('../pages/Licenses').then((m) => ({ default: m.Licenses }))
+);
 
 // 프로젝트 관리
 const ProjectList = lazy(() =>
@@ -191,6 +194,14 @@ export function AppRouter() {
           element={
             <Suspense fallback={<PageLoader />}>
               <ResetPassword />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/licenses"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <Licenses />
             </Suspense>
           }
         />
