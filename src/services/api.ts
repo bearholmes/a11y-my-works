@@ -729,8 +729,10 @@ export const serviceAPI = {
     pageSize?: number;
     search?: string;
     costGroupId?: number;
+    isActive?: boolean;
   }) {
-    const { page = 1, pageSize = 20, search, costGroupId } = params || {};
+    const { page = 1, pageSize = 20, search, costGroupId, isActive } =
+      params || {};
 
     let query = supabase
       .from('services')
@@ -744,11 +746,15 @@ export const serviceAPI = {
       .order('created_at', { ascending: false });
 
     if (search) {
-      query = query.or(`name.ilike.%${search}%,code.ilike.%${search}%`);
+      query = query.ilike('name', `%${search}%`);
     }
 
     if (costGroupId) {
       query = query.eq('cost_group_id', costGroupId);
+    }
+
+    if (isActive !== undefined) {
+      query = query.eq('is_active', isActive);
     }
 
     const start = (page - 1) * pageSize;

@@ -8,11 +8,6 @@ import { serviceAPI } from '../services/api';
 
 const serviceSchema = z.object({
   name: z.string().min(1, '서비스명을 입력해주세요'),
-  code: z
-    .string()
-    .min(1, '서비스 코드를 입력해주세요')
-    .regex(/^[A-Z0-9_]+$/, '대문자, 숫자, 언더스코어만 사용 가능합니다'),
-  description: z.string().optional(),
   cost_group_id: z.number().min(1, '청구 그룹을 선택해주세요'),
 });
 
@@ -51,8 +46,6 @@ export function ServiceForm() {
     if (service) {
       reset({
         name: service.name,
-        code: service.code,
-        description: service.description || '',
         cost_group_id: service.cost_group_id || 0,
       });
     }
@@ -128,65 +121,6 @@ export function ServiceForm() {
       >
         <div>
           <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
-          >
-            서비스명 <span className="text-red-500">*</span>
-          </label>
-          <input
-            {...register('name')}
-            type="text"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-          {errors.name && (
-            <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-          )}
-        </div>
-
-        <div>
-          <label
-            htmlFor="code"
-            className="block text-sm font-medium text-gray-700"
-          >
-            서비스 코드 <span className="text-red-500">*</span>
-          </label>
-          <input
-            {...register('code')}
-            type="text"
-            placeholder="SERVICE_CODE"
-            disabled={isEditMode}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed font-mono"
-          />
-          {errors.code && (
-            <p className="mt-1 text-sm text-red-600">{errors.code.message}</p>
-          )}
-          <p className="mt-1 text-sm text-gray-500">
-            대문자, 숫자, 언더스코어만 사용 가능합니다.{' '}
-            {isEditMode && '(코드는 수정할 수 없습니다)'}
-          </p>
-        </div>
-
-        <div>
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700"
-          >
-            설명
-          </label>
-          <textarea
-            {...register('description')}
-            rows={3}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-          {errors.description && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.description.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label
             htmlFor="cost_group_id"
             className="block text-sm font-medium text-gray-700"
           >
@@ -209,6 +143,24 @@ export function ServiceForm() {
             </p>
           )}
         </div>
+
+        <div>
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700"
+          >
+            서비스명 <span className="text-red-500">*</span>
+          </label>
+          <input
+            {...register('name')}
+            type="text"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          />
+          {errors.name && (
+            <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+          )}
+        </div>
+
 
         <div className="flex gap-3 pt-4">
           <button

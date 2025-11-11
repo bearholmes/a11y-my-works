@@ -12,6 +12,15 @@ export function ServiceList() {
   const [costGroupFilter, setCostGroupFilter] = useState<number | undefined>(
     undefined
   );
+  const [costGroupInput, setCostGroupInput] = useState<number | undefined>(
+    undefined
+  );
+  const [isActiveFilter, setIsActiveFilter] = useState<boolean | undefined>(
+    undefined
+  );
+  const [isActiveInput, setIsActiveInput] = useState<boolean | undefined>(
+    undefined
+  );
 
   // 청구 그룹 목록 조회 (필터용)
   const { data: costGroups } = useQuery({
@@ -21,13 +30,17 @@ export function ServiceList() {
 
   // 서비스 목록 조회
   const { data, isLoading, error } = useQuery({
-    queryKey: ['services', { page, search, costGroupId: costGroupFilter }],
+    queryKey: [
+      'services',
+      { page, search, costGroupId: costGroupFilter, isActive: isActiveFilter },
+    ],
     queryFn: () =>
       serviceAPI.getServices({
         page,
         pageSize: 20,
         search,
         costGroupId: costGroupFilter,
+        isActive: isActiveFilter,
       }),
   });
 
@@ -46,6 +59,8 @@ export function ServiceList() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setSearch(searchInput);
+    setCostGroupFilter(costGroupInput);
+    setIsActiveFilter(isActiveInput);
     setPage(1);
   };
 
@@ -88,17 +103,16 @@ export function ServiceList() {
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="서비스명, 코드로 검색"
+              placeholder="서비스명으로 검색"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <select
-            value={costGroupFilter || ''}
+            value={costGroupInput || ''}
             onChange={(e) => {
-              setCostGroupFilter(
+              setCostGroupInput(
                 e.target.value ? Number(e.target.value) : undefined
               );
-              setPage(1);
             }}
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
@@ -108,6 +122,23 @@ export function ServiceList() {
                 {group.name}
               </option>
             ))}
+          </select>
+          <select
+            value={
+              isActiveInput === undefined ? '' : isActiveInput ? 'true' : 'false'
+            }
+            onChange={(e) => {
+              setIsActiveInput(
+                e.target.value === ''
+                  ? undefined
+                  : e.target.value === 'true'
+              );
+            }}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">전체 상태</option>
+            <option value="true">활성</option>
+            <option value="false">비활성</option>
           </select>
           <button
             type="submit"
@@ -139,9 +170,6 @@ export function ServiceList() {
                       서비스명
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      코드
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       청구 그룹
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -162,16 +190,6 @@ export function ServiceList() {
                         <div className="text-sm font-medium text-gray-900">
                           {service.name}
                         </div>
-                        {service.description && (
-                          <div className="text-sm text-gray-500">
-                            {service.description}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <code className="text-sm text-gray-900 bg-gray-100 px-2 py-1 rounded">
-                          {service.code}
-                        </code>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
