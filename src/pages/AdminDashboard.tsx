@@ -12,6 +12,8 @@ export function AdminDashboard() {
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1); // 1-12
   const [showIncompleteOnly, setShowIncompleteOnly] = useState(true); // 기본값: 미완료만 보기
+  const [searchQuery, setSearchQuery] = useState(''); // 사용자 이름 검색
+  const [selectedDate, setSelectedDate] = useState<number | null>(null); // 선택한 날짜 (1-31, null = 전체)
 
   // 관리자 대시보드 통계 조회
   const { data: stats, isLoading } = useQuery({
@@ -21,9 +23,31 @@ export function AdminDashboard() {
 
   // 필터링된 사용자 목록
   const filteredMembers = stats?.memberCompletion.filter((member) => {
-    if (showIncompleteOnly) {
-      return member.stats.completionRate < 100;
+    // 1. 완료율 필터 (미완료만 보기)
+    if (showIncompleteOnly && member.stats.completionRate === 100) {
+      return false;
     }
+
+    // 2. 사용자 이름 검색 필터
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      const nameMatch = member.memberName.toLowerCase().includes(query);
+      const accountIdMatch = member.accountId.toLowerCase().includes(query);
+      if (!nameMatch && !accountIdMatch) {
+        return false;
+      }
+    }
+
+    // 3. 특정 날짜 미작성자 필터
+    if (selectedDate !== null) {
+      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(selectedDate).padStart(2, '0')}`;
+      const completion = member.dailyCompletion[dateStr];
+      // null(주말/공휴일)이거나 true(완료)인 경우 제외
+      if (completion !== false) {
+        return false;
+      }
+    }
+
     return true;
   }) || [];
 
@@ -81,21 +105,8 @@ export function AdminDashboard() {
             </p>
           </div>
 
-          {/* 월 선택기 및 필터 */}
-          <div className="mt-4 md:mt-0 flex flex-col md:flex-row items-start md:items-center gap-3">
-            {/* 필터 토글 */}
-            <div className="flex items-center gap-2">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={showIncompleteOnly}
-                  onChange={(e) => setShowIncompleteOnly(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-700">미완료만 보기</span>
-              </label>
-            </div>
-
+          {/* 검색 및 필터 */}
+          <div className="mt-4 md:mt-0 flex flex-col gap-3">
             {/* 월 선택기 */}
             <div className="flex items-center gap-3">
               <button
@@ -141,6 +152,81 @@ export function AdminDashboard() {
               >
                 →
               </button>
+            </div>
+
+            {/* 필터 컨트롤 */}
+            <div className="flex flex-wrap items-center gap-3">
+              {/* 사용자 검색 */}
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="사용자 이름 또는 ID 검색..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-8 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
+                />
+                <svg
+                  className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+
+              {/* 날짜 필터 */}
+              <select
+                value={selectedDate ?? ''}
+                onChange={(e) =>
+                  setSelectedDate(e.target.value ? Number(e.target.value) : null)
+                }
+                className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+              >
+                <option value="">전체 날짜</option>
+                {days
+                  .filter((day) => {
+                    // 주말은 제외
+                    const dayOfWeek = getDayOfWeek(day);
+                    return dayOfWeek !== 0 && dayOfWeek !== 6;
+                  })
+                  .map((day) => (
+                    <option key={day} value={day}>
+                      {month}월 {day}일 미작성자
+                    </option>
+                  ))}
+              </select>
+
+              {/* 미완료만 보기 토글 */}
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={showIncompleteOnly}
+                  onChange={(e) => setShowIncompleteOnly(e.target.checked)}
+                  className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">미완료만 보기</span>
+              </label>
+
+              {/* 필터 초기화 */}
+              {(searchQuery || selectedDate !== null || !showIncompleteOnly) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedDate(null);
+                    setShowIncompleteOnly(true);
+                  }}
+                  className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 underline"
+                >
+                  필터 초기화
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -215,13 +301,12 @@ export function AdminDashboard() {
                 </p>
               </div>
               <div className="text-sm text-gray-600">
-                {showIncompleteOnly ? (
-                  <span className="text-red-600 font-medium">
-                    미완료 사용자 {filteredMembers.length}명
-                  </span>
-                ) : (
-                  <span>
-                    전체 사용자 {stats?.memberCompletion.length || 0}명
+                <span className="text-blue-600 font-medium">
+                  {filteredMembers.length}명
+                </span>
+                {selectedDate && (
+                  <span className="ml-2 text-gray-500">
+                    ({month}월 {selectedDate}일 미작성)
                   </span>
                 )}
               </div>
@@ -322,9 +407,22 @@ export function AdminDashboard() {
           {/* 통계 요약 */}
           {filteredMembers.length === 0 && (
             <div className="px-6 py-12 text-center text-gray-500">
-              {showIncompleteOnly
-                ? '모든 사용자가 업무 일지를 완료했습니다! 🎉'
-                : '활성화된 사용자가 없습니다.'}
+              {selectedDate ? (
+                <div>
+                  <p className="text-lg">
+                    {month}월 {selectedDate}일에 미작성한 사용자가 없습니다! 🎉
+                  </p>
+                  <p className="mt-2 text-sm">
+                    모든 사용자가 해당 날짜의 업무 일지를 작성했습니다.
+                  </p>
+                </div>
+              ) : searchQuery ? (
+                <p>검색 결과가 없습니다.</p>
+              ) : showIncompleteOnly ? (
+                <p>모든 사용자가 업무 일지를 완료했습니다! 🎉</p>
+              ) : (
+                <p>활성화된 사용자가 없습니다.</p>
+              )}
             </div>
           )}
         </div>
