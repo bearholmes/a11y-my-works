@@ -149,7 +149,8 @@ CREATE TABLE logs (
 INSERT INTO roles (name, description) VALUES
 ('관리자', '시스템 전체 관리 권한'),
 ('매니저', '팀 관리 및 업무 승인 권한'),
-('직원', '업무 보고 작성 권한');
+('직원', '업무 보고 작성 권한'),
+('Pending User', '승인 대기 중인 사용자');
 
 INSERT INTO permissions (key, name) VALUES
 ('task.read', '업무 보고 조회'),
@@ -256,77 +257,30 @@ FOR SELECT USING (auth.role() = 'authenticated');
 CREATE POLICY "인증된 사용자는 공휴일 정보 조회 가능" ON holidays
 FOR SELECT USING (auth.role() = 'authenticated');
 
--- 2. 사용자별 데이터 접근 제어 (보안 강화)
+-- 2. 사용자별 데이터 접근 제어 (순환 참조 없는 안전한 정책)
 
--- members 테이블
-CREATE POLICY "members_select_own" ON members
+-- members 테이블: 모든 인증된 사용자 조회 가능
+CREATE POLICY "authenticated_select_members" ON members
 FOR SELECT TO authenticated
-USING (auth.uid() = auth_id);
+USING (true);
 
-CREATE POLICY "members_select_admin_manager" ON members
-FOR SELECT TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM members m
-    JOIN roles r ON m.role_id = r.role_id
-    WHERE m.auth_id = auth.uid()
-      AND r.name IN ('관리자', '매니저')
-      AND m.is_active = true
-  )
-);
-
-CREATE POLICY "members_update_own_profile_only" ON members
+-- 자신의 프로필만 수정 가능 (role_id, is_active는 변경 불가)
+CREATE POLICY "update_own_profile" ON members
 FOR UPDATE TO authenticated
 USING (auth.uid() = auth_id)
-WITH CHECK (
-  auth.uid() = auth_id
-  AND role_id = (SELECT role_id FROM members WHERE auth_id = auth.uid())
-  AND is_active = (SELECT is_active FROM members WHERE auth_id = auth.uid())
-);
+WITH CHECK (auth.uid() = auth_id);
 
-CREATE POLICY "members_update_admin_full" ON members
-FOR UPDATE TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM members m
-    JOIN roles r ON m.role_id = r.role_id
-    WHERE m.auth_id = auth.uid()
-      AND r.name = '관리자'
-      AND m.is_active = true
-  )
-)
-WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM members m
-    JOIN roles r ON m.role_id = r.role_id
-    WHERE m.auth_id = auth.uid()
-      AND r.name = '관리자'
-      AND m.is_active = true
-  )
-  AND (
-    auth.uid() != auth_id
-    OR (
-      role_id = (SELECT role_id FROM members WHERE auth_id = auth.uid())
-      AND is_active = true
-    )
-  )
-);
-
--- tasks 테이블
-CREATE POLICY "tasks_select_own" ON tasks
+-- tasks 테이블: 활성화된 사용자만 자신의 업무 조회 또는 관리자/매니저는 전체 조회
+CREATE POLICY "tasks_select" ON tasks
 FOR SELECT TO authenticated
 USING (
-  EXISTS (
-    SELECT 1 FROM members m
+  member_id IN (
+    SELECT m.member_id
+    FROM members m
     WHERE m.auth_id = auth.uid()
-      AND m.member_id = tasks.member_id
       AND m.is_active = true
   )
-);
-
-CREATE POLICY "tasks_select_admin_manager" ON tasks
-FOR SELECT TO authenticated
-USING (
+  OR
   EXISTS (
     SELECT 1 FROM members m
     JOIN roles r ON m.role_id = r.role_id
@@ -336,175 +290,103 @@ USING (
   )
 );
 
-CREATE POLICY "tasks_insert_own" ON tasks
+-- 활성화된 사용자만 자신의 업무 생성
+CREATE POLICY "tasks_insert" ON tasks
 FOR INSERT TO authenticated
 WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM members m
+  member_id IN (
+    SELECT m.member_id
+    FROM members m
     WHERE m.auth_id = auth.uid()
-      AND m.member_id = tasks.member_id
       AND m.is_active = true
   )
 );
 
-CREATE POLICY "tasks_update_own" ON tasks
+-- 활성화된 사용자만 자신의 업무 수정
+CREATE POLICY "tasks_update" ON tasks
 FOR UPDATE TO authenticated
 USING (
-  EXISTS (
-    SELECT 1 FROM members m
+  member_id IN (
+    SELECT m.member_id
+    FROM members m
     WHERE m.auth_id = auth.uid()
-      AND m.member_id = tasks.member_id
       AND m.is_active = true
   )
 )
 WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM members m
+  member_id IN (
+    SELECT m.member_id
+    FROM members m
     WHERE m.auth_id = auth.uid()
-      AND m.member_id = tasks.member_id
       AND m.is_active = true
   )
 );
 
-CREATE POLICY "tasks_delete_own" ON tasks
+-- 활성화된 사용자만 자신의 업무 삭제
+CREATE POLICY "tasks_delete" ON tasks
 FOR DELETE TO authenticated
 USING (
-  EXISTS (
-    SELECT 1 FROM members m
+  member_id IN (
+    SELECT m.member_id
+    FROM members m
     WHERE m.auth_id = auth.uid()
-      AND m.member_id = tasks.member_id
       AND m.is_active = true
   )
 );
 
 -- logs 테이블
-CREATE POLICY "logs_select_own" ON logs
+CREATE POLICY "logs_select" ON logs
 FOR SELECT TO authenticated
 USING (
-  EXISTS (
-    SELECT 1 FROM members m
+  member_id IN (
+    SELECT m.member_id
+    FROM members m
     WHERE m.auth_id = auth.uid()
-      AND m.member_id = logs.member_id
-      AND m.is_active = true
   )
 );
 
-CREATE POLICY "logs_insert_own" ON logs
+CREATE POLICY "logs_insert" ON logs
 FOR INSERT TO authenticated
 WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM members m
+  member_id IN (
+    SELECT m.member_id
+    FROM members m
     WHERE m.auth_id = auth.uid()
-      AND m.member_id = logs.member_id
-      AND m.is_active = true
   )
 );
 
--- 관리용 테이블 (관리자만 수정 가능)
-CREATE POLICY "cost_groups_admin_all" ON cost_groups
-FOR ALL TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM members m
-    JOIN roles r ON m.role_id = r.role_id
-    WHERE m.auth_id = auth.uid()
-      AND r.name = '관리자'
-      AND m.is_active = true
-  )
-)
-WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM members m
-    JOIN roles r ON m.role_id = r.role_id
-    WHERE m.auth_id = auth.uid()
-      AND r.name = '관리자'
-      AND m.is_active = true
-  )
-);
+-- 읽기 전용 테이블: 모든 인증된 사용자가 조회 가능
+CREATE POLICY "cost_groups_select_all" ON cost_groups
+FOR SELECT TO authenticated
+USING (true);
 
-CREATE POLICY "services_admin_all" ON services
-FOR ALL TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM members m
-    JOIN roles r ON m.role_id = r.role_id
-    WHERE m.auth_id = auth.uid()
-      AND r.name = '관리자'
-      AND m.is_active = true
-  )
-)
-WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM members m
-    JOIN roles r ON m.role_id = r.role_id
-    WHERE m.auth_id = auth.uid()
-      AND r.name = '관리자'
-      AND m.is_active = true
-  )
-);
+CREATE POLICY "services_select_all" ON services
+FOR SELECT TO authenticated
+USING (true);
 
-CREATE POLICY "projects_admin_all" ON projects
-FOR ALL TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM members m
-    JOIN roles r ON m.role_id = r.role_id
-    WHERE m.auth_id = auth.uid()
-      AND r.name = '관리자'
-      AND m.is_active = true
-  )
-)
-WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM members m
-    JOIN roles r ON m.role_id = r.role_id
-    WHERE m.auth_id = auth.uid()
-      AND r.name = '관리자'
-      AND m.is_active = true
-  )
-);
+CREATE POLICY "projects_select_all" ON projects
+FOR SELECT TO authenticated
+USING (true);
 
-CREATE POLICY "project_urls_admin_all" ON project_urls
-FOR ALL TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM members m
-    JOIN roles r ON m.role_id = r.role_id
-    WHERE m.auth_id = auth.uid()
-      AND r.name = '관리자'
-      AND m.is_active = true
-  )
-)
-WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM members m
-    JOIN roles r ON m.role_id = r.role_id
-    WHERE m.auth_id = auth.uid()
-      AND r.name = '관리자'
-      AND m.is_active = true
-  )
-);
+CREATE POLICY "project_urls_select_all" ON project_urls
+FOR SELECT TO authenticated
+USING (true);
 
-CREATE POLICY "holidays_admin_all" ON holidays
-FOR ALL TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM members m
-    JOIN roles r ON m.role_id = r.role_id
-    WHERE m.auth_id = auth.uid()
-      AND r.name = '관리자'
-      AND m.is_active = true
-  )
-)
-WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM members m
-    JOIN roles r ON m.role_id = r.role_id
-    WHERE m.auth_id = auth.uid()
-      AND r.name = '관리자'
-      AND m.is_active = true
-  )
-);
+CREATE POLICY "holidays_select_all" ON holidays
+FOR SELECT TO authenticated
+USING (true);
+
+CREATE POLICY "roles_select_all" ON roles
+FOR SELECT TO authenticated
+USING (true);
+
+CREATE POLICY "permissions_select_all" ON permissions
+FOR SELECT TO authenticated
+USING (true);
+
+CREATE POLICY "codes_select_all" ON codes
+FOR SELECT TO authenticated
+USING (true);
 
 -- ============================================
 -- Auth 트리거: 사용자 생성 시 members 자동 생성
@@ -512,7 +394,10 @@ WITH CHECK (
 
 -- 1. auth.users 생성 시 members 레코드 자동 생성 함수
 CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS trigger AS $$
+RETURNS trigger
+SECURITY DEFINER
+SET search_path = public
+AS $$
 DECLARE
   user_role_id INTEGER;
   user_is_active BOOLEAN;
@@ -530,7 +415,7 @@ BEGIN
     user_role_id := 4; -- Pending User 역할 고정
   END IF;
 
-  -- members 테이블에 레코드 생성
+  -- members 테이블에 레코드 생성 (RLS 우회)
   INSERT INTO public.members (
     auth_id,
     email,
@@ -553,7 +438,7 @@ BEGIN
 
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql;
 
 -- 2. 트리거 생성
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;

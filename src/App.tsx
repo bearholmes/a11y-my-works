@@ -62,9 +62,26 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   // 회원 정보가 없거나 비활성 상태이거나 역할이 없거나 Pending User(role_id=4)면 승인 대기 화면
+  console.log('🔍 member 상태:', {
+    member,
+    hasMember: !!member,
+    isActive: member?.is_active,
+    roleId: member?.role_id,
+    isPending: member?.role_id === 4,
+  });
+
   if (!member || !member.is_active || !member.role_id || member.role_id === 4) {
+    console.log('❌ 승인 대기 화면 표시 이유:', {
+      noMember: !member,
+      notActive: !member?.is_active,
+      noRole: !member?.role_id,
+      isPendingUser: member?.role_id === 4,
+    });
     return <PendingApprovalScreen />;
   }
+
+  console.log('✅ 정상 진입');
+
 
   return <Layout>{children}</Layout>;
 }

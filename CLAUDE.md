@@ -1,4 +1,4 @@
-# CLAUDE.md
+_# CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -231,4 +231,4 @@ export const isAuthenticatedAtom = atom((get) => {
 - `git-convention.md`: Git 워크플로우 및 커밋 가이드
 - `jsdoc-guide.md`: 코드 문서화 표준
 - `security-design.md`: 보안 설계
-- `test-strategy.md`: 테스트 전략
+- `test-strategy.md`: 테스트 전략_
