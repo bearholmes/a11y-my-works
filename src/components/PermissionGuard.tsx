@@ -22,14 +22,21 @@ export function PermissionGuard({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12" role="status" aria-live="polite">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" aria-label="권한 확인 중"></div>
+      <div
+        className="flex items-center justify-center py-12"
+        role="status"
+        aria-live="polite"
+      >
+        <div
+          className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
+          aria-label="권한 확인 중"
+        ></div>
       </div>
     );
   }
 
   if (!hasPermission) {
-    return fallback ? <>{fallback}</> : <Navigate to="/forbidden" replace />;
+    return fallback ? fallback : <Navigate to="/forbidden" replace />;
   }
 
   return <>{children}</>;

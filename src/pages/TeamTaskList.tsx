@@ -51,15 +51,19 @@ export function TeamTaskList() {
       });
 
       // 팀원 정보 및 프로젝트 정보 조합
-      const tasksWithDetails: TaskWithMember[] = result.data.map((task: Task) => {
-        const member = members.find((m: Member) => m.member_id === task.member_id);
-        return {
-          ...task,
-          member_name: member?.name,
-          member_account_id: member?.account_id,
-          member_email: member?.email,
-        };
-      });
+      const tasksWithDetails: TaskWithMember[] = result.data.map(
+        (task: Task) => {
+          const member = members.find(
+            (m: Member) => m.member_id === task.member_id
+          );
+          return {
+            ...task,
+            member_name: member?.name,
+            member_account_id: member?.account_id,
+            member_email: member?.email,
+          };
+        }
+      );
 
       return tasksWithDetails;
     },
@@ -235,7 +239,7 @@ export function TeamTaskList() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200" role="table">
+            <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
                   <th

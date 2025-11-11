@@ -10,7 +10,9 @@ export function CostGroupList() {
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [isActive, setIsActive] = useState<boolean | undefined>(undefined);
-  const [isActiveInput, setIsActiveInput] = useState<boolean | undefined>(undefined);
+  const [isActiveInput, setIsActiveInput] = useState<boolean | undefined>(
+    undefined
+  );
 
   // 청구 그룹 목록 조회
   const { data, isLoading, error } = useQuery({
@@ -91,10 +93,18 @@ export function CostGroupList() {
               />
             </div>
             <select
-              value={isActiveInput === undefined ? 'all' : isActiveInput ? 'active' : 'inactive'}
+              value={
+                isActiveInput === undefined
+                  ? 'all'
+                  : isActiveInput
+                    ? 'active'
+                    : 'inactive'
+              }
               onChange={(e) => {
                 const value = e.target.value;
-                setIsActiveInput(value === 'all' ? undefined : value === 'active');
+                setIsActiveInput(
+                  value === 'all' ? undefined : value === 'active'
+                );
               }}
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
