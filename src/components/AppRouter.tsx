@@ -42,6 +42,12 @@ const ResetPassword = lazy(() =>
 const Forbidden = lazy(() =>
   import('../pages/Forbidden').then((m) => ({ default: m.Forbidden }))
 );
+const NotFound = lazy(() =>
+  import('../pages/NotFound').then((m) => ({ default: m.NotFound }))
+);
+const ServerError = lazy(() =>
+  import('../pages/ServerError').then((m) => ({ default: m.ServerError }))
+);
 
 // 프로젝트 관리
 const ProjectList = lazy(() =>
@@ -459,7 +465,22 @@ export function AppRouter() {
             </Suspense>
           }
         />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route
+          path="/500"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <ServerError />
+            </Suspense>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <NotFound />
+            </Suspense>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
