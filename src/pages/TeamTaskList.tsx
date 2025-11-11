@@ -7,6 +7,7 @@ import type { Member, Task } from '../types/database';
 
 interface TaskWithMember extends Task {
   member_name?: string;
+  member_account_id?: string;
   member_email?: string;
   project_name?: string;
   service_name?: string;
@@ -55,6 +56,7 @@ export function TeamTaskList() {
         return {
           ...task,
           member_name: member?.name,
+          member_account_id: member?.account_id,
           member_email: member?.email,
         };
       });
@@ -197,7 +199,7 @@ export function TeamTaskList() {
               <option value="">전체 팀원</option>
               {members.map((member: Member) => (
                 <option key={member.member_id} value={member.member_id}>
-                  {member.name} ({member.email})
+                  {member.name} (@{member.account_id})
                 </option>
               ))}
             </select>
@@ -287,7 +289,7 @@ export function TeamTaskList() {
                             {task.member_name}
                           </div>
                           <div className="text-sm text-gray-500">
-                            {task.member_email}
+                            @{task.member_account_id}
                           </div>
                         </div>
                       </div>

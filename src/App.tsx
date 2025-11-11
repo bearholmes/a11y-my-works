@@ -23,6 +23,8 @@ import { ServiceList } from './pages/ServiceList';
 import { TaskForm } from './pages/TaskForm';
 import { TaskList } from './pages/TaskList';
 import { TestPage } from './pages/TestPage';
+import { Profile } from './pages/Profile';
+import { ChangePassword } from './pages/ChangePassword';
 import { AuthProvider, useAuthContext } from './providers/AuthProvider';
 import { memberAPI } from './services/api';
 
@@ -266,6 +268,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <TestPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/change-password"
+              element={
+                <ProtectedRoute>
+                  <ChangePassword />
                 </ProtectedRoute>
               }
             />
