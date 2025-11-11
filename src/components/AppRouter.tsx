@@ -113,6 +113,11 @@ const PendingApprovalScreen = lazy(() =>
   import('../pages/PendingApprovalScreen').then((m) => ({ default: m.PendingApprovalScreen }))
 );
 
+// 관리자 대시보드
+const AdminDashboard = lazy(() =>
+  import('../pages/AdminDashboard').then((m) => ({ default: m.AdminDashboard }))
+);
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
@@ -228,6 +233,18 @@ export function AppRouter() {
           element={
             <ProtectedRoute>
               <ChangePassword />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 관리자 대시보드 */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute>
+              <PermissionGuard permission="member.read">
+                <AdminDashboard />
+              </PermissionGuard>
             </ProtectedRoute>
           }
         />

@@ -28,6 +28,13 @@ const MENU_ITEMS: MenuItem[] = [
     requireReadOnly: false,
   },
   {
+    name: '관리자 대시보드',
+    href: '/admin/dashboard',
+    icon: '📈',
+    requiredPermission: 'member.read',
+    requireReadOnly: true,
+  },
+  {
     name: '팀 업무 조회',
     href: '/team/tasks',
     icon: '👨‍👩‍👧‍👦',
