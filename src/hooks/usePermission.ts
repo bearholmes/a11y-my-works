@@ -96,8 +96,8 @@ export function useAllPermissions(
 }
 
 /**
- * 관리자 권한 확인 (시스템 설정 권한 보유 여부)
+ * 관리자 권한 확인 (사용자 관리 쓰기 권한 보유 여부)
  */
 export function useIsAdmin() {
-  return usePermission('SYSTEM_SETTINGS', false);
+  return usePermission('member.write', true);
 }

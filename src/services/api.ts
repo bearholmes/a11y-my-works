@@ -1187,7 +1187,7 @@ export const dashboardAPI = {
     const { count: totalTasks } = await taskCountQuery;
 
     // 2. 총 작업 시간
-    let taskTimeQuery = supabase.from('tasks').select('task_hours, ot_hours');
+    let taskTimeQuery = supabase.from('tasks').select('work_time');
 
     if (startDate) taskTimeQuery = taskTimeQuery.gte('task_date', startDate);
     if (endDate) taskTimeQuery = taskTimeQuery.lte('task_date', endDate);
@@ -1196,7 +1196,7 @@ export const dashboardAPI = {
 
     const totalHours =
       tasks?.reduce(
-        (sum, task) => sum + (task.task_hours || 0) + (task.ot_hours || 0),
+        (sum, task) => sum + (task.work_time || 0) / 60, // 분을 시간으로 변환
         0
       ) || 0;
 
@@ -1228,7 +1228,7 @@ export const dashboardAPI = {
 
     let query = supabase
       .from('tasks')
-      .select('task_date, task_hours, ot_hours')
+      .select('task_date, work_time')
       .order('task_date', { ascending: true });
 
     if (startDate) query = query.gte('task_date', startDate);
@@ -1248,7 +1248,7 @@ export const dashboardAPI = {
           taskCount: 0,
         };
       }
-      acc[date].totalHours += (task.task_hours || 0) + (task.ot_hours || 0);
+      acc[date].totalHours += (task.work_time || 0) / 60; // 분을 시간으로 변환
       acc[date].taskCount += 1;
       return acc;
     }, {});
@@ -1269,8 +1269,7 @@ export const dashboardAPI = {
     let query = supabase.from('tasks').select(
       `
         project_id,
-        task_hours,
-        ot_hours,
+        work_time,
         projects(name)
       `
     );
@@ -1295,8 +1294,7 @@ export const dashboardAPI = {
           taskCount: 0,
         };
       }
-      acc[projectId].totalHours +=
-        (task.task_hours || 0) + (task.ot_hours || 0);
+      acc[projectId].totalHours += (task.work_time || 0) / 60; // 분을 시간으로 변환
       acc[projectId].taskCount += 1;
       return acc;
     }, {});
@@ -1320,8 +1318,7 @@ export const dashboardAPI = {
     let query = supabase.from('tasks').select(
       `
         member_id,
-        task_hours,
-        ot_hours,
+        work_time,
         members!inner(name, account_id)
       `
     );
@@ -1346,7 +1343,7 @@ export const dashboardAPI = {
           taskCount: 0,
         };
       }
-      acc[memberId].totalHours += (task.task_hours || 0) + (task.ot_hours || 0);
+      acc[memberId].totalHours += (task.work_time || 0) / 60; // 분을 시간으로 변환
       acc[memberId].taskCount += 1;
       return acc;
     }, {});

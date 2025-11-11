@@ -1,9 +1,11 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../hooks/useAuth';
 import { Layout } from './Layout';
 import { LoginForm } from './LoginForm';
 import { PermissionGuard } from './PermissionGuard';
+import { memberAPI } from '../services/api';
 
 // 로딩 컴포넌트
 function PageLoader() {
@@ -101,11 +103,22 @@ const TeamTaskList = lazy(() =>
 const ResourceStats = lazy(() =>
   import('../pages/ResourceStats').then((m) => ({ default: m.ResourceStats }))
 );
+const PendingApprovalScreen = lazy(() =>
+  import('../pages/PendingApprovalScreen').then((m) => ({ default: m.PendingApprovalScreen }))
+);
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
-  if (loading) {
+  // 회원 정보 조회 (승인 상태 확인용)
+  const { data: member, isLoading: memberLoading } = useQuery({
+    queryKey: ['currentMember', user?.id],
+    queryFn: () => memberAPI.getCurrentMember(),
+    enabled: !!user,
+    retry: 1,
+  });
+
+  if (loading || memberLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center" role="status" aria-live="polite">
@@ -118,6 +131,15 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  // 회원 정보가 없거나 비활성 상태이거나 역할이 없거나 Pending User(role_id=4)면 승인 대기 화면
+  if (!member || !member.is_active || !member.role_id || member.role_id === 4) {
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <PendingApprovalScreen />
+      </Suspense>
+    );
   }
 
   return (
@@ -171,7 +193,7 @@ export function AppRouter() {
           path="/tasks/new"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="TASK_WRITE" requireWrite>
+              <PermissionGuard permission="task.write" requireWrite>
                 <TaskForm />
               </PermissionGuard>
             </ProtectedRoute>
@@ -181,7 +203,7 @@ export function AppRouter() {
           path="/tasks/edit/:id"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="TASK_WRITE" requireWrite>
+              <PermissionGuard permission="task.write" requireWrite>
                 <TaskForm />
               </PermissionGuard>
             </ProtectedRoute>
@@ -209,7 +231,7 @@ export function AppRouter() {
           path="/team/tasks"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="TASK_READ">
+              <PermissionGuard permission="task.read">
                 <TeamTaskList />
               </PermissionGuard>
             </ProtectedRoute>
@@ -219,7 +241,7 @@ export function AppRouter() {
           path="/team/stats"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="TASK_READ">
+              <PermissionGuard permission="task.read">
                 <ResourceStats />
               </PermissionGuard>
             </ProtectedRoute>
@@ -231,7 +253,7 @@ export function AppRouter() {
           path="/projects"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="PROJECT_READ">
+              <PermissionGuard permission="project.read">
                 <ProjectList />
               </PermissionGuard>
             </ProtectedRoute>
@@ -241,7 +263,7 @@ export function AppRouter() {
           path="/projects/new"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="PROJECT_WRITE" requireWrite>
+              <PermissionGuard permission="project.write" requireWrite>
                 <ProjectForm />
               </PermissionGuard>
             </ProtectedRoute>
@@ -251,7 +273,7 @@ export function AppRouter() {
           path="/projects/edit/:id"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="PROJECT_WRITE" requireWrite>
+              <PermissionGuard permission="project.write" requireWrite>
                 <ProjectForm />
               </PermissionGuard>
             </ProtectedRoute>
@@ -263,7 +285,7 @@ export function AppRouter() {
           path="/services"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="PROJECT_READ">
+              <PermissionGuard permission="project.read">
                 <ServiceList />
               </PermissionGuard>
             </ProtectedRoute>
@@ -273,7 +295,7 @@ export function AppRouter() {
           path="/services/new"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="PROJECT_WRITE" requireWrite>
+              <PermissionGuard permission="project.write" requireWrite>
                 <ServiceForm />
               </PermissionGuard>
             </ProtectedRoute>
@@ -283,7 +305,7 @@ export function AppRouter() {
           path="/services/edit/:id"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="PROJECT_WRITE" requireWrite>
+              <PermissionGuard permission="project.write" requireWrite>
                 <ServiceForm />
               </PermissionGuard>
             </ProtectedRoute>
@@ -295,7 +317,7 @@ export function AppRouter() {
           path="/cost-groups"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="PROJECT_READ">
+              <PermissionGuard permission="project.read">
                 <CostGroupList />
               </PermissionGuard>
             </ProtectedRoute>
@@ -305,7 +327,7 @@ export function AppRouter() {
           path="/cost-groups/new"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="PROJECT_WRITE" requireWrite>
+              <PermissionGuard permission="project.write" requireWrite>
                 <CostGroupForm />
               </PermissionGuard>
             </ProtectedRoute>
@@ -315,7 +337,7 @@ export function AppRouter() {
           path="/cost-groups/edit/:id"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="PROJECT_WRITE" requireWrite>
+              <PermissionGuard permission="project.write" requireWrite>
                 <CostGroupForm />
               </PermissionGuard>
             </ProtectedRoute>
@@ -327,7 +349,7 @@ export function AppRouter() {
           path="/holidays"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="PROJECT_READ">
+              <PermissionGuard permission="project.read">
                 <HolidayList />
               </PermissionGuard>
             </ProtectedRoute>
@@ -337,7 +359,7 @@ export function AppRouter() {
           path="/holidays/new"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="PROJECT_WRITE" requireWrite>
+              <PermissionGuard permission="project.write" requireWrite>
                 <HolidayForm />
               </PermissionGuard>
             </ProtectedRoute>
@@ -347,7 +369,7 @@ export function AppRouter() {
           path="/holidays/edit/:id"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="PROJECT_WRITE" requireWrite>
+              <PermissionGuard permission="project.write" requireWrite>
                 <HolidayForm />
               </PermissionGuard>
             </ProtectedRoute>
@@ -359,7 +381,7 @@ export function AppRouter() {
           path="/members"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="MEMBER_READ">
+              <PermissionGuard permission="member.read">
                 <MemberList />
               </PermissionGuard>
             </ProtectedRoute>
@@ -369,7 +391,7 @@ export function AppRouter() {
           path="/members/new"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="MEMBER_WRITE" requireWrite>
+              <PermissionGuard permission="member.write" requireWrite>
                 <MemberForm />
               </PermissionGuard>
             </ProtectedRoute>
@@ -379,7 +401,7 @@ export function AppRouter() {
           path="/members/edit/:id"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="MEMBER_WRITE" requireWrite>
+              <PermissionGuard permission="member.write" requireWrite>
                 <MemberForm />
               </PermissionGuard>
             </ProtectedRoute>
@@ -391,7 +413,7 @@ export function AppRouter() {
           path="/roles"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="MEMBER_WRITE" requireWrite>
+              <PermissionGuard permission="member.write" requireWrite>
                 <RoleList />
               </PermissionGuard>
             </ProtectedRoute>
@@ -401,7 +423,7 @@ export function AppRouter() {
           path="/roles/new"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="MEMBER_WRITE" requireWrite>
+              <PermissionGuard permission="member.write" requireWrite>
                 <RoleForm />
               </PermissionGuard>
             </ProtectedRoute>
@@ -411,7 +433,7 @@ export function AppRouter() {
           path="/roles/edit/:id"
           element={
             <ProtectedRoute>
-              <PermissionGuard permission="MEMBER_WRITE" requireWrite>
+              <PermissionGuard permission="member.write" requireWrite>
                 <RoleForm />
               </PermissionGuard>
             </ProtectedRoute>

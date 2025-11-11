@@ -82,7 +82,7 @@ export function TeamTaskList() {
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">팀 업무 보고</h1>
+          <h1 className="text-2xl font-bold text-gray-900">팀 업무 조회</h1>
           <p className="mt-1 text-sm text-gray-600">
             팀원들의 업무 보고를 조회하고 관리합니다
           </p>
