@@ -101,3 +101,11 @@ export function useAllPermissions(
 export function useIsAdmin() {
   return usePermission('member.write', true);
 }
+
+/**
+ * 관리자 또는 매니저 권한 확인 (사용자 조회 권한 보유 여부)
+ * 관리자 대시보드 등 팀 전체 현황을 볼 수 있는 권한
+ */
+export function useIsAdminOrManager() {
+  return usePermission('member.read', false);
+}

@@ -1389,4 +1389,177 @@ export const dashboardAPI = {
     if (error) throw error;
     return data || [];
   },
+
+  /**
+   * 월별 사용자별 업무 작성 현황을 조회합니다.
+   * @param year - 조회할 연도
+   * @param month - 조회할 월 (1-12)
+   * @returns 사용자별 일별 업무 작성 현황 (480분 기준 완료 여부)
+   */
+  async getMonthlyMemberTaskCompletion(year: number, month: number) {
+    // 해당 월의 시작일과 종료일 계산
+    const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+    const lastDay = new Date(year, month, 0).getDate();
+    const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+
+    // 1. 활성화된 사용자 목록 조회
+    const { data: members, error: membersError } = await supabase
+      .from('members')
+      .select('member_id, name, account_id')
+      .eq('is_active', true)
+      .not('role_id', 'is', null)
+      .order('name');
+
+    if (membersError) throw membersError;
+
+    // 2. 해당 월의 모든 업무 조회
+    const { data: tasks, error: tasksError } = await supabase
+      .from('tasks')
+      .select('member_id, task_date, work_time')
+      .gte('task_date', startDate)
+      .lte('task_date', endDate);
+
+    if (tasksError) throw tasksError;
+
+    // 3. 사용자별, 날짜별로 작업 시간 집계
+    const memberDateStats: Record<
+      number,
+      Record<string, { totalMinutes: number; isComplete: boolean }>
+    > = {};
+
+    (tasks || []).forEach((task) => {
+      const { member_id, task_date, work_time } = task;
+
+      if (!memberDateStats[member_id]) {
+        memberDateStats[member_id] = {};
+      }
+
+      if (!memberDateStats[member_id][task_date]) {
+        memberDateStats[member_id][task_date] = {
+          totalMinutes: 0,
+          isComplete: false,
+        };
+      }
+
+      memberDateStats[member_id][task_date].totalMinutes +=
+        work_time || 0;
+      memberDateStats[member_id][task_date].isComplete =
+        memberDateStats[member_id][task_date].totalMinutes >= 480; // 8시간 = 480분
+    });
+
+    // 4. 공휴일 조회
+    const { data: holidays, error: holidaysError } = await supabase
+      .from('holidays')
+      .select('holiday_date')
+      .gte('holiday_date', startDate)
+      .lte('holiday_date', endDate);
+
+    if (holidaysError) throw holidaysError;
+
+    const holidayDates = new Set(
+      (holidays || []).map((h) => h.holiday_date)
+    );
+
+    // 5. 결과 데이터 구성
+    const result = (members || []).map((member) => {
+      const dailyCompletion: Record<string, boolean | null> = {};
+      const stats = {
+        completedDays: 0,
+        incompleteDays: 0,
+        totalWorkingDays: 0,
+      };
+
+      // 해당 월의 모든 날짜에 대해 처리
+      for (let day = 1; day <= lastDay; day++) {
+        const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayOfWeek = new Date(date).getDay();
+        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6; // 일요일(0) 또는 토요일(6)
+        const isHoliday = holidayDates.has(date);
+
+        // 주말이나 공휴일은 null로 표시
+        if (isWeekend || isHoliday) {
+          dailyCompletion[date] = null;
+        } else {
+          stats.totalWorkingDays++;
+          const dayStats = memberDateStats[member.member_id]?.[date];
+          const isComplete = dayStats?.isComplete || false;
+          dailyCompletion[date] = isComplete;
+
+          if (isComplete) {
+            stats.completedDays++;
+          } else {
+            stats.incompleteDays++;
+          }
+        }
+      }
+
+      const completionRate =
+        stats.totalWorkingDays > 0
+          ? Math.round(
+              (stats.completedDays / stats.totalWorkingDays) * 100
+            )
+          : 0;
+
+      return {
+        memberId: member.member_id,
+        memberName: member.name,
+        accountId: member.account_id,
+        dailyCompletion,
+        stats: {
+          ...stats,
+          completionRate,
+        },
+      };
+    });
+
+    return result;
+  },
+
+  /**
+   * 관리자 대시보드 통계를 조회합니다.
+   */
+  async getAdminDashboardStats(year: number, month: number) {
+    const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+    const lastDay = new Date(year, month, 0).getDate();
+    const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+
+    // 1. 활성 사용자 수
+    const { count: totalActiveMembers } = await supabase
+      .from('members')
+      .select('member_id', { count: 'exact', head: true })
+      .eq('is_active', true)
+      .not('role_id', 'is', null);
+
+    // 2. 업무 작성 현황 조회
+    const memberCompletion =
+      await this.getMonthlyMemberTaskCompletion(year, month);
+
+    // 3. 전체 완료율 계산
+    const totalCompletedDays = memberCompletion.reduce(
+      (sum, m) => sum + m.stats.completedDays,
+      0
+    );
+    const totalWorkingDays = memberCompletion.reduce(
+      (sum, m) => sum + m.stats.totalWorkingDays,
+      0
+    );
+    const overallCompletionRate =
+      totalWorkingDays > 0
+        ? Math.round((totalCompletedDays / totalWorkingDays) * 100)
+        : 0;
+
+    // 4. 완전히 작성한 사용자 수 (100% 완료)
+    const fullyCompletedMembers = memberCompletion.filter(
+      (m) => m.stats.completionRate === 100
+    ).length;
+
+    return {
+      totalActiveMembers: totalActiveMembers || 0,
+      fullyCompletedMembers,
+      totalCompletedDays,
+      totalWorkingDays,
+      overallCompletionRate,
+      memberCompletion,
+    };
+  },
 };
