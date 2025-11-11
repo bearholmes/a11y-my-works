@@ -42,27 +42,24 @@ export function useAuth() {
     profile?: { name: string; account_id: string }
   ) => {
     try {
+      // profile 데이터를 options.data에 포함시켜 raw_user_meta_data에 저장
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            name: profile?.name || '',
+            account_id: profile?.account_id || '',
+          },
+        },
       });
 
       if (error) {
         return { data, error };
       }
 
-      if (data.user && profile) {
-        const { memberAPI } = await import('../services/api');
-        try {
-          await memberAPI.createMemberProfile(data.user.id, {
-            account_id: profile.account_id,
-            name: profile.name,
-            email: email,
-          });
-        } catch (memberError) {
-          console.error('Failed to create member profile:', memberError);
-        }
-      }
+      // 트리거가 자동으로 members 테이블에 생성하므로
+      // createMemberProfile 호출 제거
 
       return { data, error };
     } catch (err) {
