@@ -99,11 +99,6 @@ export function Layout({ children }: LayoutProps) {
                     />
                   </svg>
                 </button>
-
-                {/* 사용자 정보 */}
-                <div className="hidden sm:block">
-                  <p className="text-sm text-gray-600">{user?.email}</p>
-                </div>
               </div>
 
               {/* 사용자 메뉴 */}
