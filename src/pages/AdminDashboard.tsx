@@ -11,12 +11,21 @@ export function AdminDashboard() {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1); // 1-12
+  const [showIncompleteOnly, setShowIncompleteOnly] = useState(true); // 기본값: 미완료만 보기
 
   // 관리자 대시보드 통계 조회
   const { data: stats, isLoading } = useQuery({
     queryKey: ['adminDashboardStats', year, month],
     queryFn: () => dashboardAPI.getAdminDashboardStats(year, month),
   });
+
+  // 필터링된 사용자 목록
+  const filteredMembers = stats?.memberCompletion.filter((member) => {
+    if (showIncompleteOnly) {
+      return member.stats.completionRate < 100;
+    }
+    return true;
+  }) || [];
 
   // 해당 월의 날짜 수
   const lastDay = new Date(year, month, 0).getDate();
@@ -72,51 +81,67 @@ export function AdminDashboard() {
             </p>
           </div>
 
-          {/* 월 선택기 */}
-          <div className="mt-4 md:mt-0 flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handlePrevMonth}
-              className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors"
-              aria-label="이전 달"
-            >
-              ←
-            </button>
-            <div className="flex gap-2">
-              <select
-                value={year}
-                onChange={(e) => setYear(Number(e.target.value))}
-                className="px-3 py-2 border border-gray-300 rounded-md text-sm"
-              >
-                {Array.from(
-                  { length: 5 },
-                  (_, i) => now.getFullYear() - 2 + i
-                ).map((y) => (
-                  <option key={y} value={y}>
-                    {y}년
-                  </option>
-                ))}
-              </select>
-              <select
-                value={month}
-                onChange={(e) => setMonth(Number(e.target.value))}
-                className="px-3 py-2 border border-gray-300 rounded-md text-sm"
-              >
-                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                  <option key={m} value={m}>
-                    {m}월
-                  </option>
-                ))}
-              </select>
+          {/* 월 선택기 및 필터 */}
+          <div className="mt-4 md:mt-0 flex flex-col md:flex-row items-start md:items-center gap-3">
+            {/* 필터 토글 */}
+            <div className="flex items-center gap-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={showIncompleteOnly}
+                  onChange={(e) => setShowIncompleteOnly(e.target.checked)}
+                  className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">미완료만 보기</span>
+              </label>
             </div>
-            <button
-              type="button"
-              onClick={handleNextMonth}
-              className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors"
-              aria-label="다음 달"
-            >
-              →
-            </button>
+
+            {/* 월 선택기 */}
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handlePrevMonth}
+                className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors"
+                aria-label="이전 달"
+              >
+                ←
+              </button>
+              <div className="flex gap-2">
+                <select
+                  value={year}
+                  onChange={(e) => setYear(Number(e.target.value))}
+                  className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                >
+                  {Array.from(
+                    { length: 5 },
+                    (_, i) => now.getFullYear() - 2 + i
+                  ).map((y) => (
+                    <option key={y} value={y}>
+                      {y}년
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={month}
+                  onChange={(e) => setMonth(Number(e.target.value))}
+                  className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                >
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                    <option key={m} value={m}>
+                      {m}월
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <button
+                type="button"
+                onClick={handleNextMonth}
+                className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors"
+                aria-label="다음 달"
+              >
+                →
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -180,12 +205,27 @@ export function AdminDashboard() {
       {stats && !isLoading && (
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">
-              월별 업무 일지 작성 현황
-            </h3>
-            <p className="mt-1 text-sm text-gray-600">
-              ✅ = 완료 (8시간 이상), ❌ = 미완료, - = 주말/공휴일
-            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  월별 업무 일지 작성 현황
+                </h3>
+                <p className="mt-1 text-sm text-gray-600">
+                  ✅ = 완료 (8시간 이상), ❌ = 미완료, - = 주말/공휴일
+                </p>
+              </div>
+              <div className="text-sm text-gray-600">
+                {showIncompleteOnly ? (
+                  <span className="text-red-600 font-medium">
+                    미완료 사용자 {filteredMembers.length}명
+                  </span>
+                ) : (
+                  <span>
+                    전체 사용자 {stats?.memberCompletion.length || 0}명
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
@@ -216,7 +256,7 @@ export function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {stats.memberCompletion.map((member) => (
+                {filteredMembers.map((member) => (
                   <tr key={member.memberId} className="hover:bg-gray-50">
                     <td className="sticky left-0 z-10 bg-white px-4 py-3 text-sm font-medium text-gray-900 border-r border-gray-200 hover:bg-gray-50">
                       <div className="flex items-center gap-2">
@@ -280,9 +320,11 @@ export function AdminDashboard() {
           </div>
 
           {/* 통계 요약 */}
-          {stats.memberCompletion.length === 0 && (
+          {filteredMembers.length === 0 && (
             <div className="px-6 py-12 text-center text-gray-500">
-              활성화된 사용자가 없습니다.
+              {showIncompleteOnly
+                ? '모든 사용자가 업무 일지를 완료했습니다! 🎉'
+                : '활성화된 사용자가 없습니다.'}
             </div>
           )}
         </div>
