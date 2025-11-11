@@ -35,6 +35,13 @@ const MENU_ITEMS: MenuItem[] = [
     requireReadOnly: true,
   },
   {
+    name: '리소스 통계',
+    href: '/team/stats',
+    icon: '📊',
+    requiredPermission: 'task.read',
+    requireReadOnly: true,
+  },
+  {
     name: '청구 그룹',
     href: '/cost-groups',
     icon: '💰',

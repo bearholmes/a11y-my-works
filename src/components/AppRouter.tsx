@@ -98,6 +98,9 @@ const TestPage = lazy(() =>
 const TeamTaskList = lazy(() =>
   import('../pages/TeamTaskList').then((m) => ({ default: m.TeamTaskList }))
 );
+const ResourceStats = lazy(() =>
+  import('../pages/ResourceStats').then((m) => ({ default: m.ResourceStats }))
+);
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -208,6 +211,16 @@ export function AppRouter() {
             <ProtectedRoute>
               <PermissionGuard permission="TASK_READ">
                 <TeamTaskList />
+              </PermissionGuard>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/team/stats"
+          element={
+            <ProtectedRoute>
+              <PermissionGuard permission="TASK_READ">
+                <ResourceStats />
               </PermissionGuard>
             </ProtectedRoute>
           }

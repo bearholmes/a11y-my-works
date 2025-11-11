@@ -1,0 +1,434 @@
+import { useQuery } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import { useState } from 'react';
+import { taskAPI } from '../services/api';
+import type { Task } from '../types/database';
+
+/**
+ * 리소스 통계 데이터 타입
+ */
+interface ResourceStat {
+  id: number;
+  name: string;
+  totalHours: number;
+  taskCount: number;
+  memberCount: number;
+  percentage: number;
+}
+
+interface MonthlyStats {
+  projects: ResourceStat[];
+  services: ResourceStat[];
+  costGroups: ResourceStat[];
+  totalHours: number;
+  totalTasks: number;
+  totalMembers: number;
+}
+
+/**
+ * 매니저용 월간 리소스 통계 페이지
+ *
+ * 기능:
+ * - 프로젝트별 투입 시간 및 리소스 통계
+ * - 서비스별 투입 시간 및 리소스 통계
+ * - 청구 그룹별 투입 시간 및 리소스 통계
+ * - 월별 조회 및 비교
+ */
+export function ResourceStats() {
+  const [selectedMonth, setSelectedMonth] = useState(
+    format(new Date(), 'yyyy-MM')
+  );
+
+  // 월간 업무 데이터 조회
+  const { data: tasks = [], isLoading } = useQuery({
+    queryKey: ['monthly-tasks', selectedMonth],
+    queryFn: async () => {
+      const startDate = `${selectedMonth}-01`;
+      const endDate = `${selectedMonth}-31`;
+
+      const result = await taskAPI.getTasks({
+        startDate,
+        endDate,
+        pageSize: 1000, // 한 달 데이터 전체 조회
+      });
+
+      return result.data;
+    },
+  });
+
+  // 통계 계산
+  const stats: MonthlyStats = {
+    projects: [],
+    services: [],
+    costGroups: [],
+    totalHours: 0,
+    totalTasks: 0,
+    totalMembers: 0,
+  };
+
+  if (tasks.length > 0) {
+    // 총계 계산
+    stats.totalHours = tasks.reduce(
+      (sum: number, task: Task) => sum + (task.work_time || 0),
+      0
+    );
+    stats.totalTasks = tasks.length;
+    stats.totalMembers = new Set(tasks.map((t: Task) => t.member_id)).size;
+
+    // 프로젝트별 통계
+    const projectMap = new Map<number, ResourceStat>();
+    tasks.forEach((task: Task) => {
+      if (task.project_id) {
+        const existing = projectMap.get(task.project_id) || {
+          id: task.project_id,
+          name: (task as any).projects?.name || `프로젝트 ${task.project_id}`,
+          totalHours: 0,
+          taskCount: 0,
+          memberCount: 0,
+          percentage: 0,
+        };
+
+        existing.totalHours += task.work_time || 0;
+        existing.taskCount += 1;
+        projectMap.set(task.project_id, existing);
+      }
+    });
+
+    stats.projects = Array.from(projectMap.values())
+      .map((stat) => ({
+        ...stat,
+        percentage: stats.totalHours > 0 ? (stat.totalHours / stats.totalHours) * 100 : 0,
+      }))
+      .sort((a, b) => b.totalHours - a.totalHours);
+
+    // 서비스별 통계
+    const serviceMap = new Map<number, ResourceStat>();
+    tasks.forEach((task: Task) => {
+      if (task.service_id) {
+        const existing = serviceMap.get(task.service_id) || {
+          id: task.service_id,
+          name: (task as any).services?.name || `서비스 ${task.service_id}`,
+          totalHours: 0,
+          taskCount: 0,
+          memberCount: 0,
+          percentage: 0,
+        };
+
+        existing.totalHours += task.work_time || 0;
+        existing.taskCount += 1;
+        serviceMap.set(task.service_id, existing);
+      }
+    });
+
+    stats.services = Array.from(serviceMap.values())
+      .map((stat) => ({
+        ...stat,
+        percentage: stats.totalHours > 0 ? (stat.totalHours / stats.totalHours) * 100 : 0,
+      }))
+      .sort((a, b) => b.totalHours - a.totalHours);
+
+    // 청구 그룹별 통계
+    const costGroupMap = new Map<number, ResourceStat>();
+    tasks.forEach((task: Task) => {
+      if (task.cost_group_id) {
+        const existing = costGroupMap.get(task.cost_group_id) || {
+          id: task.cost_group_id,
+          name:
+            (task as any).cost_groups?.name || `청구그룹 ${task.cost_group_id}`,
+          totalHours: 0,
+          taskCount: 0,
+          memberCount: 0,
+          percentage: 0,
+        };
+
+        existing.totalHours += task.work_time || 0;
+        existing.taskCount += 1;
+        costGroupMap.set(task.cost_group_id, existing);
+      }
+    });
+
+    stats.costGroups = Array.from(costGroupMap.values())
+      .map((stat) => ({
+        ...stat,
+        percentage: stats.totalHours > 0 ? (stat.totalHours / stats.totalHours) * 100 : 0,
+      }))
+      .sort((a, b) => b.totalHours - a.totalHours);
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* 헤더 */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">월간 리소스 통계</h1>
+          <p className="mt-1 text-sm text-gray-600">
+            프로젝트, 서비스, 청구그룹별 투입 리소스 현황
+          </p>
+        </div>
+
+        <div>
+          <label htmlFor="month" className="sr-only">
+            조회 월 선택
+          </label>
+          <input
+            type="month"
+            id="month"
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            aria-label="조회할 월 선택"
+          />
+        </div>
+      </div>
+
+      {/* 전체 통계 카드 */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="p-5">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <span className="text-3xl" aria-hidden="true">
+                  ⏱️
+                </span>
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    총 투입 시간
+                  </dt>
+                  <dd className="flex items-baseline">
+                    <div className="text-3xl font-semibold text-gray-900">
+                      {stats.totalHours.toFixed(1)}
+                    </div>
+                    <div className="ml-2 text-sm text-gray-500">시간</div>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="p-5">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <span className="text-3xl" aria-hidden="true">
+                  📋
+                </span>
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    총 업무 건수
+                  </dt>
+                  <dd className="flex items-baseline">
+                    <div className="text-3xl font-semibold text-gray-900">
+                      {stats.totalTasks}
+                    </div>
+                    <div className="ml-2 text-sm text-gray-500">건</div>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="p-5">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <span className="text-3xl" aria-hidden="true">
+                  👥
+                </span>
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    투입 인원
+                  </dt>
+                  <dd className="flex items-baseline">
+                    <div className="text-3xl font-semibold text-gray-900">
+                      {stats.totalMembers}
+                    </div>
+                    <div className="ml-2 text-sm text-gray-500">명</div>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div
+          className="flex items-center justify-center py-12"
+          role="status"
+          aria-live="polite"
+        >
+          <div
+            className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
+            aria-label="로딩 중"
+          ></div>
+        </div>
+      ) : (
+        <>
+          {/* 프로젝트별 통계 */}
+          <div className="bg-white shadow rounded-lg overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">
+                프로젝트별 리소스
+              </h2>
+            </div>
+            <div className="p-6">
+              {stats.projects.length === 0 ? (
+                <p className="text-center text-gray-500 py-8">
+                  프로젝트 데이터가 없습니다
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {stats.projects.map((project) => (
+                    <div key={project.id} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-gray-900">
+                            {project.name}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {project.taskCount}건 업무
+                          </div>
+                        </div>
+                        <div className="text-right ml-4">
+                          <div className="text-sm font-semibold text-gray-900">
+                            {project.totalHours.toFixed(1)}h
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {project.percentage.toFixed(1)}%
+                          </div>
+                        </div>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-blue-600 h-2 rounded-full transition-all"
+                          style={{ width: `${project.percentage}%` }}
+                          role="progressbar"
+                          aria-valuenow={project.percentage}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-label={`${project.name} 비율`}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 서비스별 통계 */}
+          <div className="bg-white shadow rounded-lg overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">
+                서비스별 리소스
+              </h2>
+            </div>
+            <div className="p-6">
+              {stats.services.length === 0 ? (
+                <p className="text-center text-gray-500 py-8">
+                  서비스 데이터가 없습니다
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {stats.services.map((service) => (
+                    <div key={service.id} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-gray-900">
+                            {service.name}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {service.taskCount}건 업무
+                          </div>
+                        </div>
+                        <div className="text-right ml-4">
+                          <div className="text-sm font-semibold text-gray-900">
+                            {service.totalHours.toFixed(1)}h
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {service.percentage.toFixed(1)}%
+                          </div>
+                        </div>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-green-600 h-2 rounded-full transition-all"
+                          style={{ width: `${service.percentage}%` }}
+                          role="progressbar"
+                          aria-valuenow={service.percentage}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-label={`${service.name} 비율`}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 청구 그룹별 통계 */}
+          <div className="bg-white shadow rounded-lg overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">
+                청구 그룹별 리소스
+              </h2>
+            </div>
+            <div className="p-6">
+              {stats.costGroups.length === 0 ? (
+                <p className="text-center text-gray-500 py-8">
+                  청구 그룹 데이터가 없습니다
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {stats.costGroups.map((costGroup) => (
+                    <div key={costGroup.id} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-gray-900">
+                            {costGroup.name}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {costGroup.taskCount}건 업무
+                          </div>
+                        </div>
+                        <div className="text-right ml-4">
+                          <div className="text-sm font-semibold text-gray-900">
+                            {costGroup.totalHours.toFixed(1)}h
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {costGroup.percentage.toFixed(1)}%
+                          </div>
+                        </div>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-purple-600 h-2 rounded-full transition-all"
+                          style={{ width: `${costGroup.percentage}%` }}
+                          role="progressbar"
+                          aria-valuenow={costGroup.percentage}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-label={`${costGroup.name} 비율`}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}

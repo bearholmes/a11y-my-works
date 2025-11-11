@@ -56,6 +56,10 @@ export function useKeyboardShortcuts() {
             event.preventDefault();
             navigate('/tasks/new');
             break;
+          case 'r':
+            event.preventDefault();
+            navigate('/team/stats');
+            break;
           case 'p':
             event.preventDefault();
             navigate('/projects');
@@ -104,6 +108,11 @@ export function getShortcutList(): ShortcutConfig[] {
     {
       key: 'Alt + N',
       description: '새 업무 작성',
+      action: () => {},
+    },
+    {
+      key: 'Alt + R',
+      description: '리소스 통계',
       action: () => {},
     },
     {
