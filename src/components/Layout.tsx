@@ -4,6 +4,8 @@ import { useAuthContext } from '../providers/AuthProvider';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 import { Sidebar } from './Sidebar';
+import { memberAPI } from '../services/api';
+import { useQuery } from '@tanstack/react-query';
 
 interface LayoutProps {
   children: ReactNode;
@@ -17,6 +19,13 @@ export function Layout({ children }: LayoutProps) {
 
   // 키보드 단축키 활성화
   useKeyboardShortcuts();
+
+  // 현재 로그인한 사용자의 멤버 정보 조회
+  const { data: currentMember } = useQuery({
+    queryKey: ['currentMember'],
+    queryFn: memberAPI.getCurrentMember,
+    staleTime: 5 * 60 * 1000, // 5분간 fresh 상태 유지
+  });
 
   // Esc 키로 드롭다운 닫기 및 Alt + / 로 도움말 열기
   useEffect(() => {
@@ -114,7 +123,7 @@ export function Layout({ children }: LayoutProps) {
                   <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold" aria-hidden="true">
                     {user?.email?.charAt(0).toUpperCase()}
                   </div>
-                  <span className="hidden sm:block">{user?.email}</span>
+                  <span className="hidden sm:block">{currentMember?.name}</span>
                   <svg
                     className="w-4 h-4"
                     fill="none"
