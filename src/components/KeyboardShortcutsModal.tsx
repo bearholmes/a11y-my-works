@@ -129,7 +129,7 @@ export function KeyboardShortcutsModal({
               다음 키보드 단축키를 사용하여 빠르게 탐색할 수 있습니다.
             </p>
 
-            <table className="w-full" role="table">
+            <table className="w-full">
               <thead>
                 <tr className="border-b">
                   <th

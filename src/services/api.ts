@@ -207,12 +207,14 @@ export const memberAPI = {
     if (permError) throw permError;
 
     // 권한 데이터 변환
-    return (rolePermissions || []).map((rp: any) => ({
-      key: rp.permissions.key,
-      name: rp.permissions.name,
-      canRead: rp.read_access,
-      canWrite: rp.write_access,
-    }));
+    return (rolePermissions || []).map(
+      (rp: { permissions: { key: string; name: string } }) => ({
+        key: rp.permissions.key,
+        name: rp.permissions.name,
+        canRead: rp.read_access,
+        canWrite: rp.write_access,
+      })
+    );
   },
 
   /**
@@ -403,13 +405,15 @@ export const roleAPI = {
 
     return {
       ...role,
-      permissions: (rolePermissions || []).map((rp: any) => ({
-        permissionId: rp.permissions.permission_id,
-        key: rp.permissions.key,
-        name: rp.permissions.name,
-        readAccess: rp.read_access,
-        writeAccess: rp.write_access,
-      })),
+      permissions: (rolePermissions || []).map(
+        (rp: { permissions: { permission_id: number; key: string } }) => ({
+          permissionId: rp.permissions.permission_id,
+          key: rp.permissions.key,
+          name: rp.permissions.name,
+          readAccess: rp.read_access,
+          writeAccess: rp.write_access,
+        })
+      ),
     };
   },
 
@@ -731,8 +735,13 @@ export const serviceAPI = {
     costGroupId?: number;
     isActive?: boolean;
   }) {
-    const { page = 1, pageSize = 20, search, costGroupId, isActive } =
-      params || {};
+    const {
+      page = 1,
+      pageSize = 20,
+      search,
+      costGroupId,
+      isActive,
+    } = params || {};
 
     let query = supabase
       .from('services')
@@ -1441,8 +1450,7 @@ export const dashboardAPI = {
         };
       }
 
-      memberDateStats[member_id][task_date].totalMinutes +=
-        work_time || 0;
+      memberDateStats[member_id][task_date].totalMinutes += work_time || 0;
       memberDateStats[member_id][task_date].isComplete =
         memberDateStats[member_id][task_date].totalMinutes >= 480; // 8시간 = 480분
     });
@@ -1456,9 +1464,7 @@ export const dashboardAPI = {
 
     if (holidaysError) throw holidaysError;
 
-    const holidayDates = new Set(
-      (holidays || []).map((h) => h.holiday_date)
-    );
+    const holidayDates = new Set((holidays || []).map((h) => h.holiday_date));
 
     // 5. 결과 데이터 구성
     const result = (members || []).map((member) => {
@@ -1495,9 +1501,7 @@ export const dashboardAPI = {
 
       const completionRate =
         stats.totalWorkingDays > 0
-          ? Math.round(
-              (stats.completedDays / stats.totalWorkingDays) * 100
-            )
+          ? Math.round((stats.completedDays / stats.totalWorkingDays) * 100)
           : 0;
 
       return {
@@ -1519,10 +1523,6 @@ export const dashboardAPI = {
    * 관리자 대시보드 통계를 조회합니다.
    */
   async getAdminDashboardStats(year: number, month: number) {
-    const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
-    const lastDay = new Date(year, month, 0).getDate();
-    const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
-
     // 1. 활성 사용자 수
     const { count: totalActiveMembers } = await supabase
       .from('members')
@@ -1531,8 +1531,10 @@ export const dashboardAPI = {
       .not('role_id', 'is', null);
 
     // 2. 업무 작성 현황 조회
-    const memberCompletion =
-      await this.getMonthlyMemberTaskCompletion(year, month);
+    const memberCompletion = await this.getMonthlyMemberTaskCompletion(
+      year,
+      month
+    );
 
     // 3. 전체 완료율 계산
     const totalCompletedDays = memberCompletion.reduce(

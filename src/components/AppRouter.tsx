@@ -1,17 +1,24 @@
+import { useQuery } from '@tanstack/react-query';
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../hooks/useAuth';
+import { memberAPI } from '../services/api';
 import { Layout } from './Layout';
 import { LoginForm } from './LoginForm';
 import { PermissionGuard } from './PermissionGuard';
-import { memberAPI } from '../services/api';
 
 // 로딩 컴포넌트
 function PageLoader() {
   return (
-    <div className="flex items-center justify-center py-12" role="status" aria-live="polite">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" aria-label="페이지 로딩 중"></div>
+    <div
+      className="flex items-center justify-center py-12"
+      role="status"
+      aria-live="polite"
+    >
+      <div
+        className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
+        aria-label="페이지 로딩 중"
+      ></div>
       <span className="sr-only">페이지 로딩 중...</span>
     </div>
   );
@@ -110,7 +117,9 @@ const ResourceStats = lazy(() =>
   import('../pages/ResourceStats').then((m) => ({ default: m.ResourceStats }))
 );
 const PendingApprovalScreen = lazy(() =>
-  import('../pages/PendingApprovalScreen').then((m) => ({ default: m.PendingApprovalScreen }))
+  import('../pages/PendingApprovalScreen').then((m) => ({
+    default: m.PendingApprovalScreen,
+  }))
 );
 
 // 관리자 대시보드
@@ -133,7 +142,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center" role="status" aria-live="polite">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" aria-label="인증 확인 중"></div>
+          <div
+            className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"
+            aria-label="인증 확인 중"
+          ></div>
           <p className="mt-4 text-gray-600">로딩 중...</p>
         </div>
       </div>

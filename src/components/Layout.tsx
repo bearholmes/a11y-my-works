@@ -1,11 +1,11 @@
-import { type ReactNode, useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { type ReactNode, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuthContext } from '../providers/AuthProvider';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
+import { useAuthContext } from '../providers/AuthProvider';
+import { memberAPI } from '../services/api';
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 import { Sidebar } from './Sidebar';
-import { memberAPI } from '../services/api';
-import { useQuery } from '@tanstack/react-query';
 
 interface LayoutProps {
   children: ReactNode;
@@ -120,7 +120,10 @@ export function Layout({ children }: LayoutProps) {
                   aria-expanded={isDropdownOpen}
                   aria-haspopup="true"
                 >
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold" aria-hidden="true">
+                  <div
+                    className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold"
+                    aria-hidden="true"
+                  >
                     {user?.email?.charAt(0).toUpperCase()}
                   </div>
                   <span className="hidden sm:block">{currentMember?.name}</span>
@@ -169,7 +172,7 @@ export function Layout({ children }: LayoutProps) {
                       >
                         비밀번호 변경
                       </Link>
-                      <hr className="my-1" aria-hidden="true" />
+                      <hr className="my-1" />
                       <button
                         type="button"
                         onClick={handleSignOut}
@@ -187,7 +190,11 @@ export function Layout({ children }: LayoutProps) {
         </header>
 
         {/* 메인 컨텐츠 */}
-        <main id="main-content" className="flex-1 overflow-y-auto" tabIndex={-1}>
+        <main
+          id="main-content"
+          className="flex-1 overflow-y-auto"
+          tabIndex={-1}
+        >
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
             {children}
           </div>

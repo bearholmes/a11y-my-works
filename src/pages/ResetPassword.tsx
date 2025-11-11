@@ -44,7 +44,7 @@ export function ResetPassword() {
         alert('비밀번호가 변경되었습니다. 로그인 페이지로 이동합니다.');
         navigate('/login');
       }
-    } catch (err) {
+    } catch (_err) {
       setError('오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       setSubmitting(false);

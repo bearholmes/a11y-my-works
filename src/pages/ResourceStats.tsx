@@ -103,7 +103,8 @@ export function ResourceStats() {
     stats.projects = Array.from(projectMap.values())
       .map((stat) => ({
         ...stat,
-        percentage: stats.totalHours > 0 ? (stat.totalHours / stats.totalHours) * 100 : 0,
+        percentage:
+          stats.totalHours > 0 ? (stat.totalHours / stats.totalHours) * 100 : 0,
       }))
       .sort((a, b) => b.totalHours - a.totalHours);
 
@@ -129,7 +130,8 @@ export function ResourceStats() {
     stats.services = Array.from(serviceMap.values())
       .map((stat) => ({
         ...stat,
-        percentage: stats.totalHours > 0 ? (stat.totalHours / stats.totalHours) * 100 : 0,
+        percentage:
+          stats.totalHours > 0 ? (stat.totalHours / stats.totalHours) * 100 : 0,
       }))
       .sort((a, b) => b.totalHours - a.totalHours);
 
@@ -156,7 +158,8 @@ export function ResourceStats() {
     stats.costGroups = Array.from(costGroupMap.values())
       .map((stat) => ({
         ...stat,
-        percentage: stats.totalHours > 0 ? (stat.totalHours / stats.totalHours) * 100 : 0,
+        percentage:
+          stats.totalHours > 0 ? (stat.totalHours / stats.totalHours) * 100 : 0,
       }))
       .sort((a, b) => b.totalHours - a.totalHours);
 
@@ -183,7 +186,8 @@ export function ResourceStats() {
     stats.members = Array.from(memberMap.values())
       .map((stat) => ({
         ...stat,
-        percentage: stats.totalHours > 0 ? (stat.totalHours / stats.totalHours) * 100 : 0,
+        percentage:
+          stats.totalHours > 0 ? (stat.totalHours / stats.totalHours) * 100 : 0,
       }))
       .sort((a, b) => b.totalHours - a.totalHours);
   }
@@ -480,7 +484,10 @@ export function ResourceStats() {
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="text-sm font-medium text-gray-900">
-                            {member.name} <span className="text-gray-500">(@{member.accountId})</span>
+                            {member.name}{' '}
+                            <span className="text-gray-500">
+                              (@{member.accountId})
+                            </span>
                           </div>
                           <div className="text-xs text-gray-500">
                             {member.taskCount}건 업무

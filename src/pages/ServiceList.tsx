@@ -125,13 +125,15 @@ export function ServiceList() {
           </select>
           <select
             value={
-              isActiveInput === undefined ? '' : isActiveInput ? 'true' : 'false'
+              isActiveInput === undefined
+                ? ''
+                : isActiveInput
+                  ? 'true'
+                  : 'false'
             }
             onChange={(e) => {
               setIsActiveInput(
-                e.target.value === ''
-                  ? undefined
-                  : e.target.value === 'true'
+                e.target.value === '' ? undefined : e.target.value === 'true'
               );
             }}
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

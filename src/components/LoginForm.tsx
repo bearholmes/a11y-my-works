@@ -45,7 +45,10 @@ export function LoginForm() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center" role="status" aria-live="polite">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" aria-label="로딩 중"></div>
+          <div
+            className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"
+            aria-label="로딩 중"
+          ></div>
           <p className="mt-4 text-gray-600">로딩 중...</p>
         </div>
       </div>
@@ -89,7 +92,7 @@ export function LoginForm() {
         // 로그인 성공 시 onAuthStateChange가 자동으로 감지하고
         // LoginForm의 useEffect가 리다이렉션 처리함
       }
-    } catch (err) {
+    } catch (_err) {
       setError('오류가 발생했습니다.');
     } finally {
       setSubmitting(false);
@@ -156,9 +159,11 @@ export function LoginForm() {
                   : loginForm.formState.errors.email)
               }
               aria-describedby={
-                (isSignUp
-                  ? signUpForm.formState.errors.email
-                  : loginForm.formState.errors.email)
+                (
+                  isSignUp
+                    ? signUpForm.formState.errors.email
+                    : loginForm.formState.errors.email
+                )
                   ? 'email-error'
                   : undefined
               }
@@ -166,7 +171,11 @@ export function LoginForm() {
             {(isSignUp
               ? signUpForm.formState.errors.email
               : loginForm.formState.errors.email) && (
-              <p id="email-error" className="mt-1 text-sm text-red-600" role="alert">
+              <p
+                id="email-error"
+                className="mt-1 text-sm text-red-600"
+                role="alert"
+              >
                 {
                   (isSignUp
                     ? signUpForm.formState.errors.email
@@ -209,9 +218,11 @@ export function LoginForm() {
                   : loginForm.formState.errors.password)
               }
               aria-describedby={
-                (isSignUp
-                  ? signUpForm.formState.errors.password
-                  : loginForm.formState.errors.password)
+                (
+                  isSignUp
+                    ? signUpForm.formState.errors.password
+                    : loginForm.formState.errors.password
+                )
                   ? 'password-error'
                   : undefined
               }
@@ -219,7 +230,11 @@ export function LoginForm() {
             {(isSignUp
               ? signUpForm.formState.errors.password
               : loginForm.formState.errors.password) && (
-              <p id="password-error" className="mt-1 text-sm text-red-600" role="alert">
+              <p
+                id="password-error"
+                className="mt-1 text-sm text-red-600"
+                role="alert"
+              >
                 {
                   (isSignUp
                     ? signUpForm.formState.errors.password
@@ -254,7 +269,11 @@ export function LoginForm() {
                   }
                 />
                 {signUpForm.formState.errors.confirmPassword && (
-                  <p id="confirmPassword-error" className="mt-1 text-sm text-red-600" role="alert">
+                  <p
+                    id="confirmPassword-error"
+                    className="mt-1 text-sm text-red-600"
+                    role="alert"
+                  >
                     {signUpForm.formState.errors.confirmPassword.message}
                   </p>
                 )}
@@ -280,7 +299,11 @@ export function LoginForm() {
                   }
                 />
                 {signUpForm.formState.errors.name && (
-                  <p id="name-error" className="mt-1 text-sm text-red-600" role="alert">
+                  <p
+                    id="name-error"
+                    className="mt-1 text-sm text-red-600"
+                    role="alert"
+                  >
                     {signUpForm.formState.errors.name.message}
                   </p>
                 )}
@@ -308,7 +331,11 @@ export function LoginForm() {
                   }
                 />
                 {signUpForm.formState.errors.accountId && (
-                  <p id="accountId-error" className="mt-1 text-sm text-red-600" role="alert">
+                  <p
+                    id="accountId-error"
+                    className="mt-1 text-sm text-red-600"
+                    role="alert"
+                  >
                     {signUpForm.formState.errors.accountId.message}
                   </p>
                 )}

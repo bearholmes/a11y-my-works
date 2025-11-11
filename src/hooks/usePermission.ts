@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { memberAPI } from '../services/api';
 import { useAuthContext } from '../providers/AuthProvider';
+import { memberAPI } from '../services/api';
 
 /**
  * 사용자의 특정 권한 보유 여부를 확인하는 훅

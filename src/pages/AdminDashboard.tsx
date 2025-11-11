@@ -22,34 +22,35 @@ export function AdminDashboard() {
   });
 
   // 필터링된 사용자 목록
-  const filteredMembers = stats?.memberCompletion.filter((member) => {
-    // 1. 완료율 필터 (미완료만 보기)
-    if (showIncompleteOnly && member.stats.completionRate === 100) {
-      return false;
-    }
-
-    // 2. 사용자 이름 검색 필터
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      const nameMatch = member.memberName.toLowerCase().includes(query);
-      const accountIdMatch = member.accountId.toLowerCase().includes(query);
-      if (!nameMatch && !accountIdMatch) {
+  const filteredMembers =
+    stats?.memberCompletion.filter((member) => {
+      // 1. 완료율 필터 (미완료만 보기)
+      if (showIncompleteOnly && member.stats.completionRate === 100) {
         return false;
       }
-    }
 
-    // 3. 특정 날짜 미작성자 필터
-    if (selectedDate !== null) {
-      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(selectedDate).padStart(2, '0')}`;
-      const completion = member.dailyCompletion[dateStr];
-      // null(주말/공휴일)이거나 true(완료)인 경우 제외
-      if (completion !== false) {
-        return false;
+      // 2. 사용자 이름 검색 필터
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        const nameMatch = member.memberName.toLowerCase().includes(query);
+        const accountIdMatch = member.accountId.toLowerCase().includes(query);
+        if (!nameMatch && !accountIdMatch) {
+          return false;
+        }
       }
-    }
 
-    return true;
-  }) || [];
+      // 3. 특정 날짜 미작성자 필터
+      if (selectedDate !== null) {
+        const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(selectedDate).padStart(2, '0')}`;
+        const completion = member.dailyCompletion[dateStr];
+        // null(주말/공휴일)이거나 true(완료)인 경우 제외
+        if (completion !== false) {
+          return false;
+        }
+      }
+
+      return true;
+    }) || [];
 
   // 해당 월의 날짜 수
   const lastDay = new Date(year, month, 0).getDate();
@@ -184,7 +185,9 @@ export function AdminDashboard() {
               <select
                 value={selectedDate ?? ''}
                 onChange={(e) =>
-                  setSelectedDate(e.target.value ? Number(e.target.value) : null)
+                  setSelectedDate(
+                    e.target.value ? Number(e.target.value) : null
+                  )
                 }
                 className="px-3 py-2 border border-gray-300 rounded-md text-sm"
               >
@@ -214,7 +217,9 @@ export function AdminDashboard() {
               </label>
 
               {/* 필터 초기화 */}
-              {(searchQuery || selectedDate !== null || !showIncompleteOnly) && (
+              {(searchQuery ||
+                selectedDate !== null ||
+                !showIncompleteOnly) && (
                 <button
                   type="button"
                   onClick={() => {
@@ -240,9 +245,7 @@ export function AdminDashboard() {
             <div className="mt-2 text-3xl font-semibold text-gray-900">
               {stats.totalActiveMembers}명
             </div>
-            <p className="mt-2 text-xs text-gray-600">
-              현재 활성화된 팀원 수
-            </p>
+            <p className="mt-2 text-xs text-gray-600">현재 활성화된 팀원 수</p>
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
@@ -262,9 +265,7 @@ export function AdminDashboard() {
             <div className="mt-2 text-3xl font-semibold text-green-600">
               {stats.fullyCompletedMembers}명
             </div>
-            <p className="mt-2 text-xs text-gray-600">
-              100% 작성 완료한 팀원
-            </p>
+            <p className="mt-2 text-xs text-gray-600">100% 작성 완료한 팀원</p>
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
@@ -446,9 +447,7 @@ export function AdminDashboard() {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-gray-400">-</span>
-            <span className="text-gray-700">
-              주말/공휴일 - 작성 불필요
-            </span>
+            <span className="text-gray-700">주말/공휴일 - 작성 불필요</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
