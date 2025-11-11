@@ -81,7 +81,7 @@ export function CostGroupList() {
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="청구 그룹명, 코드로 검색"
+              placeholder="청구 그룹명으로 검색"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -115,9 +115,6 @@ export function CostGroupList() {
                       청구 그룹명
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      코드
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       상태
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -143,11 +140,6 @@ export function CostGroupList() {
                             {costGroup.description}
                           </div>
                         )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <code className="text-sm text-gray-900 bg-gray-100 px-2 py-1 rounded">
-                          {costGroup.code}
-                        </code>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span

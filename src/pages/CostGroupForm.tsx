@@ -8,10 +8,6 @@ import { costGroupAPI } from '../services/api';
 
 const costGroupSchema = z.object({
   name: z.string().min(1, '청구 그룹명을 입력해주세요'),
-  code: z
-    .string()
-    .min(1, '청구 그룹 코드를 입력해주세요')
-    .regex(/^[A-Z0-9_]+$/, '대문자, 숫자, 언더스코어만 사용 가능합니다'),
   description: z.string().optional(),
 });
 
@@ -44,7 +40,6 @@ export function CostGroupForm() {
     if (costGroup) {
       reset({
         name: costGroup.name,
-        code: costGroup.code,
         description: costGroup.description || '',
       });
     }
@@ -129,33 +124,11 @@ export function CostGroupForm() {
             {...register('name')}
             type="text"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            placeholder="예: 내부사업, 구글, 애플"
           />
           {errors.name && (
             <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
           )}
-        </div>
-
-        <div>
-          <label
-            htmlFor="code"
-            className="block text-sm font-medium text-gray-700"
-          >
-            청구 그룹 코드 <span className="text-red-500">*</span>
-          </label>
-          <input
-            {...register('code')}
-            type="text"
-            placeholder="COST_GROUP_CODE"
-            disabled={isEditMode}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed font-mono"
-          />
-          {errors.code && (
-            <p className="mt-1 text-sm text-red-600">{errors.code.message}</p>
-          )}
-          <p className="mt-1 text-sm text-gray-500">
-            대문자, 숫자, 언더스코어만 사용 가능합니다.{' '}
-            {isEditMode && '(코드는 수정할 수 없습니다)'}
-          </p>
         </div>
 
         <div>
@@ -169,6 +142,7 @@ export function CostGroupForm() {
             {...register('description')}
             rows={3}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            placeholder="청구 그룹에 대한 설명을 입력하세요"
           />
           {errors.description && (
             <p className="mt-1 text-sm text-red-600">

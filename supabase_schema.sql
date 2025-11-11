@@ -33,6 +33,7 @@ CREATE TABLE role_permissions (
 CREATE TABLE cost_groups (
     cost_group_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
+    description TEXT,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
@@ -176,13 +177,9 @@ INSERT INTO role_permissions (role_id, permission_id, read_access, write_access)
 (3, 1, TRUE, FALSE), -- 직원 - 업무 보고
 (3, 2, TRUE, TRUE);
 
-INSERT INTO cost_groups (name) VALUES
-('프로젝트'),
-('데이터 버퍼'),
-('일반 버퍼'),
-('기타 버퍼'),
-('매니징 버퍼'),
-('휴가');
+INSERT INTO cost_groups (name, description) VALUES
+('내부사업', '사내 프로젝트 및 업무'),
+('카카오', '카카오 관련 프로젝트');
 
 INSERT INTO code_groups (name, description) VALUES
 ('PLATFORM', '플랫폼 구분'),
