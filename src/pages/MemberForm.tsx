@@ -13,6 +13,7 @@ const memberSchema = z.object({
   mobile: z.string().optional(),
   role_id: z.number().min(1, '역할을 선택해주세요'),
   is_active: z.boolean(),
+  requires_daily_report: z.boolean(),
 });
 
 type MemberFormData = z.infer<typeof memberSchema>;
@@ -32,6 +33,7 @@ export function MemberForm() {
     resolver: zodResolver(memberSchema),
     defaultValues: {
       is_active: true,
+      requires_daily_report: true,
     },
   });
 
@@ -58,6 +60,7 @@ export function MemberForm() {
         mobile: member.mobile || '',
         role_id: member.role_id || 0,
         is_active: member.is_active,
+        requires_daily_report: member.requires_daily_report,
       });
     }
   }, [member, reset]);
@@ -234,6 +237,23 @@ export function MemberForm() {
           >
             활성 상태
           </label>
+        </div>
+
+        <div className="flex items-center">
+          <input
+            {...register('requires_daily_report')}
+            type="checkbox"
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          />
+          <label
+            htmlFor="requires_daily_report"
+            className="ml-2 block text-sm text-gray-900"
+          >
+            업무보고 작성 의무
+          </label>
+          <span className="ml-2 text-xs text-gray-500">
+            (체크 시 일일 업무보고 작성 대상자로 분류됩니다)
+          </span>
         </div>
 
         <div className="flex gap-3 pt-4">

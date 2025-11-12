@@ -103,9 +103,18 @@ CREATE TABLE members (
     mobile VARCHAR(20),
     role_id INTEGER REFERENCES roles(role_id),
     is_active BOOLEAN DEFAULT TRUE,
+    requires_daily_report BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
+
+-- members 테이블 컬럼 설명
+COMMENT ON COLUMN members.requires_daily_report IS '일일 업무보고 작성 의무 여부. TRUE=작성 필수(기본값), FALSE=작성 불필요';
+
+-- members 테이블 인덱스
+CREATE INDEX idx_members_requires_daily_report
+ON members(requires_daily_report)
+WHERE is_active = TRUE;
 
 -- 11. 업무 보고(Tasks) 테이블
 CREATE TABLE tasks (

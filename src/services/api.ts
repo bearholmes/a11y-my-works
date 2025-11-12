@@ -166,6 +166,7 @@ export const memberAPI = {
         mobile: profile.mobile,
         role_id: autoApprove ? profile.role_id || 3 : null, // 자동승인: 역할 부여, 일반가입: null
         is_active: autoApprove, // 자동승인: true, 일반가입: false
+        requires_daily_report: profile.requires_daily_report ?? true, // 기본값: true (업무보고 작성 필수)
       })
       .select()
       .single();
@@ -207,14 +208,12 @@ export const memberAPI = {
     if (permError) throw permError;
 
     // 권한 데이터 변환
-    return (rolePermissions || []).map(
-      (rp: { permissions: { key: string; name: string } }) => ({
-        key: rp.permissions.key,
-        name: rp.permissions.name,
-        canRead: rp.read_access,
-        canWrite: rp.write_access,
-      })
-    );
+    return (rolePermissions || []).map((rp: any) => ({
+      key: rp.permissions.key,
+      name: rp.permissions.name,
+      canRead: rp.read_access,
+      canWrite: rp.write_access,
+    }));
   },
 
   /**
@@ -405,15 +404,13 @@ export const roleAPI = {
 
     return {
       ...role,
-      permissions: (rolePermissions || []).map(
-        (rp: { permissions: { permission_id: number; key: string } }) => ({
-          permissionId: rp.permissions.permission_id,
-          key: rp.permissions.key,
-          name: rp.permissions.name,
-          readAccess: rp.read_access,
-          writeAccess: rp.write_access,
-        })
-      ),
+      permissions: (rolePermissions || []).map((rp: any) => ({
+        permissionId: rp.permissions.permission_id,
+        key: rp.permissions.key,
+        name: rp.permissions.name,
+        readAccess: rp.read_access,
+        writeAccess: rp.write_access,
+      })),
     };
   },
 
@@ -1411,11 +1408,12 @@ export const dashboardAPI = {
     const lastDay = new Date(year, month, 0).getDate();
     const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
-    // 1. 활성화된 사용자 목록 조회
+    // 1. 활성화된 사용자 목록 조회 (업무보고 작성 대상자만)
     const { data: members, error: membersError } = await supabase
       .from('members')
       .select('member_id, name, account_id')
       .eq('is_active', true)
+      .eq('requires_daily_report', true)
       .not('role_id', 'is', null)
       .order('name');
 
@@ -1523,11 +1521,12 @@ export const dashboardAPI = {
    * 관리자 대시보드 통계를 조회합니다.
    */
   async getAdminDashboardStats(year: number, month: number) {
-    // 1. 활성 사용자 수
+    // 1. 활성 사용자 수 (업무보고 작성 대상자만)
     const { count: totalActiveMembers } = await supabase
       .from('members')
       .select('member_id', { count: 'exact', head: true })
       .eq('is_active', true)
+      .eq('requires_daily_report', true)
       .not('role_id', 'is', null);
 
     // 2. 업무 작성 현황 조회

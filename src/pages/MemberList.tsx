@@ -284,6 +284,9 @@ export function MemberList() {
                       상태
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      업무보고
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       가입일
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -336,6 +339,19 @@ export function MemberList() {
                           }`}
                         >
                           {member.is_active ? '활성' : '비활성'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            member.requires_daily_report
+                              ? 'bg-purple-100 text-purple-800'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}
+                        >
+                          {member.requires_daily_report
+                            ? '작성 필수'
+                            : '작성 불필요'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

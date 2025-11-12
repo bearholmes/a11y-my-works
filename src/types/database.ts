@@ -93,6 +93,7 @@ export interface Member {
   mobile?: string;
   role_id?: number;
   is_active: boolean;
+  requires_daily_report: boolean;
   created_at: string;
   updated_at: string;
 }
