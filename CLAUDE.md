@@ -127,6 +127,24 @@ Supabase PostgreSQL 데이터베이스 사용. 주요 테이블:
 
 ## Code Conventions
 
+### Git Branch Strategy
+
+**IMPORTANT: 모든 작업은 `develop` 브랜치에서 분기합니다.**
+
+- **Base Branch**: `develop` (메인 개발 브랜치)
+- **Production Branch**: `main` (프로덕션 배포용, 직접 커밋 금지)
+- **Feature Branches**: `develop`에서 분기, 작업 완료 후 `develop`으로 PR
+- **Claude Code Branches**: `claude/*-sessionId` 형식으로 `develop`에서 자동 생성
+
+**작업 시작 전 필수 체크:**
+```bash
+# 항상 develop 브랜치에서 최신 코드 pull 후 작업 시작
+git checkout develop
+git pull origin develop
+```
+
+**PR Target**: 모든 PR은 `develop` 브랜치를 타겟으로 생성
+
 ### Git Commit Convention
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
 ```

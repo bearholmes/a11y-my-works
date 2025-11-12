@@ -84,6 +84,7 @@ coverage/
 
 # Gatsby files
 public/
+!public/LICENSES.txt
 
 # Storybook build outputs
 .out/
