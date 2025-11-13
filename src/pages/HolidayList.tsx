@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useConfirm } from '../hooks/useConfirm';
+import { useNotification } from '../hooks/useNotification';
 import { holidayAPI } from '../services/api';
 
 export function HolidayList() {
@@ -9,6 +11,8 @@ export function HolidayList() {
   const [page, setPage] = useState(1);
   const [year, setYear] = useState<number>(new Date().getFullYear());
   const pageSize = 20;
+  const { confirmDelete } = useConfirm();
+  const { showSuccess, showError } = useNotification();
 
   // 공휴일 목록 조회
   const { data, isLoading } = useQuery({
@@ -21,15 +25,15 @@ export function HolidayList() {
     mutationFn: (holidayId: number) => holidayAPI.deleteHoliday(holidayId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['holidays'] });
-      alert('공휴일이 삭제되었습니다.');
+      showSuccess('공휴일이 삭제되었습니다.');
     },
     onError: (error) => {
-      alert(`오류가 발생했습니다: ${(error as Error).message}`);
+      showError(`오류가 발생했습니다: ${(error as Error).message}`);
     },
   });
 
-  const handleDelete = (holidayId: number, name: string) => {
-    if (window.confirm(`"${name}" 공휴일을 삭제하시겠습니까?`)) {
+  const handleDelete = async (holidayId: number, name: string) => {
+    if (await confirmDelete('공휴일을 삭제하시겠습니까?', name)) {
       deleteMutation.mutate(holidayId);
     }
   };
@@ -100,18 +104,33 @@ export function HolidayList() {
       {/* 목록 */}
       <div className="bg-white shadow-sm rounded-lg border overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
+          <caption className="sr-only">
+            공휴일 목록 - 총 {data?.pagination?.total || 0}건
+          </caption>
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 날짜
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 공휴일명
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 설명
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                scope="col"
+                className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 관리
               </th>
             </tr>
@@ -140,6 +159,7 @@ export function HolidayList() {
                       onClick={() =>
                         navigate(`/holidays/${holiday.holiday_id}`)
                       }
+                      aria-label={`${holiday.name} 공휴일 수정`}
                       className="text-blue-600 hover:text-blue-900 mr-4"
                     >
                       수정
@@ -148,6 +168,7 @@ export function HolidayList() {
                       onClick={() =>
                         handleDelete(holiday.holiday_id, holiday.name)
                       }
+                      aria-label={`${holiday.name} 공휴일 삭제`}
                       className="text-red-600 hover:text-red-900"
                     >
                       삭제

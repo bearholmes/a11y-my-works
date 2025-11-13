@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { useNotification } from '../hooks/useNotification';
 import { costGroupAPI } from '../services/api';
 
 const costGroupSchema = z.object({
@@ -18,6 +19,7 @@ export function CostGroupForm() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isEditMode = !!id;
+  const { showSuccess, showError } = useNotification();
 
   const {
     register,
@@ -51,11 +53,11 @@ export function CostGroupForm() {
       costGroupAPI.createCostGroup({ ...data, is_active: true }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['costGroups'] });
-      alert('청구 그룹이 생성되었습니다.');
+      showSuccess('청구 그룹이 생성되었습니다.');
       navigate('/cost-groups');
     },
     onError: (error) => {
-      alert(`오류가 발생했습니다: ${(error as Error).message}`);
+      showError(`오류가 발생했습니다: ${(error as Error).message}`);
     },
   });
 
@@ -71,11 +73,11 @@ export function CostGroupForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['costGroups'] });
       queryClient.invalidateQueries({ queryKey: ['costGroup', id] });
-      alert('청구 그룹이 수정되었습니다.');
+      showSuccess('청구 그룹이 수정되었습니다.');
       navigate('/cost-groups');
     },
     onError: (error) => {
-      alert(`오류가 발생했습니다: ${(error as Error).message}`);
+      showError(`오류가 발생했습니다: ${(error as Error).message}`);
     },
   });
 
@@ -112,22 +114,36 @@ export function CostGroupForm() {
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white shadow-sm rounded-lg border p-6 space-y-6"
+        aria-label={isEditMode ? '청구 그룹 수정 폼' : '청구 그룹 등록 폼'}
       >
         <div>
           <label
             htmlFor="name"
             className="block text-sm font-medium text-gray-700"
           >
-            청구 그룹명 <span className="text-red-500">*</span>
+            청구 그룹명{' '}
+            <span className="text-red-600" aria-label="필수 항목">
+              *
+            </span>
           </label>
           <input
+            id="name"
             {...register('name')}
             type="text"
+            aria-required="true"
+            aria-invalid={!!errors.name}
+            aria-describedby={errors.name ? 'name-error' : undefined}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             placeholder="예: 내부사업, 구글, 애플"
           />
           {errors.name && (
-            <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+            <p
+              id="name-error"
+              className="mt-1 text-sm text-red-600"
+              role="alert"
+            >
+              {errors.name.message}
+            </p>
           )}
         </div>
 
@@ -139,13 +155,23 @@ export function CostGroupForm() {
             설명
           </label>
           <textarea
+            id="description"
             {...register('description')}
             rows={3}
+            aria-label="청구 그룹 설명 입력"
+            aria-invalid={!!errors.description}
+            aria-describedby={
+              errors.description ? 'description-error' : undefined
+            }
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             placeholder="청구 그룹에 대한 설명을 입력하세요"
           />
           {errors.description && (
-            <p className="mt-1 text-sm text-red-600">
+            <p
+              id="description-error"
+              className="mt-1 text-sm text-red-600"
+              role="alert"
+            >
               {errors.description.message}
             </p>
           )}
@@ -155,6 +181,8 @@ export function CostGroupForm() {
           <button
             type="submit"
             disabled={createMutation.isPending || updateMutation.isPending}
+            aria-label={isEditMode ? '청구 그룹 수정 저장' : '청구 그룹 등록'}
+            aria-busy={createMutation.isPending || updateMutation.isPending}
             className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
             {createMutation.isPending || updateMutation.isPending
@@ -166,6 +194,7 @@ export function CostGroupForm() {
           <button
             type="button"
             onClick={() => navigate('/cost-groups')}
+            aria-label="청구 그룹 등록 취소하고 목록으로 돌아가기"
             className="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
           >
             취소

@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useConfirm } from '../hooks/useConfirm';
+import { useNotification } from '../hooks/useNotification';
 import { serviceAPI } from '../services/api';
 
 export function ServiceList() {
@@ -21,6 +23,8 @@ export function ServiceList() {
   const [isActiveInput, setIsActiveInput] = useState<boolean | undefined>(
     undefined
   );
+  const { confirmDelete } = useConfirm();
+  const { showSuccess, showError } = useNotification();
 
   // 청구 그룹 목록 조회 (필터용)
   const { data: costGroups } = useQuery({
@@ -49,10 +53,10 @@ export function ServiceList() {
     mutationFn: (serviceId: number) => serviceAPI.deleteService(serviceId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] });
-      alert('서비스가 삭제되었습니다.');
+      showSuccess('서비스가 삭제되었습니다.');
     },
     onError: (error) => {
-      alert(`삭제 실패: ${(error as Error).message}`);
+      showError(`삭제 실패: ${(error as Error).message}`);
     },
   });
 
@@ -64,8 +68,8 @@ export function ServiceList() {
     setPage(1);
   };
 
-  const handleDelete = (serviceId: number, serviceName: string) => {
-    if (confirm(`"${serviceName}" 서비스를 삭제하시겠습니까?`)) {
+  const handleDelete = async (serviceId: number, serviceName: string) => {
+    if (await confirmDelete('서비스를 삭제하시겠습니까?', serviceName)) {
       deleteMutation.mutate(serviceId);
     }
   };
@@ -99,11 +103,16 @@ export function ServiceList() {
       <div className="bg-white p-4 rounded-lg shadow-sm border">
         <form onSubmit={handleSearch} className="flex gap-4">
           <div className="flex-1">
+            <label htmlFor="service-search" className="sr-only">
+              서비스명으로 검색
+            </label>
             <input
-              type="text"
+              id="service-search"
+              type="search"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="서비스명으로 검색"
+              aria-label="서비스명으로 검색"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -166,21 +175,39 @@ export function ServiceList() {
           <>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
+                <caption className="sr-only">
+                  서비스 목록 - 총 {data.pagination.total}건
+                </caption>
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       서비스명
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       청구 그룹
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       상태
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       생성일
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       작업
                     </th>
                   </tr>
@@ -215,6 +242,7 @@ export function ServiceList() {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                         <Link
                           to={`/services/edit/${service.service_id}`}
+                          aria-label={`${service.name} 서비스 수정`}
                           className="text-blue-600 hover:text-blue-900"
                         >
                           수정
@@ -223,6 +251,7 @@ export function ServiceList() {
                           onClick={() =>
                             handleDelete(service.service_id, service.name)
                           }
+                          aria-label={`${service.name} 서비스 삭제`}
                           className="text-red-600 hover:text-red-900"
                           disabled={deleteMutation.isPending}
                         >
