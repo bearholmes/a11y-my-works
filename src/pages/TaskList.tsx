@@ -156,14 +156,16 @@ export function TaskList() {
 
           {/* 검색어 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="keyword-search" className="block text-sm font-medium text-gray-700 mb-1">
               검색어
             </label>
             <input
-              type="text"
+              id="keyword-search"
+              type="search"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="업무명, 상세내용"
+              aria-label="업무명 또는 상세내용으로 검색"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -275,24 +277,27 @@ export function TaskList() {
           <>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
+                <caption className="sr-only">
+                  업무 보고 목록 - 총 {data.pagination.total}건
+                </caption>
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       날짜
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       업무명
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       작성자
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       작업시간
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       프로젝트
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       작업
                     </th>
                   </tr>
@@ -333,12 +338,14 @@ export function TaskList() {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleViewDetail(task)}
+                            aria-label={`${task.task_name} 업무 상세보기`}
                             className="text-blue-600 hover:text-blue-900"
                           >
                             상세
                           </button>
                           <Link
                             to={`/tasks/edit/${task.task_id}`}
+                            aria-label={`${task.task_name} 업무 수정`}
                             className="text-green-600 hover:text-green-900"
                           >
                             수정
@@ -347,6 +354,7 @@ export function TaskList() {
                             onClick={() =>
                               handleDelete(task.task_id, task.task_name)
                             }
+                            aria-label={`${task.task_name} 업무 삭제`}
                             className="text-red-600 hover:text-red-900"
                             disabled={deleteMutation.isPending}
                           >
@@ -447,14 +455,25 @@ export function TaskList() {
 
       {/* 상세보기 모달 */}
       {showDetailModal && selectedTask && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setShowDetailModal(false)}
+          role="presentation"
+        >
+          <div
+            className="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="task-detail-title"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-900">
+              <h2 id="task-detail-title" className="text-xl font-bold text-gray-900">
                 업무 상세 정보
               </h2>
               <button
                 onClick={() => setShowDetailModal(false)}
+                aria-label="모달 닫기"
                 className="text-gray-400 hover:text-gray-600"
               >
                 <svg
@@ -462,6 +481,7 @@ export function TaskList() {
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
