@@ -2,11 +2,15 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useConfirm } from '../hooks/useConfirm';
+import { useNotification } from '../hooks/useNotification';
 import { roleAPI } from '../services/api';
 
 export function RoleList() {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
+  const { confirm } = useConfirm();
+  const { showSuccess, showError } = useNotification();
 
   // 역할 목록 조회
   const { data, isLoading, error } = useQuery({
@@ -19,18 +23,20 @@ export function RoleList() {
     mutationFn: (roleId: number) => roleAPI.deleteRole(roleId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['roles'] });
-      alert('역할이 삭제되었습니다.');
+      showSuccess('역할이 삭제되었습니다.');
     },
     onError: (error) => {
-      alert((error as Error).message);
+      showError((error as Error).message);
     },
   });
 
-  const handleDelete = (roleId: number, roleName: string) => {
+  const handleDelete = async (roleId: number, roleName: string) => {
     if (
-      confirm(
-        `"${roleName}" 역할을 삭제하시겠습니까?\n이 역할을 사용하는 사용자가 있으면 삭제할 수 없습니다.`
-      )
+      await confirm({
+        title: '삭제 확인',
+        message: `"${roleName}" 역할을 삭제하시겠습니까?\n이 역할을 사용하는 사용자가 있으면 삭제할 수 없습니다.`,
+        confirmButtonVariant: 'danger',
+      })
     ) {
       deleteMutation.mutate(roleId);
     }
@@ -76,21 +82,39 @@ export function RoleList() {
           <>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
+                <caption className="sr-only">
+                  역할 목록 - 총 {data.pagination.total}건
+                </caption>
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       역할명
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       설명
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       상태
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       생성일
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       작업
                     </th>
                   </tr>
@@ -125,12 +149,14 @@ export function RoleList() {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                         <Link
                           to={`/roles/edit/${role.role_id}`}
+                          aria-label={`${role.name} 역할 수정`}
                           className="text-blue-600 hover:text-blue-900"
                         >
                           수정
                         </Link>
                         <button
                           onClick={() => handleDelete(role.role_id, role.name)}
+                          aria-label={`${role.name} 역할 삭제`}
                           className="text-red-600 hover:text-red-900"
                           disabled={deleteMutation.isPending}
                         >

@@ -1,5 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppRouter } from './components/AppRouter';
+import { ConfirmDialog } from './components/ConfirmDialog';
+import { LiveRegionAnnouncer, ToastContainer } from './components/Toast';
 import { AuthProvider } from './providers/AuthProvider';
 
 const queryClient = new QueryClient({
@@ -16,6 +18,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <AppRouter />
+        <ToastContainer />
+        <LiveRegionAnnouncer />
+        <ConfirmDialog />
       </AuthProvider>
     </QueryClientProvider>
   );

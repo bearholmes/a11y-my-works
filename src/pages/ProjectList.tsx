@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useConfirm } from '../hooks/useConfirm';
+import { useNotification } from '../hooks/useNotification';
 import { projectAPI } from '../services/api';
 
 export function ProjectList() {
@@ -10,6 +12,8 @@ export function ProjectList() {
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [platformFilter, setPlatformFilter] = useState<string>('');
+  const { confirmDelete } = useConfirm();
+  const { showSuccess, showError } = useNotification();
 
   // 프로젝트 목록 조회
   const { data, isLoading, error } = useQuery({
@@ -31,10 +35,10 @@ export function ProjectList() {
     mutationFn: (projectId: number) => projectAPI.deleteProject(projectId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
-      alert('프로젝트가 삭제되었습니다.');
+      showSuccess('프로젝트가 삭제되었습니다.');
     },
     onError: (error) => {
-      alert(`삭제 실패: ${(error as Error).message}`);
+      showError(`삭제 실패: ${(error as Error).message}`);
     },
   });
 
@@ -44,8 +48,8 @@ export function ProjectList() {
     setPage(1);
   };
 
-  const handleDelete = (projectId: number, projectName: string) => {
-    if (confirm(`"${projectName}" 프로젝트를 삭제하시겠습니까?`)) {
+  const handleDelete = async (projectId: number, projectName: string) => {
+    if (await confirmDelete('프로젝트를 삭제하시겠습니까?', projectName)) {
       deleteMutation.mutate(projectId);
     }
   };
@@ -79,11 +83,16 @@ export function ProjectList() {
       <div className="bg-white p-4 rounded-lg shadow-sm border">
         <form onSubmit={handleSearch} className="flex gap-4">
           <div className="flex-1">
+            <label htmlFor="project-search" className="sr-only">
+              프로젝트명 또는 코드로 검색
+            </label>
             <input
-              type="text"
+              id="project-search"
+              type="search"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="프로젝트명, 코드로 검색"
+              aria-label="프로젝트명 또는 코드로 검색"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -124,24 +133,45 @@ export function ProjectList() {
           <>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
+                <caption className="sr-only">
+                  프로젝트 목록 - 총 {data.pagination.total}건
+                </caption>
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       프로젝트명
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       코드
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       플랫폼
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       버전
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       생성일
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       작업
                     </th>
                   </tr>
@@ -190,6 +220,7 @@ export function ProjectList() {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                         <Link
                           to={`/projects/edit/${project.project_id}`}
+                          aria-label={`${project.name} 프로젝트 수정`}
                           className="text-blue-600 hover:text-blue-900"
                         >
                           수정
@@ -198,6 +229,7 @@ export function ProjectList() {
                           onClick={() =>
                             handleDelete(project.project_id, project.name)
                           }
+                          aria-label={`${project.name} 프로젝트 삭제`}
                           className="text-red-600 hover:text-red-900"
                           disabled={deleteMutation.isPending}
                         >

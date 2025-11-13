@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { useNotification } from '../hooks/useNotification';
 import { holidayAPI } from '../services/api';
 
 const holidaySchema = z.object({
@@ -19,6 +20,7 @@ export function HolidayForm() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isEditMode = !!id;
+  const { showSuccess, showError } = useNotification();
 
   const {
     register,
@@ -52,11 +54,11 @@ export function HolidayForm() {
     mutationFn: (data: HolidayFormData) => holidayAPI.createHoliday(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['holidays'] });
-      alert('공휴일이 등록되었습니다.');
+      showSuccess('공휴일이 등록되었습니다.');
       navigate('/holidays');
     },
     onError: (error) => {
-      alert(`오류가 발생했습니다: ${(error as Error).message}`);
+      showError(`오류가 발생했습니다: ${(error as Error).message}`);
     },
   });
 
@@ -72,11 +74,11 @@ export function HolidayForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['holidays'] });
       queryClient.invalidateQueries({ queryKey: ['holiday', id] });
-      alert('공휴일이 수정되었습니다.');
+      showSuccess('공휴일이 수정되었습니다.');
       navigate('/holidays');
     },
     onError: (error) => {
-      alert(`오류가 발생했습니다: ${(error as Error).message}`);
+      showError(`오류가 발생했습니다: ${(error as Error).message}`);
     },
   });
 
