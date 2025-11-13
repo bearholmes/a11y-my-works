@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useConfirm } from '../hooks/useConfirm';
+import { useNotification } from '../hooks/useNotification';
 import { costGroupAPI } from '../services/api';
 
 export function CostGroupList() {
@@ -13,6 +15,8 @@ export function CostGroupList() {
   const [isActiveInput, setIsActiveInput] = useState<boolean | undefined>(
     undefined
   );
+  const { confirmDelete } = useConfirm();
+  const { showSuccess, showError } = useNotification();
 
   // 청구 그룹 목록 조회
   const { data, isLoading, error } = useQuery({
@@ -32,10 +36,10 @@ export function CostGroupList() {
       costGroupAPI.deleteCostGroup(costGroupId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['costGroups'] });
-      alert('청구 그룹이 삭제되었습니다.');
+      showSuccess('청구 그룹이 삭제되었습니다.');
     },
     onError: (error) => {
-      alert(`삭제 실패: ${(error as Error).message}`);
+      showError(`삭제 실패: ${(error as Error).message}`);
     },
   });
 
@@ -46,8 +50,8 @@ export function CostGroupList() {
     setPage(1);
   };
 
-  const handleDelete = (costGroupId: number, costGroupName: string) => {
-    if (confirm(`"${costGroupName}" 청구 그룹을 삭제하시겠습니까?`)) {
+  const handleDelete = async (costGroupId: number, costGroupName: string) => {
+    if (await confirmDelete('청구 그룹을 삭제하시겠습니까?', costGroupName)) {
       deleteMutation.mutate(costGroupId);
     }
   };
@@ -84,11 +88,16 @@ export function CostGroupList() {
         <form onSubmit={handleSearch} className="space-y-4">
           <div className="flex gap-4">
             <div className="flex-1">
+              <label htmlFor="cost-group-search" className="sr-only">
+                청구 그룹명 또는 설명으로 검색
+              </label>
               <input
-                type="text"
+                id="cost-group-search"
+                type="search"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="청구 그룹명 또는 설명으로 검색"
+                aria-label="청구 그룹명 또는 설명으로 검색"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -137,18 +146,33 @@ export function CostGroupList() {
           <>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
+                <caption className="sr-only">
+                  청구 그룹 목록 - 총 {data.pagination.total}건
+                </caption>
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       청구 그룹명
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       상태
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       생성일
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       작업
                     </th>
                   </tr>
@@ -186,6 +210,7 @@ export function CostGroupList() {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                         <Link
                           to={`/cost-groups/edit/${costGroup.cost_group_id}`}
+                          aria-label={`${costGroup.name} 청구 그룹 수정`}
                           className="text-blue-600 hover:text-blue-900"
                         >
                           수정
@@ -197,6 +222,7 @@ export function CostGroupList() {
                               costGroup.name
                             )
                           }
+                          aria-label={`${costGroup.name} 청구 그룹 삭제`}
                           className="text-red-600 hover:text-red-900"
                           disabled={deleteMutation.isPending}
                         >

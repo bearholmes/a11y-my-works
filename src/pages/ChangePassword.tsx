@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useAuth } from '../hooks/useAuth';
+import { useNotification } from '../hooks/useNotification';
 
 const changePasswordSchema = z
   .object({
@@ -23,6 +24,7 @@ export function ChangePassword() {
   const { user, signIn, updatePassword } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string>('');
+  const { showSuccess } = useNotification();
 
   const {
     register,
@@ -58,7 +60,7 @@ export function ChangePassword() {
       if (error) {
         setError(error.message);
       } else {
-        alert('비밀번호가 변경되었습니다.');
+        showSuccess('비밀번호가 변경되었습니다.');
         reset();
         navigate('/');
       }

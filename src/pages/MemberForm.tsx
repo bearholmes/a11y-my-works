@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { useNotification } from '../hooks/useNotification';
 import { memberAPI, roleAPI } from '../services/api';
 
 const memberSchema = z.object({
@@ -22,6 +23,7 @@ export function MemberForm() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isEditMode = !!id;
+  const { showSuccess, showError } = useNotification();
 
   const {
     register,
@@ -74,11 +76,11 @@ export function MemberForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['members'] });
       queryClient.invalidateQueries({ queryKey: ['member', id] });
-      alert('사용자 정보가 수정되었습니다.');
+      showSuccess('사용자 정보가 수정되었습니다.');
       navigate('/members');
     },
     onError: (error) => {
-      alert(`오류가 발생했습니다: ${(error as Error).message}`);
+      showError(`오류가 발생했습니다: ${(error as Error).message}`);
     },
   });
 
@@ -113,21 +115,35 @@ export function MemberForm() {
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white shadow-sm rounded-lg border p-6 space-y-6"
+        aria-label={isEditMode ? '사용자 수정 폼' : '사용자 등록 폼'}
       >
         <div>
           <label
             htmlFor="name"
             className="block text-sm font-medium text-gray-700"
           >
-            이름 <span className="text-red-500">*</span>
+            이름{' '}
+            <span className="text-red-600" aria-label="필수 항목">
+              *
+            </span>
           </label>
           <input
+            id="name"
             {...register('name')}
             type="text"
+            aria-required="true"
+            aria-invalid={!!errors.name}
+            aria-describedby={errors.name ? 'name-error' : undefined}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
           {errors.name && (
-            <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+            <p
+              id="name-error"
+              className="mt-1 text-sm text-red-600"
+              role="alert"
+            >
+              {errors.name.message}
+            </p>
           )}
         </div>
 
@@ -136,16 +152,29 @@ export function MemberForm() {
             htmlFor="account_id"
             className="block text-sm font-medium text-gray-700"
           >
-            계정 ID <span className="text-red-500">*</span>
+            계정 ID{' '}
+            <span className="text-red-600" aria-label="필수 항목">
+              *
+            </span>
           </label>
           <input
+            id="account_id"
             {...register('account_id')}
             type="text"
             disabled={isEditMode}
+            aria-required="true"
+            aria-invalid={!!errors.account_id}
+            aria-describedby={
+              errors.account_id ? 'account_id-error' : undefined
+            }
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
           />
           {errors.account_id && (
-            <p className="mt-1 text-sm text-red-600">
+            <p
+              id="account_id-error"
+              className="mt-1 text-sm text-red-600"
+              role="alert"
+            >
               {errors.account_id.message}
             </p>
           )}
@@ -161,16 +190,29 @@ export function MemberForm() {
             htmlFor="email"
             className="block text-sm font-medium text-gray-700"
           >
-            이메일 <span className="text-red-500">*</span>
+            이메일{' '}
+            <span className="text-red-600" aria-label="필수 항목">
+              *
+            </span>
           </label>
           <input
+            id="email"
             {...register('email')}
             type="email"
             disabled={isEditMode}
+            aria-required="true"
+            aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? 'email-error' : undefined}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
           />
           {errors.email && (
-            <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+            <p
+              id="email-error"
+              className="mt-1 text-sm text-red-600"
+              role="alert"
+            >
+              {errors.email.message}
+            </p>
           )}
           {isEditMode && (
             <p className="mt-1 text-sm text-gray-500">
@@ -187,13 +229,23 @@ export function MemberForm() {
             휴대폰 번호
           </label>
           <input
+            id="mobile"
             {...register('mobile')}
             type="tel"
             placeholder="010-1234-5678"
+            aria-label="휴대폰 번호 입력"
+            aria-invalid={!!errors.mobile}
+            aria-describedby={errors.mobile ? 'mobile-error' : undefined}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
           {errors.mobile && (
-            <p className="mt-1 text-sm text-red-600">{errors.mobile.message}</p>
+            <p
+              id="mobile-error"
+              className="mt-1 text-sm text-red-600"
+              role="alert"
+            >
+              {errors.mobile.message}
+            </p>
           )}
         </div>
 
@@ -202,10 +254,17 @@ export function MemberForm() {
             htmlFor="role_id"
             className="block text-sm font-medium text-gray-700"
           >
-            역할 <span className="text-red-500">*</span>
+            역할{' '}
+            <span className="text-red-600" aria-label="필수 항목">
+              *
+            </span>
           </label>
           <select
+            id="role_id"
             {...register('role_id', { valueAsNumber: true })}
+            aria-required="true"
+            aria-invalid={!!errors.role_id}
+            aria-describedby={errors.role_id ? 'role_id-error' : undefined}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           >
             <option value={0}>역할 선택</option>
@@ -216,7 +275,11 @@ export function MemberForm() {
             ))}
           </select>
           {errors.role_id && (
-            <p className="mt-1 text-sm text-red-600">
+            <p
+              id="role_id-error"
+              className="mt-1 text-sm text-red-600"
+              role="alert"
+            >
               {errors.role_id.message}
             </p>
           )}
@@ -224,8 +287,10 @@ export function MemberForm() {
 
         <div className="flex items-center">
           <input
+            id="is_active"
             {...register('is_active')}
             type="checkbox"
+            aria-label="사용자 활성 상태"
             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
           />
           <label
@@ -240,6 +305,8 @@ export function MemberForm() {
           <button
             type="submit"
             disabled={updateMutation.isPending}
+            aria-label={isEditMode ? '사용자 정보 수정 저장' : '사용자 등록'}
+            aria-busy={updateMutation.isPending}
             className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
             {updateMutation.isPending
@@ -251,6 +318,7 @@ export function MemberForm() {
           <button
             type="button"
             onClick={() => navigate('/members')}
+            aria-label="사용자 등록 취소하고 목록으로 돌아가기"
             className="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
           >
             취소
