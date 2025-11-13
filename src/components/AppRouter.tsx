@@ -120,8 +120,8 @@ const PendingApprovalScreen = lazy(() =>
   }))
 );
 
-// 관리자 대시보드
-const AdminDashboard = lazy(() =>
+// 팀 관리 - 업무 작성 현황 (구 관리자 대시보드)
+const TeamReportStatus = lazy(() =>
   import('../pages/AdminDashboard').then((m) => ({ default: m.AdminDashboard }))
 );
 
@@ -255,13 +255,13 @@ export function AppRouter() {
           }
         />
 
-        {/* 관리자 대시보드 */}
+        {/* 팀 관리 - 업무 작성 현황 */}
         <Route
-          path="/admin/dashboard"
+          path="/team/report-status"
           element={
             <ProtectedRoute>
               <PermissionGuard permission="member.read">
-                <AdminDashboard />
+                <TeamReportStatus />
               </PermissionGuard>
             </ProtectedRoute>
           }

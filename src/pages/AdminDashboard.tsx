@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { dashboardAPI } from '../services/api';
 
 /**
- * 관리자 대시보드 페이지
+ * 업무 작성 현황 페이지
  * 매니저와 관리자가 월별로 팀원들의 업무 일지 작성 현황을 확인할 수 있습니다.
  * 일별 기준: 480분(8시간) 이상 작성 시 완료로 표시
  */
@@ -99,10 +99,10 @@ export function AdminDashboard() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">
-              관리자 대시보드
+              업무 작성 현황
             </h2>
             <p className="mt-1 text-sm text-gray-600">
-              팀원들의 월별 업무 일지 작성 현황을 확인하세요
+              팀원들의 월별 업무 일지 작성 현황을 확인하세요 (기준: 8시간)
             </p>
           </div>
 

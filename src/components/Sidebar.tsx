@@ -52,6 +52,13 @@ const MENU_ITEMS: MenuItem[] = [
         requiredPermission: 'task.read',
         requireReadOnly: true,
       },
+      {
+        name: '업무 작성 현황',
+        href: '/team/report-status',
+        icon: '📊',
+        requiredPermission: 'member.read',
+        requireReadOnly: true,
+      },
     ],
   },
   {
@@ -98,13 +105,6 @@ const MENU_ITEMS: MenuItem[] = [
     requiredPermission: 'member.read',
     requireReadOnly: true,
     children: [
-      {
-        name: '관리자 대시보드',
-        href: '/admin/dashboard',
-        icon: '📊',
-        requiredPermission: 'member.read',
-        requireReadOnly: true,
-      },
       {
         name: '사용자 관리',
         href: '/members',
