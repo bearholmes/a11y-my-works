@@ -1,6 +1,8 @@
 import { useAtom, useSetAtom } from 'jotai';
+import { useEffect } from 'react';
 import {
   type Notification,
+  clearAllNotificationsAtom,
   notificationsAtom,
   removeNotificationAtom,
 } from '../stores/notificationStore';
@@ -46,6 +48,14 @@ function ToastItem({ notification }: { notification: Notification }) {
   const removeNotification = useSetAtom(removeNotificationAtom);
   const style = notificationStyles[notification.type];
 
+  // 알림 타입별 한글 레이블
+  const typeLabels = {
+    success: '성공',
+    error: '오류',
+    warning: '경고',
+    info: '정보',
+  };
+
   return (
     <div
       role="alert"
@@ -81,13 +91,14 @@ function ToastItem({ notification }: { notification: Notification }) {
       {/* 닫기 버튼 */}
       <button
         onClick={() => removeNotification(notification.id)}
-        aria-label="알림 닫기"
+        aria-label={`${typeLabels[notification.type]} 알림 닫기`}
         className={`
           ${style.text}
           hover:opacity-70
           focus:outline-none focus:ring-2 focus:ring-offset-2
           rounded
           p-1
+          flex-shrink-0
         `}
       >
         <svg
@@ -113,11 +124,29 @@ function ToastItem({ notification }: { notification: Notification }) {
  */
 export function ToastContainer() {
   const [notifications] = useAtom(notificationsAtom);
+  const clearAllNotifications = useSetAtom(clearAllNotificationsAtom);
+
+  // ESC 키로 모든 알림 닫기 (키보드 접근성)
+  useEffect(() => {
+    if (notifications.length === 0) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        clearAllNotifications();
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [notifications.length, clearAllNotifications]);
+
+  if (notifications.length === 0) return null;
 
   return (
     <div
+      role="region"
+      aria-label={`알림 영역 - ${notifications.length}개의 알림. ESC 키를 눌러 모든 알림을 닫을 수 있습니다.`}
       className="fixed top-4 right-4 z-50 flex flex-col gap-3"
-      aria-label="알림 영역"
     >
       {notifications.map((notification) => (
         <ToastItem key={notification.id} notification={notification} />
