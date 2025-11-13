@@ -107,11 +107,6 @@ const RoleForm = lazy(() =>
   import('../pages/RoleForm').then((m) => ({ default: m.RoleForm }))
 );
 
-// 테스트
-const TestPage = lazy(() =>
-  import('../pages/TestPage').then((m) => ({ default: m.TestPage }))
-);
-
 // 팀 관리
 const TeamTaskList = lazy(() =>
   import('../pages/TeamTaskList').then((m) => ({ default: m.TeamTaskList }))
@@ -482,16 +477,6 @@ export function AppRouter() {
               <PermissionGuard permission="member.write" requireWrite>
                 <RoleForm />
               </PermissionGuard>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* 테스트 페이지 */}
-        <Route
-          path="/test"
-          element={
-            <ProtectedRoute>
-              <TestPage />
             </ProtectedRoute>
           }
         />

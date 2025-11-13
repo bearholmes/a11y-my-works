@@ -119,13 +119,6 @@ const MENU_ITEMS: MenuItem[] = [
         requiredPermission: 'member.write',
         requireReadOnly: false,
       },
-      {
-        name: '데이터 테스트',
-        href: '/test',
-        icon: '🧪',
-        requiredPermission: 'member.read',
-        requireReadOnly: true,
-      },
     ],
   },
 ];
