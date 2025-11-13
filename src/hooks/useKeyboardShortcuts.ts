@@ -17,9 +17,10 @@ interface ShortcutConfig {
  * 글로벌 키보드 단축키 훅
  *
  * 지원하는 단축키:
+ * - Ctrl/Cmd + N: 새 업무 작성
+ * - Ctrl/Cmd + F: 검색 포커스
  * - Alt + H: 홈 (대시보드)
  * - Alt + T: 업무 목록
- * - Alt + N: 새 업무 작성
  * - Alt + P: 프로젝트 관리
  * - Alt + S: 서비스 관리
  * - Alt + M: 사용자 관리
@@ -31,13 +32,38 @@ export function useKeyboardShortcuts() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // 입력 필드에서는 단축키 비활성화
+      // 입력 필드에서는 네비게이션 단축키 비활성화 (검색은 제외)
       const target = event.target as HTMLElement;
-      if (
+      const isInputField =
         target.tagName === 'INPUT' ||
         target.tagName === 'TEXTAREA' ||
-        target.isContentEditable
-      ) {
+        target.isContentEditable;
+
+      // Ctrl/Cmd 키 조합 (데스크탑 중심)
+      if ((event.ctrlKey || event.metaKey) && !event.altKey) {
+        switch (event.key.toLowerCase()) {
+          case 'n':
+            // 새 업무 작성 (입력 필드에서도 동작)
+            event.preventDefault();
+            navigate('/tasks/new');
+            break;
+          case 'f':
+            // 검색 포커스
+            event.preventDefault();
+            const searchInput = document.querySelector<HTMLInputElement>(
+              'input[type="search"], input[id*="search"]'
+            );
+            if (searchInput) {
+              searchInput.focus();
+              searchInput.select();
+            }
+            break;
+        }
+        return;
+      }
+
+      // 입력 필드에서는 Alt 단축키 비활성화
+      if (isInputField) {
         return;
       }
 
@@ -51,10 +77,6 @@ export function useKeyboardShortcuts() {
           case 't':
             event.preventDefault();
             navigate('/tasks');
-            break;
-          case 'n':
-            event.preventDefault();
-            navigate('/tasks/new');
             break;
           case 'r':
             event.preventDefault();
@@ -75,8 +97,8 @@ export function useKeyboardShortcuts() {
           case '/':
           case '?':
             event.preventDefault();
-            // 단축키 도움말 표시 (나중에 구현)
-            console.log('키보드 단축키 도움말');
+            // 단축키 도움말 표시 (KeyboardShortcutsModal)
+            window.dispatchEvent(new CustomEvent('toggle-shortcuts-modal'));
             break;
         }
       }
@@ -96,18 +118,23 @@ export function useKeyboardShortcuts() {
 export function getShortcutList(): ShortcutConfig[] {
   return [
     {
+      key: 'Ctrl + N',
+      description: '새 업무 작성',
+      action: () => {},
+    },
+    {
+      key: 'Ctrl + F',
+      description: '검색 포커스',
+      action: () => {},
+    },
+    {
       key: 'Alt + H',
       description: '홈 (대시보드)',
       action: () => {},
     },
     {
       key: 'Alt + T',
-      description: '업무 목록',
-      action: () => {},
-    },
-    {
-      key: 'Alt + N',
-      description: '새 업무 작성',
+      description: '업무 관리',
       action: () => {},
     },
     {
