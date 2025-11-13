@@ -100,18 +100,21 @@ export function HolidayList() {
       {/* 목록 */}
       <div className="bg-white shadow-sm rounded-lg border overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
+          <caption className="sr-only">
+            공휴일 목록 - 총 {data?.pagination?.total || 0}건
+          </caption>
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 날짜
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 공휴일명
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 설명
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 관리
               </th>
             </tr>
@@ -140,6 +143,7 @@ export function HolidayList() {
                       onClick={() =>
                         navigate(`/holidays/${holiday.holiday_id}`)
                       }
+                      aria-label={`${holiday.name} 공휴일 수정`}
                       className="text-blue-600 hover:text-blue-900 mr-4"
                     >
                       수정
@@ -148,6 +152,7 @@ export function HolidayList() {
                       onClick={() =>
                         handleDelete(holiday.holiday_id, holiday.name)
                       }
+                      aria-label={`${holiday.name} 공휴일 삭제`}
                       className="text-red-600 hover:text-red-900"
                     >
                       삭제
