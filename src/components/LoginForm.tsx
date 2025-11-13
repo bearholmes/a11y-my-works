@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, Navigate } from 'react-router-dom';
 import { z } from 'zod';
+import { useNotification } from '../hooks/useNotification';
 import { useAuthContext } from '../providers/AuthProvider';
 
 const loginSchema = z.object({
@@ -31,6 +32,7 @@ export function LoginForm() {
   const { user, signIn, signUp, loading } = useAuthContext();
   const [error, setError] = useState<string>('');
   const [submitting, setSubmitting] = useState(false);
+  const { showSuccess } = useNotification();
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -76,7 +78,9 @@ export function LoginForm() {
           setError(error.message);
         } else {
           setError('');
-          alert('회원가입이 완료되었습니다. 이메일 인증 후 로그인해주세요.');
+          showSuccess(
+            '회원가입이 완료되었습니다. 이메일 인증 후 로그인해주세요.'
+          );
           // 회원가입 성공 후 로그인 모드로 전환
           setIsSignUp(false);
           loginForm.reset();

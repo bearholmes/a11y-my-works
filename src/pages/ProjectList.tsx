@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useConfirm } from '../hooks/useConfirm';
+import { useNotification } from '../hooks/useNotification';
 import { projectAPI } from '../services/api';
 
 export function ProjectList() {
@@ -10,6 +12,8 @@ export function ProjectList() {
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [platformFilter, setPlatformFilter] = useState<string>('');
+  const { confirmDelete } = useConfirm();
+  const { showSuccess, showError } = useNotification();
 
   // 프로젝트 목록 조회
   const { data, isLoading, error } = useQuery({
@@ -31,10 +35,10 @@ export function ProjectList() {
     mutationFn: (projectId: number) => projectAPI.deleteProject(projectId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
-      alert('프로젝트가 삭제되었습니다.');
+      showSuccess('프로젝트가 삭제되었습니다.');
     },
     onError: (error) => {
-      alert(`삭제 실패: ${(error as Error).message}`);
+      showError(`삭제 실패: ${(error as Error).message}`);
     },
   });
 
@@ -44,8 +48,8 @@ export function ProjectList() {
     setPage(1);
   };
 
-  const handleDelete = (projectId: number, projectName: string) => {
-    if (confirm(`"${projectName}" 프로젝트를 삭제하시겠습니까?`)) {
+  const handleDelete = async (projectId: number, projectName: string) => {
+    if (await confirmDelete('프로젝트를 삭제하시겠습니까?', projectName)) {
       deleteMutation.mutate(projectId);
     }
   };
@@ -134,22 +138,40 @@ export function ProjectList() {
                 </caption>
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       프로젝트명
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       코드
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       플랫폼
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       버전
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       생성일
                     </th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       작업
                     </th>
                   </tr>

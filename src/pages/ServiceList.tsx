@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useConfirm } from '../hooks/useConfirm';
+import { useNotification } from '../hooks/useNotification';
 import { serviceAPI } from '../services/api';
 
 export function ServiceList() {
@@ -21,6 +23,8 @@ export function ServiceList() {
   const [isActiveInput, setIsActiveInput] = useState<boolean | undefined>(
     undefined
   );
+  const { confirmDelete } = useConfirm();
+  const { showSuccess, showError } = useNotification();
 
   // 청구 그룹 목록 조회 (필터용)
   const { data: costGroups } = useQuery({
@@ -49,10 +53,10 @@ export function ServiceList() {
     mutationFn: (serviceId: number) => serviceAPI.deleteService(serviceId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] });
-      alert('서비스가 삭제되었습니다.');
+      showSuccess('서비스가 삭제되었습니다.');
     },
     onError: (error) => {
-      alert(`삭제 실패: ${(error as Error).message}`);
+      showError(`삭제 실패: ${(error as Error).message}`);
     },
   });
 
@@ -64,8 +68,8 @@ export function ServiceList() {
     setPage(1);
   };
 
-  const handleDelete = (serviceId: number, serviceName: string) => {
-    if (confirm(`"${serviceName}" 서비스를 삭제하시겠습니까?`)) {
+  const handleDelete = async (serviceId: number, serviceName: string) => {
+    if (await confirmDelete('서비스를 삭제하시겠습니까?', serviceName)) {
       deleteMutation.mutate(serviceId);
     }
   };
@@ -176,19 +180,34 @@ export function ServiceList() {
                 </caption>
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       서비스명
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       청구 그룹
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       상태
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       생성일
                     </th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       작업
                     </th>
                   </tr>

@@ -140,11 +140,21 @@ export function TaskForm() {
           {isEdit ? '업무 보고 수정' : '업무 보고 등록'}
         </h2>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" aria-label={isEdit ? '업무 보고 수정 폼' : '업무 보고 등록 폼'}>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-6"
+          aria-label={isEdit ? '업무 보고 수정 폼' : '업무 보고 등록 폼'}
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="task_date" className="block text-sm font-medium text-gray-700 mb-2">
-                날짜 <span className="text-red-600" aria-label="필수 항목">*</span>
+              <label
+                htmlFor="task_date"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                날짜{' '}
+                <span className="text-red-600" aria-label="필수 항목">
+                  *
+                </span>
               </label>
               <input
                 id="task_date"
@@ -152,18 +162,27 @@ export function TaskForm() {
                 {...register('task_date')}
                 aria-required="true"
                 aria-invalid={!!errors.task_date}
-                aria-describedby={errors.task_date ? 'task_date-error' : undefined}
+                aria-describedby={
+                  errors.task_date ? 'task_date-error' : undefined
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.task_date && (
-                <p id="task_date-error" className="mt-1 text-sm text-red-600" role="alert">
+                <p
+                  id="task_date-error"
+                  className="mt-1 text-sm text-red-600"
+                  role="alert"
+                >
                   {errors.task_date.message}
                 </p>
               )}
             </div>
 
             <div>
-              <label htmlFor="work_time" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="work_time"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 작업 시간 (분)
               </label>
               <input
@@ -178,8 +197,14 @@ export function TaskForm() {
           </div>
 
           <div>
-            <label htmlFor="task_name" className="block text-sm font-medium text-gray-700 mb-2">
-              업무명 <span className="text-red-600" aria-label="필수 항목">*</span>
+            <label
+              htmlFor="task_name"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              업무명{' '}
+              <span className="text-red-600" aria-label="필수 항목">
+                *
+              </span>
             </label>
             <input
               id="task_name"
@@ -187,19 +212,28 @@ export function TaskForm() {
               {...register('task_name')}
               aria-required="true"
               aria-invalid={!!errors.task_name}
-              aria-describedby={errors.task_name ? 'task_name-error' : undefined}
+              aria-describedby={
+                errors.task_name ? 'task_name-error' : undefined
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="업무명을 입력하세요"
             />
             {errors.task_name && (
-              <p id="task_name-error" className="mt-1 text-sm text-red-600" role="alert">
+              <p
+                id="task_name-error"
+                className="mt-1 text-sm text-red-600"
+                role="alert"
+              >
                 {errors.task_name.message}
               </p>
             )}
           </div>
 
           <div>
-            <label htmlFor="task_detail" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="task_detail"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               업무 상세
             </label>
             <textarea
@@ -213,7 +247,10 @@ export function TaskForm() {
           </div>
 
           <div>
-            <label htmlFor="task_url" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="task_url"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               관련 URL
             </label>
             <input
@@ -226,7 +263,11 @@ export function TaskForm() {
               placeholder="https://..."
             />
             {errors.task_url && (
-              <p id="task_url-error" className="mt-1 text-sm text-red-600" role="alert">
+              <p
+                id="task_url-error"
+                className="mt-1 text-sm text-red-600"
+                role="alert"
+              >
                 {errors.task_url.message}
               </p>
             )}
@@ -234,7 +275,10 @@ export function TaskForm() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="start_time" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="start_time"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 시작 시간
               </label>
               <input
@@ -247,7 +291,10 @@ export function TaskForm() {
             </div>
 
             <div>
-              <label htmlFor="end_time" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="end_time"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 종료 시간
               </label>
               <input
@@ -262,7 +309,10 @@ export function TaskForm() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="cost_group_id" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="cost_group_id"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 청구 그룹
               </label>
               <select
@@ -281,7 +331,10 @@ export function TaskForm() {
             </div>
 
             <div>
-              <label htmlFor="platform_id" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="platform_id"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 플랫폼
               </label>
               <select
@@ -300,12 +353,19 @@ export function TaskForm() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6" role="group" aria-labelledby="project-selection-label">
+          <div
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            role="group"
+            aria-labelledby="project-selection-label"
+          >
             <span id="project-selection-label" className="sr-only">
               프로젝트 선택 (청구 그룹, 서비스, 프로젝트 순서)
             </span>
             <div>
-              <label htmlFor="service_id" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="service_id"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 서비스
               </label>
               <select
@@ -316,7 +376,11 @@ export function TaskForm() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 disabled={!selectedCostGroup}
               >
-                <option value="">{selectedCostGroup ? '서비스를 선택하세요' : '먼저 청구 그룹을 선택하세요'}</option>
+                <option value="">
+                  {selectedCostGroup
+                    ? '서비스를 선택하세요'
+                    : '먼저 청구 그룹을 선택하세요'}
+                </option>
                 {services?.map((service) => (
                   <option key={service.service_id} value={service.service_id}>
                     {service.name}
@@ -326,7 +390,10 @@ export function TaskForm() {
             </div>
 
             <div>
-              <label htmlFor="project_id" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="project_id"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 프로젝트
               </label>
               <select
@@ -337,7 +404,11 @@ export function TaskForm() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 disabled={!selectedService}
               >
-                <option value="">{selectedService ? '프로젝트를 선택하세요' : '먼저 서비스를 선택하세요'}</option>
+                <option value="">
+                  {selectedService
+                    ? '프로젝트를 선택하세요'
+                    : '먼저 서비스를 선택하세요'}
+                </option>
                 {projects?.map((project) => (
                   <option key={project.project_id} value={project.project_id}>
                     {project.name}

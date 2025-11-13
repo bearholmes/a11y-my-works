@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { useNotification } from '../hooks/useNotification';
 import { permissionAPI, roleAPI } from '../services/api';
 
 const roleSchema = z.object({
@@ -27,6 +28,7 @@ export function RoleForm() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isEditMode = !!id;
+  const { showSuccess, showError } = useNotification();
 
   const [permissions, setPermissions] = useState<PermissionState[]>([]);
 
@@ -119,11 +121,11 @@ export function RoleForm() {
       ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['roles'] });
-      alert('역할이 생성되었습니다.');
+      showSuccess('역할이 생성되었습니다.');
       navigate('/roles');
     },
     onError: (error) => {
-      alert(`오류가 발생했습니다: ${(error as Error).message}`);
+      showError(`오류가 발생했습니다: ${(error as Error).message}`);
     },
   });
 
@@ -141,11 +143,11 @@ export function RoleForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['roles'] });
       queryClient.invalidateQueries({ queryKey: ['role', id] });
-      alert('역할이 수정되었습니다.');
+      showSuccess('역할이 수정되었습니다.');
       navigate('/roles');
     },
     onError: (error) => {
-      alert(`오류가 발생했습니다: ${(error as Error).message}`);
+      showError(`오류가 발생했습니다: ${(error as Error).message}`);
     },
   });
 
@@ -191,7 +193,11 @@ export function RoleForm() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" aria-label={isEditMode ? '역할 수정 폼' : '역할 생성 폼'}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-6"
+        aria-label={isEditMode ? '역할 수정 폼' : '역할 생성 폼'}
+      >
         {/* 기본 정보 */}
         <div className="bg-white shadow-sm rounded-lg border p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-900">기본 정보</h2>
@@ -201,7 +207,10 @@ export function RoleForm() {
               htmlFor="name"
               className="block text-sm font-medium text-gray-700"
             >
-              역할명 <span className="text-red-600" aria-label="필수 항목">*</span>
+              역할명{' '}
+              <span className="text-red-600" aria-label="필수 항목">
+                *
+              </span>
             </label>
             <input
               id="name"
@@ -213,7 +222,13 @@ export function RoleForm() {
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
             {errors.name && (
-              <p id="name-error" className="mt-1 text-sm text-red-600" role="alert">{errors.name.message}</p>
+              <p
+                id="name-error"
+                className="mt-1 text-sm text-red-600"
+                role="alert"
+              >
+                {errors.name.message}
+              </p>
             )}
           </div>
 
@@ -257,16 +272,28 @@ export function RoleForm() {
           </h2>
 
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200" aria-label="역할 권한 설정 테이블">
+            <table
+              className="min-w-full divide-y divide-gray-200"
+              aria-label="역할 권한 설정 테이블"
+            >
               <thead className="bg-gray-50">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     권한
                   </th>
-                  <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     읽기
                   </th>
-                  <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     쓰기
                   </th>
                 </tr>

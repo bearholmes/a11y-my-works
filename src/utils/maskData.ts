@@ -14,8 +14,7 @@ export function maskEmail(email: string): string {
   if (!localPart || !domain) return email;
 
   const visibleLength = Math.min(2, Math.floor(localPart.length / 2));
-  const maskedLocal =
-    localPart.substring(0, visibleLength) + '***';
+  const maskedLocal = `${localPart.substring(0, visibleLength)}***`;
 
   return `${maskedLocal}@${domain}`;
 }
@@ -52,15 +51,15 @@ export function maskName(name: string): string {
   // 한글 이름 (2-4자)
   if (/^[가-힣]{2,4}$/.test(name)) {
     if (name.length === 2) {
-      return name[0] + '*';
+      return `${name[0]}*`;
     }
-    return name[0] + '*'.repeat(name.length - 2) + name[name.length - 1];
+    return `${name[0]}${'*'.repeat(name.length - 2)}${name[name.length - 1]}`;
   }
 
   // 영문 이름
   return name
     .split(' ')
-    .map((part) => part[0] + '***')
+    .map((part) => `${part[0]}***`)
     .join(' ');
 }
 
@@ -72,7 +71,7 @@ export function maskAccountId(accountId: string): string {
   if (!accountId || typeof accountId !== 'string') return '';
 
   const visibleLength = Math.min(2, Math.floor(accountId.length / 3));
-  return accountId.substring(0, visibleLength) + '***';
+  return `${accountId.substring(0, visibleLength)}***`;
 }
 
 /**
@@ -118,6 +117,8 @@ export function maskUserInfo(
     email: user.email ? maskEmail(user.email) : user.email,
     mobile: user.mobile ? maskPhoneNumber(user.mobile) : user.mobile,
     name: user.name ? maskName(user.name) : user.name,
-    account_id: user.account_id ? maskAccountId(user.account_id) : user.account_id,
+    account_id: user.account_id
+      ? maskAccountId(user.account_id)
+      : user.account_id,
   };
 }

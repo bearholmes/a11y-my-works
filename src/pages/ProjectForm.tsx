@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { useNotification } from '../hooks/useNotification';
 import { projectAPI } from '../services/api';
 
 const projectSchema = z.object({
@@ -30,6 +31,7 @@ export function ProjectForm() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isEditMode = !!id;
+  const { showSuccess, showError } = useNotification();
 
   const {
     register,
@@ -74,11 +76,11 @@ export function ProjectForm() {
       projectAPI.createProject({ ...data, is_active: true }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
-      alert('프로젝트가 생성되었습니다.');
+      showSuccess('프로젝트가 생성되었습니다.');
       navigate('/projects');
     },
     onError: (error) => {
-      alert(`오류가 발생했습니다: ${(error as Error).message}`);
+      showError(`오류가 발생했습니다: ${(error as Error).message}`);
     },
   });
 
@@ -94,11 +96,11 @@ export function ProjectForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       queryClient.invalidateQueries({ queryKey: ['project', id] });
-      alert('프로젝트가 수정되었습니다.');
+      showSuccess('프로젝트가 수정되었습니다.');
       navigate('/projects');
     },
     onError: (error) => {
-      alert(`오류가 발생했습니다: ${(error as Error).message}`);
+      showError(`오류가 발생했습니다: ${(error as Error).message}`);
     },
   });
 
@@ -142,7 +144,10 @@ export function ProjectForm() {
             htmlFor="name"
             className="block text-sm font-medium text-gray-700"
           >
-            프로젝트명 <span className="text-red-600" aria-label="필수 항목">*</span>
+            프로젝트명{' '}
+            <span className="text-red-600" aria-label="필수 항목">
+              *
+            </span>
           </label>
           <input
             id="name"
@@ -154,7 +159,13 @@ export function ProjectForm() {
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
           {errors.name && (
-            <p id="name-error" className="mt-1 text-sm text-red-600" role="alert">{errors.name.message}</p>
+            <p
+              id="name-error"
+              className="mt-1 text-sm text-red-600"
+              role="alert"
+            >
+              {errors.name.message}
+            </p>
           )}
         </div>
 
@@ -163,14 +174,19 @@ export function ProjectForm() {
             htmlFor="service_id"
             className="block text-sm font-medium text-gray-700"
           >
-            서비스 <span className="text-red-600" aria-label="필수 항목">*</span>
+            서비스{' '}
+            <span className="text-red-600" aria-label="필수 항목">
+              *
+            </span>
           </label>
           <select
             id="service_id"
             {...register('service_id', { valueAsNumber: true })}
             aria-required="true"
             aria-invalid={!!errors.service_id}
-            aria-describedby={errors.service_id ? 'service_id-error' : undefined}
+            aria-describedby={
+              errors.service_id ? 'service_id-error' : undefined
+            }
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           >
             <option value={0}>서비스 선택</option>
@@ -181,7 +197,11 @@ export function ProjectForm() {
             ))}
           </select>
           {errors.service_id && (
-            <p id="service_id-error" className="mt-1 text-sm text-red-600" role="alert">
+            <p
+              id="service_id-error"
+              className="mt-1 text-sm text-red-600"
+              role="alert"
+            >
               {errors.service_id.message}
             </p>
           )}
@@ -195,7 +215,10 @@ export function ProjectForm() {
             htmlFor="code"
             className="block text-sm font-medium text-gray-700"
           >
-            프로젝트 코드 <span className="text-red-600" aria-label="필수 항목">*</span>
+            프로젝트 코드{' '}
+            <span className="text-red-600" aria-label="필수 항목">
+              *
+            </span>
           </label>
           <input
             id="code"
@@ -209,7 +232,13 @@ export function ProjectForm() {
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed font-mono"
           />
           {errors.code && (
-            <p id="code-error" className="mt-1 text-sm text-red-600" role="alert">{errors.code.message}</p>
+            <p
+              id="code-error"
+              className="mt-1 text-sm text-red-600"
+              role="alert"
+            >
+              {errors.code.message}
+            </p>
           )}
           <p className="mt-1 text-sm text-gray-500">
             대문자, 숫자, 언더스코어만 사용 가능합니다.{' '}
@@ -230,11 +259,17 @@ export function ProjectForm() {
             rows={3}
             aria-label="프로젝트 설명 입력"
             aria-invalid={!!errors.description}
-            aria-describedby={errors.description ? 'description-error' : undefined}
+            aria-describedby={
+              errors.description ? 'description-error' : undefined
+            }
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
           {errors.description && (
-            <p id="description-error" className="mt-1 text-sm text-red-600" role="alert">
+            <p
+              id="description-error"
+              className="mt-1 text-sm text-red-600"
+              role="alert"
+            >
               {errors.description.message}
             </p>
           )}
@@ -245,7 +280,10 @@ export function ProjectForm() {
             htmlFor="platform"
             className="block text-sm font-medium text-gray-700"
           >
-            플랫폼 <span className="text-red-600" aria-label="필수 항목">*</span>
+            플랫폼{' '}
+            <span className="text-red-600" aria-label="필수 항목">
+              *
+            </span>
           </label>
           <select
             id="platform"
@@ -261,7 +299,11 @@ export function ProjectForm() {
             <option value="BOTH">웹+앱</option>
           </select>
           {errors.platform && (
-            <p id="platform-error" className="mt-1 text-sm text-red-600" role="alert">
+            <p
+              id="platform-error"
+              className="mt-1 text-sm text-red-600"
+              role="alert"
+            >
               {errors.platform.message}
             </p>
           )}
@@ -285,7 +327,11 @@ export function ProjectForm() {
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
           {errors.version && (
-            <p id="version-error" className="mt-1 text-sm text-red-600" role="alert">
+            <p
+              id="version-error"
+              className="mt-1 text-sm text-red-600"
+              role="alert"
+            >
               {errors.version.message}
             </p>
           )}
@@ -305,11 +351,17 @@ export function ProjectForm() {
             placeholder="https://github.com/..."
             aria-label="저장소 URL 입력"
             aria-invalid={!!errors.repository_url}
-            aria-describedby={errors.repository_url ? 'repository_url-error' : undefined}
+            aria-describedby={
+              errors.repository_url ? 'repository_url-error' : undefined
+            }
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
           {errors.repository_url && (
-            <p id="repository_url-error" className="mt-1 text-sm text-red-600" role="alert">
+            <p
+              id="repository_url-error"
+              className="mt-1 text-sm text-red-600"
+              role="alert"
+            >
               {errors.repository_url.message}
             </p>
           )}

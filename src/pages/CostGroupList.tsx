@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useConfirm } from '../hooks/useConfirm';
+import { useNotification } from '../hooks/useNotification';
 import { costGroupAPI } from '../services/api';
 
 export function CostGroupList() {
@@ -13,6 +15,8 @@ export function CostGroupList() {
   const [isActiveInput, setIsActiveInput] = useState<boolean | undefined>(
     undefined
   );
+  const { confirmDelete } = useConfirm();
+  const { showSuccess, showError } = useNotification();
 
   // 청구 그룹 목록 조회
   const { data, isLoading, error } = useQuery({
@@ -32,10 +36,10 @@ export function CostGroupList() {
       costGroupAPI.deleteCostGroup(costGroupId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['costGroups'] });
-      alert('청구 그룹이 삭제되었습니다.');
+      showSuccess('청구 그룹이 삭제되었습니다.');
     },
     onError: (error) => {
-      alert(`삭제 실패: ${(error as Error).message}`);
+      showError(`삭제 실패: ${(error as Error).message}`);
     },
   });
 
@@ -46,8 +50,8 @@ export function CostGroupList() {
     setPage(1);
   };
 
-  const handleDelete = (costGroupId: number, costGroupName: string) => {
-    if (confirm(`"${costGroupName}" 청구 그룹을 삭제하시겠습니까?`)) {
+  const handleDelete = async (costGroupId: number, costGroupName: string) => {
+    if (await confirmDelete('청구 그룹을 삭제하시겠습니까?', costGroupName)) {
       deleteMutation.mutate(costGroupId);
     }
   };
@@ -147,16 +151,28 @@ export function CostGroupList() {
                 </caption>
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       청구 그룹명
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       상태
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       생성일
                     </th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       작업
                     </th>
                   </tr>

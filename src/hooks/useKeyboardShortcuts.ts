@@ -47,7 +47,7 @@ export function useKeyboardShortcuts() {
             event.preventDefault();
             navigate('/tasks/new');
             break;
-          case 'f':
+          case 'f': {
             // 검색 포커스
             event.preventDefault();
             const searchInput = document.querySelector<HTMLInputElement>(
@@ -58,6 +58,7 @@ export function useKeyboardShortcuts() {
               searchInput.select();
             }
             break;
+          }
         }
         return;
       }

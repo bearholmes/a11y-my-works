@@ -2,11 +2,15 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useConfirm } from '../hooks/useConfirm';
+import { useNotification } from '../hooks/useNotification';
 import { businessAPI, taskAPI } from '../services/api';
 import type { TaskQuery } from '../types/database';
 
 export function TaskList() {
   const queryClient = useQueryClient();
+  const { confirmDelete } = useConfirm();
+  const { showSuccess, showError } = useNotification();
   const [query, setQuery] = useState<TaskQuery>({
     page: 1,
     pageSize: 20,
@@ -55,10 +59,10 @@ export function TaskList() {
     mutationFn: taskAPI.deleteTask,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      alert('업무가 삭제되었습니다.');
+      showSuccess('업무가 삭제되었습니다.');
     },
     onError: (error: Error) => {
-      alert(`삭제 실패: ${error.message}`);
+      showError(`삭제 실패: ${error.message}`);
     },
   });
 
@@ -92,8 +96,9 @@ export function TaskList() {
     setShowDetailModal(true);
   };
 
-  const handleDelete = (taskId: number, taskName: string) => {
-    if (confirm(`"${taskName}" 업무를 삭제하시겠습니까?`)) {
+  const handleDelete = async (taskId: number, taskName: string) => {
+    const confirmed = await confirmDelete('삭제하시겠습니까?', taskName);
+    if (confirmed) {
       deleteMutation.mutate(taskId);
     }
   };
@@ -156,7 +161,10 @@ export function TaskList() {
 
           {/* 검색어 */}
           <div>
-            <label htmlFor="keyword-search" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="keyword-search"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               검색어
             </label>
             <input
@@ -282,22 +290,40 @@ export function TaskList() {
                 </caption>
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       날짜
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       업무명
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       작성자
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       작업시간
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       프로젝트
                     </th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       작업
                     </th>
                   </tr>
@@ -468,7 +494,10 @@ export function TaskList() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h2 id="task-detail-title" className="text-xl font-bold text-gray-900">
+              <h2
+                id="task-detail-title"
+                className="text-xl font-bold text-gray-900"
+              >
                 업무 상세 정보
               </h2>
               <button

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { useNotification } from '../hooks/useNotification';
 import { serviceAPI } from '../services/api';
 
 const serviceSchema = z.object({
@@ -18,6 +19,7 @@ export function ServiceForm() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isEditMode = !!id;
+  const { showSuccess, showError } = useNotification();
 
   const {
     register,
@@ -57,11 +59,11 @@ export function ServiceForm() {
       serviceAPI.createService({ ...data, is_active: true }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] });
-      alert('서비스가 생성되었습니다.');
+      showSuccess('서비스가 생성되었습니다.');
       navigate('/services');
     },
     onError: (error) => {
-      alert(`오류가 발생했습니다: ${(error as Error).message}`);
+      showError(`오류가 발생했습니다: ${(error as Error).message}`);
     },
   });
 
@@ -77,11 +79,11 @@ export function ServiceForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] });
       queryClient.invalidateQueries({ queryKey: ['service', id] });
-      alert('서비스가 수정되었습니다.');
+      showSuccess('서비스가 수정되었습니다.');
       navigate('/services');
     },
     onError: (error) => {
-      alert(`오류가 발생했습니다: ${(error as Error).message}`);
+      showError(`오류가 발생했습니다: ${(error as Error).message}`);
     },
   });
 
@@ -125,14 +127,19 @@ export function ServiceForm() {
             htmlFor="cost_group_id"
             className="block text-sm font-medium text-gray-700"
           >
-            청구 그룹 <span className="text-red-600" aria-label="필수 항목">*</span>
+            청구 그룹{' '}
+            <span className="text-red-600" aria-label="필수 항목">
+              *
+            </span>
           </label>
           <select
             id="cost_group_id"
             {...register('cost_group_id', { valueAsNumber: true })}
             aria-required="true"
             aria-invalid={!!errors.cost_group_id}
-            aria-describedby={errors.cost_group_id ? 'cost_group_id-error' : undefined}
+            aria-describedby={
+              errors.cost_group_id ? 'cost_group_id-error' : undefined
+            }
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           >
             <option value={0}>청구 그룹 선택</option>
@@ -143,7 +150,11 @@ export function ServiceForm() {
             ))}
           </select>
           {errors.cost_group_id && (
-            <p id="cost_group_id-error" className="mt-1 text-sm text-red-600" role="alert">
+            <p
+              id="cost_group_id-error"
+              className="mt-1 text-sm text-red-600"
+              role="alert"
+            >
               {errors.cost_group_id.message}
             </p>
           )}
@@ -154,7 +165,10 @@ export function ServiceForm() {
             htmlFor="name"
             className="block text-sm font-medium text-gray-700"
           >
-            서비스명 <span className="text-red-600" aria-label="필수 항목">*</span>
+            서비스명{' '}
+            <span className="text-red-600" aria-label="필수 항목">
+              *
+            </span>
           </label>
           <input
             id="name"
@@ -166,7 +180,13 @@ export function ServiceForm() {
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
           {errors.name && (
-            <p id="name-error" className="mt-1 text-sm text-red-600" role="alert">{errors.name.message}</p>
+            <p
+              id="name-error"
+              className="mt-1 text-sm text-red-600"
+              role="alert"
+            >
+              {errors.name.message}
+            </p>
           )}
         </div>
 

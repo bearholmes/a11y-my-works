@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useConfirm } from '../hooks/useConfirm';
+import { useNotification } from '../hooks/useNotification';
 import { invitationAPI, memberAPI, roleAPI } from '../services/api';
 
 export function MemberList() {
@@ -15,6 +17,8 @@ export function MemberList() {
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState<any>(null);
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
+  const { confirm } = useConfirm();
+  const { showSuccess, showError, showWarning } = useNotification();
 
   // 초대 관련 상태
   const [showInvitationModal, setShowInvitationModal] = useState(false);
@@ -76,7 +80,7 @@ export function MemberList() {
       setInvitationSuccess(true);
     },
     onError: (error: Error) => {
-      alert(error.message);
+      showError(error.message);
     },
   });
 
@@ -84,10 +88,10 @@ export function MemberList() {
   const resetPasswordMutation = useMutation({
     mutationFn: (email: string) => memberAPI.resetUserPassword(email),
     onSuccess: () => {
-      alert('비밀번호 재설정 이메일을 발송했습니다.');
+      showSuccess('비밀번호 재설정 이메일을 발송했습니다.');
     },
     onError: (error: Error) => {
-      alert(`비밀번호 초기화 실패: ${error.message}`);
+      showError(`비밀번호 초기화 실패: ${error.message}`);
     },
   });
 
@@ -97,11 +101,14 @@ export function MemberList() {
     setPage(1);
   };
 
-  const handleToggleActive = (memberId: number, currentStatus: boolean) => {
+  const handleToggleActive = async (
+    memberId: number,
+    currentStatus: boolean
+  ) => {
     if (
-      confirm(
-        `이 사용자를 ${currentStatus ? '비활성화' : '활성화'}하시겠습니까?`
-      )
+      await confirm({
+        message: `이 사용자를 ${currentStatus ? '비활성화' : '활성화'}하시겠습니까?`,
+      })
     ) {
       if (currentStatus) {
         deactivateMutation.mutate(memberId);
@@ -116,13 +123,15 @@ export function MemberList() {
     setShowApprovalModal(true);
   };
 
-  const handleApprovalSubmit = () => {
+  const handleApprovalSubmit = async () => {
     if (!selectedMember || !selectedRoleId) {
-      alert('역할을 선택해주세요.');
+      showWarning('역할을 선택해주세요.');
       return;
     }
 
-    if (confirm(`${selectedMember.name}님을 승인하시겠습니까?`)) {
+    if (
+      await confirm({ message: `${selectedMember.name}님을 승인하시겠습니까?` })
+    ) {
       approveMutation.mutate({
         memberId: selectedMember.member_id,
         roleId: selectedRoleId,
@@ -141,14 +150,14 @@ export function MemberList() {
 
   const handleInvitationSubmit = () => {
     if (!invitationEmail || !invitationRoleId) {
-      alert('이메일과 역할을 모두 입력해주세요.');
+      showWarning('이메일과 역할을 모두 입력해주세요.');
       return;
     }
 
     // 이메일 형식 검증
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(invitationEmail)) {
-      alert('올바른 이메일 형식이 아닙니다.');
+      showWarning('올바른 이메일 형식이 아닙니다.');
       return;
     }
 
@@ -167,11 +176,11 @@ export function MemberList() {
     setInvitationSuccess(false);
   };
 
-  const handleResetPassword = (member: any) => {
+  const handleResetPassword = async (member: any) => {
     if (
-      confirm(
-        `${member.name}님의 비밀번호를 초기화하시겠습니까?\n비밀번호 재설정 이메일이 발송됩니다.`
-      )
+      await confirm({
+        message: `${member.name}님의 비밀번호를 초기화하시겠습니까?\n비밀번호 재설정 이메일이 발송됩니다.`,
+      })
     ) {
       resetPasswordMutation.mutate(member.email);
     }
@@ -276,25 +285,46 @@ export function MemberList() {
                 </caption>
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       이름
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       계정 ID
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       이메일
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       역할
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       상태
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       가입일
                     </th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
                       작업
                     </th>
                   </tr>

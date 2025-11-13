@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { useNotification } from '../hooks/useNotification';
 import { costGroupAPI } from '../services/api';
 
 const costGroupSchema = z.object({
@@ -18,6 +19,7 @@ export function CostGroupForm() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isEditMode = !!id;
+  const { showSuccess, showError } = useNotification();
 
   const {
     register,
@@ -51,11 +53,11 @@ export function CostGroupForm() {
       costGroupAPI.createCostGroup({ ...data, is_active: true }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['costGroups'] });
-      alert('청구 그룹이 생성되었습니다.');
+      showSuccess('청구 그룹이 생성되었습니다.');
       navigate('/cost-groups');
     },
     onError: (error) => {
-      alert(`오류가 발생했습니다: ${(error as Error).message}`);
+      showError(`오류가 발생했습니다: ${(error as Error).message}`);
     },
   });
 
@@ -71,11 +73,11 @@ export function CostGroupForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['costGroups'] });
       queryClient.invalidateQueries({ queryKey: ['costGroup', id] });
-      alert('청구 그룹이 수정되었습니다.');
+      showSuccess('청구 그룹이 수정되었습니다.');
       navigate('/cost-groups');
     },
     onError: (error) => {
-      alert(`오류가 발생했습니다: ${(error as Error).message}`);
+      showError(`오류가 발생했습니다: ${(error as Error).message}`);
     },
   });
 
@@ -119,7 +121,10 @@ export function CostGroupForm() {
             htmlFor="name"
             className="block text-sm font-medium text-gray-700"
           >
-            청구 그룹명 <span className="text-red-600" aria-label="필수 항목">*</span>
+            청구 그룹명{' '}
+            <span className="text-red-600" aria-label="필수 항목">
+              *
+            </span>
           </label>
           <input
             id="name"
@@ -132,7 +137,13 @@ export function CostGroupForm() {
             placeholder="예: 내부사업, 구글, 애플"
           />
           {errors.name && (
-            <p id="name-error" className="mt-1 text-sm text-red-600" role="alert">{errors.name.message}</p>
+            <p
+              id="name-error"
+              className="mt-1 text-sm text-red-600"
+              role="alert"
+            >
+              {errors.name.message}
+            </p>
           )}
         </div>
 
@@ -149,12 +160,18 @@ export function CostGroupForm() {
             rows={3}
             aria-label="청구 그룹 설명 입력"
             aria-invalid={!!errors.description}
-            aria-describedby={errors.description ? 'description-error' : undefined}
+            aria-describedby={
+              errors.description ? 'description-error' : undefined
+            }
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             placeholder="청구 그룹에 대한 설명을 입력하세요"
           />
           {errors.description && (
-            <p id="description-error" className="mt-1 text-sm text-red-600" role="alert">
+            <p
+              id="description-error"
+              className="mt-1 text-sm text-red-600"
+              role="alert"
+            >
               {errors.description.message}
             </p>
           )}
