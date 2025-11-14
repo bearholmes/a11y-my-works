@@ -142,8 +142,9 @@ export function TaskList() {
       {/* 헤더 */}
       <header className="flex flex-none items-center justify-between mb-6">
         <div>
-          <Heading>{format(selectedDate, 'yyyy년 M월 d일')}</Heading>
+          <Heading>업무 보고</Heading>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            {format(selectedDate, 'yyyy년 M월 d일')}{' '}
             {format(selectedDate, 'EEEE', { locale: ko })}
           </p>
         </div>

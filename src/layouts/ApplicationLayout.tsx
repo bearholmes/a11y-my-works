@@ -99,7 +99,7 @@ const MENU_ITEMS: MenuItem[] = [
     requireReadOnly: true,
   },
   {
-    name: '업무 관리',
+    name: '업무 보고',
     href: '/tasks',
     icon: '📝',
     requiredPermission: 'task.read',
