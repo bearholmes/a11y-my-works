@@ -1,7 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { format, subDays } from 'date-fns';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Stat } from '../components/Stat';
+import { Badge } from '../components/ui/badge';
+import { Heading, Subheading } from '../components/ui/heading';
+import { Link } from '../components/ui/link';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { dashboardAPI } from '../services/api';
 
 export function Dashboard() {
@@ -42,88 +46,60 @@ export function Dashboard() {
   });
 
   return (
-    <div className="space-y-6">
-      {/* 헤더 및 날짜 필터 */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+    <>
+      <Heading>업무 대시보드</Heading>
+
+      <div className="mt-8 flex items-end justify-between">
+        <Subheading>주요 지표</Subheading>
+        <div className="flex gap-3">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">업무 대시보드</h2>
-            <p className="mt-1 text-sm text-gray-600">
-              업무 현황과 통계를 한눈에 확인하세요
-            </p>
+            <label htmlFor="startDate" className="block text-xs font-medium text-gray-700 mb-1">
+              시작일
+            </label>
+            <input
+              id="startDate"
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+            />
           </div>
-          <div className="mt-4 md:mt-0 flex gap-3">
-            <div>
-              <label
-                htmlFor="startDate"
-                className="block text-xs font-medium text-gray-700 mb-1"
-              >
-                시작일
-              </label>
-              <input
-                id="startDate"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md text-sm"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="endDate"
-                className="block text-xs font-medium text-gray-700 mb-1"
-              >
-                종료일
-              </label>
-              <input
-                id="endDate"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md text-sm"
-              />
-            </div>
+          <div>
+            <label htmlFor="endDate" className="block text-xs font-medium text-gray-700 mb-1">
+              종료일
+            </label>
+            <input
+              id="endDate"
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+            />
           </div>
         </div>
       </div>
 
-      {/* 주요 통계 카드 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-sm font-medium text-gray-500">총 업무 수</h3>
-          <div className="mt-2 text-3xl font-semibold text-gray-900">
-            {stats?.totalTasks || 0}
-          </div>
-          <p className="mt-2 text-xs text-gray-600">
-            선택한 기간 내 등록된 업무
-          </p>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-sm font-medium text-gray-500">총 작업 시간</h3>
-          <div className="mt-2 text-3xl font-semibold text-blue-600">
-            {stats?.totalHours || 0}h
-          </div>
-          <p className="mt-2 text-xs text-gray-600">정규 시간 + 초과 시간</p>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-sm font-medium text-gray-500">활성 사용자</h3>
-          <div className="mt-2 text-3xl font-semibold text-green-600">
-            {stats?.activeMembers || 0}
-          </div>
-          <p className="mt-2 text-xs text-gray-600">현재 활동 중인 팀원</p>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-sm font-medium text-gray-500">
-            진행 중 프로젝트
-          </h3>
-          <div className="mt-2 text-3xl font-semibold text-purple-600">
-            {stats?.activeProjects || 0}
-          </div>
-          <p className="mt-2 text-xs text-gray-600">활성 상태의 프로젝트</p>
-        </div>
+      <div className="mt-4 grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
+        <Stat
+          title="총 업무 수"
+          value={`${stats?.totalTasks || 0}`}
+          description="선택한 기간 내 등록"
+        />
+        <Stat
+          title="총 작업 시간"
+          value={`${stats?.totalHours || 0}h`}
+          description="정규 + 초과 시간"
+        />
+        <Stat
+          title="활성 사용자"
+          value={`${stats?.activeMembers || 0}`}
+          description="현재 활동 중"
+        />
+        <Stat
+          title="진행 중 프로젝트"
+          value={`${stats?.activeProjects || 0}`}
+          description="활성 상태"
+        />
       </div>
 
       {/* 차트 섹션 */}
@@ -265,45 +241,42 @@ export function Dashboard() {
         {/* 최근 업무 목록 */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">최근 업무</h3>
-            <Link
-              to="/tasks"
-              className="text-sm text-blue-600 hover:text-blue-700"
-            >
+            <Subheading>최근 업무</Subheading>
+            <Link href="/tasks" className="text-sm text-blue-600 hover:text-blue-700">
               전체 보기 →
             </Link>
           </div>
           {recentTasks && recentTasks.length > 0 ? (
-            <div className="space-y-3">
-              {recentTasks.map((task) => (
-                <div
-                  key={task.task_id}
-                  className="border-l-4 border-blue-600 pl-3 py-2"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900 line-clamp-1">
-                        {task.task_name}
-                      </p>
-                      <p className="text-xs text-gray-600 mt-1">
-                        {task.members?.name} • {task.projects?.name || '미지정'}
-                      </p>
-                    </div>
-                    <div className="text-xs text-gray-500 ml-2">
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableHeader>업무명</TableHeader>
+                  <TableHeader>담당자</TableHeader>
+                  <TableHeader>프로젝트</TableHeader>
+                  <TableHeader className="text-right">작업 시간</TableHeader>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {recentTasks.map((task) => (
+                  <TableRow key={task.task_id}>
+                    <TableCell className="font-medium">{task.task_name}</TableCell>
+                    <TableCell>{task.members?.name}</TableCell>
+                    <TableCell>
+                      <Badge color="zinc">{task.projects?.name || '미지정'}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
                       {task.task_hours}h
                       {task.ot_hours ? ` +${task.ot_hours}h` : ''}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           ) : (
-            <div className="text-center py-8 text-gray-500">
-              최근 업무가 없습니다
-            </div>
+            <div className="text-center py-8 text-gray-500">최근 업무가 없습니다</div>
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }
