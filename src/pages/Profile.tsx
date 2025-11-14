@@ -41,9 +41,9 @@ export function Profile() {
       </div>
 
       <div className="max-w-2xl">
-        <div className="bg-white dark:bg-zinc-900 rounded-lg shadow">
+        <div className="bg-white dark:bg-zinc-900 rounded-lg">
           {/* 프로필 헤더 */}
-          <div className="p-6 border-b border-zinc-200 dark:border-zinc-800">
+          <div className="p-6 border-b">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-blue-100 dark:bg-blue-950 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
@@ -88,7 +88,7 @@ export function Profile() {
           </div>
 
           {/* 액션 버튼 */}
-          <div className="p-6 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950">
+          <div className="p-6 border-t bg-zinc-50 dark:bg-zinc-950">
             <Button href="/change-password">비밀번호 변경</Button>
           </div>
         </div>

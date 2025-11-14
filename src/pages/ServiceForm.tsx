@@ -118,7 +118,7 @@ export function ServiceForm() {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mt-8 max-w-2xl bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6 space-y-6"
+        className="mt-8 max-w-2xl bg-white dark:bg-zinc-900 rounded-lg p-6 space-y-6"
         aria-label={isEditMode ? '서비스 수정 폼' : '서비스 등록 폼'}
       >
         <Field>

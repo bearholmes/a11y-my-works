@@ -134,7 +134,7 @@ export function Dashboard() {
       {/* 차트 섹션 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
         {/* 일별 업무 추이 */}
-        <div className="bg-white rounded-lg shadow p-6 dark:bg-zinc-900">
+        <div className="bg-white rounded-lg p-6 dark:bg-zinc-900">
           <Subheading className="mb-4">일별 업무 추이</Subheading>
           {dailyStats && dailyStats.length > 0 ? (
             <div className="space-y-2">
@@ -176,7 +176,7 @@ export function Dashboard() {
         </div>
 
         {/* 프로젝트별 업무 분포 */}
-        <div className="bg-white rounded-lg shadow p-6 dark:bg-zinc-900">
+        <div className="bg-white rounded-lg p-6 dark:bg-zinc-900">
           <Subheading className="mb-4">프로젝트별 업무 분포</Subheading>
           {projectStats && projectStats.length > 0 ? (
             <div className="space-y-3">
@@ -215,7 +215,7 @@ export function Dashboard() {
       {/* 사용자별 통계 및 최근 업무 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
         {/* 사용자별 작업 시간 */}
-        <div className="bg-white rounded-lg shadow p-6 dark:bg-zinc-900">
+        <div className="bg-white rounded-lg p-6 dark:bg-zinc-900">
           <Subheading className="mb-4">사용자별 작업 시간</Subheading>
           {memberStats && memberStats.length > 0 ? (
             <Table dense>
@@ -248,7 +248,7 @@ export function Dashboard() {
         </div>
 
         {/* 최근 업무 목록 */}
-        <div className="bg-white rounded-lg shadow p-6 dark:bg-zinc-900">
+        <div className="bg-white rounded-lg p-6 dark:bg-zinc-900">
           <div className="flex items-center justify-between mb-4">
             <Subheading>최근 업무</Subheading>
             <Link

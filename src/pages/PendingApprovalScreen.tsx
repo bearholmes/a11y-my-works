@@ -18,7 +18,7 @@ export function PendingApprovalScreen() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-sm p-8 text-center">
+        <div className="bg-white dark:bg-zinc-900 rounded-lg p-8 text-center">
           {/* 아이콘 */}
           <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-950 rounded-full flex items-center justify-center mx-auto mb-4">
             <ClockIcon className="w-8 h-8 text-yellow-600" />

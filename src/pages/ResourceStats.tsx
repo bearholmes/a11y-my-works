@@ -262,8 +262,8 @@ export function ResourceStats() {
       ) : (
         <>
           {/* 프로젝트별 통계 */}
-          <div className="bg-white dark:bg-zinc-900 shadow rounded-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
+          <div className="bg-white dark:bg-zinc-900 rounded-lg overflow-hidden">
+            <div className="px-6 py-4 border-b">
               <Subheading>프로젝트별 리소스</Subheading>
             </div>
             <div className="p-6">
@@ -312,8 +312,8 @@ export function ResourceStats() {
           </div>
 
           {/* 서비스별 통계 */}
-          <div className="bg-white dark:bg-zinc-900 shadow rounded-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
+          <div className="bg-white dark:bg-zinc-900 rounded-lg overflow-hidden">
+            <div className="px-6 py-4 border-b">
               <Subheading>서비스별 리소스</Subheading>
             </div>
             <div className="p-6">
@@ -362,8 +362,8 @@ export function ResourceStats() {
           </div>
 
           {/* 청구 그룹별 통계 */}
-          <div className="bg-white dark:bg-zinc-900 shadow rounded-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
+          <div className="bg-white dark:bg-zinc-900 rounded-lg overflow-hidden">
+            <div className="px-6 py-4 border-b">
               <Subheading>청구 그룹별 리소스</Subheading>
             </div>
             <div className="p-6">
@@ -412,8 +412,8 @@ export function ResourceStats() {
           </div>
 
           {/* 직원별 통계 */}
-          <div className="bg-white dark:bg-zinc-900 shadow rounded-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
+          <div className="bg-white dark:bg-zinc-900 rounded-lg overflow-hidden">
+            <div className="px-6 py-4 border-b">
               <Subheading>직원별 리소스</Subheading>
             </div>
             <div className="p-6">
