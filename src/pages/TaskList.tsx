@@ -1,3 +1,4 @@
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   addDays,
@@ -112,6 +113,10 @@ export function TaskList() {
     }
   };
 
+  const handleToday = () => {
+    setSelectedDate(new Date());
+  };
+
   const handleViewDetail = (task: any) => {
     setSelectedTask(task);
     setShowDetailModal(true);
@@ -134,110 +139,45 @@ export function TaskList() {
 
   return (
     <>
-      {/* 헤더 - 날짜 네비게이션 */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-6">
-          <Heading>업무 보고</Heading>
-          <Button href="/tasks/new">업무 등록</Button>
+      {/* 헤더 */}
+      <header className="flex flex-none items-center justify-between mb-6">
+        <div>
+          <Heading>{format(selectedDate, 'yyyy년 M월 d일')}</Heading>
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            {format(selectedDate, 'EEEE', { locale: ko })}
+          </p>
         </div>
-
-        {/* 주 단위 캘린더 */}
-        <div className="bg-white dark:bg-zinc-900 rounded-lg p-4 mb-4">
-          <div className="flex items-center gap-4">
-            {/* 이전 주 버튼 */}
-            <Button
-              plain
-              onClick={handlePreviousWeek}
-              aria-label="이전 주"
-              className="text-xl shrink-0"
+        <div className="flex items-center gap-4">
+          {/* 날짜 네비게이션 버튼 그룹 */}
+          <div className="relative flex items-center rounded-md bg-white dark:bg-white/10 shadow-sm ring-1 ring-zinc-300 dark:ring-white/10">
+            <button
+              type="button"
+              onClick={handlePreviousDay}
+              className="flex h-9 w-12 items-center justify-center rounded-l-md text-zinc-500 hover:text-zinc-700 focus:relative dark:text-zinc-400 dark:hover:text-white md:w-9 md:hover:bg-zinc-50 dark:md:hover:bg-white/10"
+              aria-label="이전 날짜"
             >
-              ◀
-            </Button>
-
-            {/* 주간 캘린더 */}
-            <div className="flex-1 grid grid-cols-7 gap-2">
-              {weekDays.map((day) => {
-                const isSelected = isSameDay(day, selectedDate);
-                const isToday = isSameDay(day, new Date());
-
-                return (
-                  <button
-                    key={day.toISOString()}
-                    onClick={() => setSelectedDate(day)}
-                    className={`
-                      p-3 rounded-lg text-center transition-colors
-                      ${
-                        isSelected
-                          ? 'bg-blue-600 text-white dark:bg-blue-500'
-                          : isToday
-                            ? 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400'
-                            : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
-                      }
-                    `}
-                    aria-label={format(day, 'yyyy년 M월 d일 EEEE', {
-                      locale: ko,
-                    })}
-                  >
-                    <div className="text-xs font-medium mb-1">
-                      {format(day, 'EEE', { locale: ko })}
-                    </div>
-                    <div className="text-lg font-bold">{format(day, 'd')}</div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* 다음 주 버튼 */}
-            <Button
-              plain
-              onClick={handleNextWeek}
-              aria-label="다음 주"
-              className="text-xl shrink-0"
+              <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              onClick={handleToday}
+              className="hidden px-3.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:relative md:block dark:text-white dark:hover:bg-white/10"
             >
-              ▶
-            </Button>
+              오늘
+            </button>
+            <span className="relative -mx-px h-5 w-px bg-zinc-300 md:hidden dark:bg-white/10" />
+            <button
+              type="button"
+              onClick={handleNextDay}
+              className="flex h-9 w-12 items-center justify-center rounded-r-md text-zinc-500 hover:text-zinc-700 focus:relative dark:text-zinc-400 dark:hover:text-white md:w-9 md:hover:bg-zinc-50 dark:md:hover:bg-white/10"
+              aria-label="다음 날짜"
+            >
+              <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
+            </button>
           </div>
-
-          {/* 주간 범위 표시 */}
-          <div className="text-center text-sm text-zinc-600 dark:text-zinc-400 mt-3">
-            {format(weekStart, 'M월 d일')} - {format(weekEnd, 'M월 d일')}
-          </div>
-        </div>
-
-        {/* 날짜 네비게이션 */}
-        <div className="flex items-center justify-center gap-4 p-4 bg-white dark:bg-zinc-900 rounded-lg">
-          {/* 이전 날짜 버튼 */}
-          <Button
-            plain
-            onClick={handlePreviousDay}
-            aria-label="이전 날짜"
-            className="text-2xl"
-          >
-            ◀
-          </Button>
-
-          {/* 선택된 날짜 표시 */}
-          <div className="text-center min-w-[200px]">
-            <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-              {format(selectedDate, 'yyyy년 M월 d일')}
-            </div>
-            <div className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
-              {format(selectedDate, 'EEEE', { locale: ko })}
-            </div>
-          </div>
-
-          {/* 다음 날짜 버튼 */}
-          <Button
-            plain
-            onClick={handleNextDay}
-            aria-label="다음 날짜"
-            className="text-2xl"
-          >
-            ▶
-          </Button>
 
           {/* 날짜 선택 (데이트피커) */}
-          <Field className="ml-4">
+          <Field>
             <Label className="sr-only">날짜 선택</Label>
             <Input
               type="date"
@@ -246,6 +186,73 @@ export function TaskList() {
               className="w-auto"
             />
           </Field>
+
+          {/* 업무 등록 버튼 */}
+          <Button href="/tasks/new">업무 등록</Button>
+        </div>
+      </header>
+
+      {/* 주 단위 캘린더 */}
+      <div className="bg-white dark:bg-zinc-900 rounded-lg p-4 mb-6 ring-1 ring-zinc-200 dark:ring-white/10">
+        <div className="flex items-center gap-4">
+          {/* 이전 주 버튼 */}
+          <button
+            type="button"
+            onClick={handlePreviousWeek}
+            className="flex items-center justify-center p-1.5 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-white"
+            aria-label="이전 주"
+          >
+            <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
+          </button>
+
+          {/* 주간 캘린더 */}
+          <div className="flex-1 grid grid-cols-7 gap-2">
+            {weekDays.map((day) => {
+              const isSelected = isSameDay(day, selectedDate);
+              const isToday = isSameDay(day, new Date());
+
+              return (
+                <button
+                  key={day.toISOString()}
+                  type="button"
+                  onClick={() => setSelectedDate(day)}
+                  className={`
+                    p-3 rounded-lg text-center transition-colors
+                    ${
+                      isSelected
+                        ? 'bg-blue-600 text-white dark:bg-blue-500'
+                        : isToday
+                          ? 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400'
+                          : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
+                    }
+                  `}
+                  aria-label={format(day, 'yyyy년 M월 d일 EEEE', {
+                    locale: ko,
+                  })}
+                >
+                  <div className="text-xs font-medium mb-1">
+                    {format(day, 'EEE', { locale: ko })}
+                  </div>
+                  <div className="text-lg font-bold">{format(day, 'd')}</div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 다음 주 버튼 */}
+          <button
+            type="button"
+            onClick={handleNextWeek}
+            className="flex items-center justify-center p-1.5 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-white"
+            aria-label="다음 주"
+          >
+            <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
+          </button>
+        </div>
+
+        {/* 주간 범위 표시 */}
+        <div className="text-center text-sm text-zinc-600 dark:text-zinc-400 mt-3">
+          {format(weekStart, 'M월 d일')} - {format(weekEnd, 'M월 d일')}
         </div>
       </div>
 
