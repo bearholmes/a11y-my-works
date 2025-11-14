@@ -67,7 +67,7 @@ export function ResetPassword() {
         </div>
 
         <form
-          className="bg-white dark:bg-zinc-900 p-8 rounded-lg shadow-sm space-y-6"
+          className="bg-white dark:bg-zinc-900 p-8 rounded-lg space-y-6"
           onSubmit={handleSubmit(onSubmit)}
         >
           {error && (

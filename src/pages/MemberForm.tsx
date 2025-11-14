@@ -121,7 +121,7 @@ export function MemberForm() {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mt-8 max-w-2xl bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6 space-y-6"
+        className="mt-8 max-w-2xl bg-white dark:bg-zinc-900 rounded-lg p-6 space-y-6"
         aria-label={isEditMode ? '사용자 수정 폼' : '사용자 등록 폼'}
       >
         <Field>
@@ -231,7 +231,7 @@ export function MemberForm() {
             {...register('is_active')}
             type="checkbox"
             aria-label="사용자 활성 상태"
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-300 dark:border-zinc-600 rounded"
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 dark:border-zinc-600 rounded"
           />
           <label
             htmlFor="is_active"
@@ -246,7 +246,7 @@ export function MemberForm() {
             id="requires_daily_report"
             {...register('requires_daily_report')}
             type="checkbox"
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-300 dark:border-zinc-600 rounded"
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 dark:border-zinc-600 rounded"
           />
           <label
             htmlFor="requires_daily_report"

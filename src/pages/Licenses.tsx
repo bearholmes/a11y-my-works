@@ -86,7 +86,7 @@ export function Licenses() {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-5xl mx-auto">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="bg-white rounded-lg border p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <Heading>오픈소스 라이센스</Heading>
             <Button href="/" plain>
@@ -100,9 +100,9 @@ export function Licenses() {
           </Text>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border p-6">
           <div className="prose prose-sm max-w-none">
-            <pre className="whitespace-pre-wrap font-mono text-xs text-gray-800 bg-gray-50 p-4 rounded border border-gray-200 overflow-x-auto">
+            <pre className="whitespace-pre-wrap font-mono text-xs text-gray-800 bg-gray-50 p-4 rounded border overflow-x-auto">
               {licenseText}
             </pre>
           </div>
