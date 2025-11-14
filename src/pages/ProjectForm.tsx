@@ -4,6 +4,11 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { Button } from '../components/ui/button';
+import { Heading } from '../components/ui/heading';
+import { Input } from '../components/ui/input';
+import { Select } from '../components/ui/select';
+import { Textarea } from '../components/ui/textarea';
 import { useNotification } from '../hooks/useNotification';
 import { projectAPI } from '../services/api';
 
@@ -124,19 +129,12 @@ export function ProjectForm() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
-          프로젝트 {isEditMode ? '수정' : '등록'}
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          프로젝트 정보를 {isEditMode ? '수정' : '입력'}합니다.
-        </p>
-      </div>
+    <>
+      <Heading>{isEditMode ? '프로젝트 수정' : '프로젝트 등록'}</Heading>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-white shadow-sm rounded-lg border p-6 space-y-6"
+        className="mt-8 max-w-2xl bg-white shadow-sm rounded-lg border p-6 space-y-6"
         aria-label={isEditMode ? '프로젝트 수정 폼' : '프로젝트 등록 폼'}
       >
         <div>
@@ -149,14 +147,13 @@ export function ProjectForm() {
               *
             </span>
           </label>
-          <input
+          <Input
             id="name"
             {...register('name')}
             type="text"
             aria-required="true"
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? 'name-error' : undefined}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
           {errors.name && (
             <p
@@ -179,7 +176,7 @@ export function ProjectForm() {
               *
             </span>
           </label>
-          <select
+          <Select
             id="service_id"
             {...register('service_id', { valueAsNumber: true })}
             aria-required="true"
@@ -187,7 +184,6 @@ export function ProjectForm() {
             aria-describedby={
               errors.service_id ? 'service_id-error' : undefined
             }
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           >
             <option value={0}>서비스 선택</option>
             {services?.map((service: any) => (
@@ -195,7 +191,7 @@ export function ProjectForm() {
                 {service.name}
               </option>
             ))}
-          </select>
+          </Select>
           {errors.service_id && (
             <p
               id="service_id-error"
@@ -220,7 +216,7 @@ export function ProjectForm() {
               *
             </span>
           </label>
-          <input
+          <Input
             id="code"
             {...register('code')}
             type="text"
@@ -229,7 +225,6 @@ export function ProjectForm() {
             aria-required="true"
             aria-invalid={!!errors.code}
             aria-describedby={errors.code ? 'code-error' : undefined}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed font-mono"
           />
           {errors.code && (
             <p
@@ -253,7 +248,7 @@ export function ProjectForm() {
           >
             설명
           </label>
-          <textarea
+          <Textarea
             id="description"
             {...register('description')}
             rows={3}
@@ -262,7 +257,6 @@ export function ProjectForm() {
             aria-describedby={
               errors.description ? 'description-error' : undefined
             }
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
           {errors.description && (
             <p
@@ -285,19 +279,18 @@ export function ProjectForm() {
               *
             </span>
           </label>
-          <select
+          <Select
             id="platform"
             {...register('platform')}
             aria-required="true"
             aria-invalid={!!errors.platform}
             aria-describedby={errors.platform ? 'platform-error' : undefined}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">플랫폼 선택</option>
             <option value="WEB">웹</option>
             <option value="APP">앱</option>
             <option value="BOTH">웹+앱</option>
-          </select>
+          </Select>
           {errors.platform && (
             <p
               id="platform-error"
@@ -316,7 +309,7 @@ export function ProjectForm() {
           >
             버전
           </label>
-          <input
+          <Input
             id="version"
             {...register('version')}
             type="text"
@@ -324,7 +317,6 @@ export function ProjectForm() {
             aria-label="프로젝트 버전 입력"
             aria-invalid={!!errors.version}
             aria-describedby={errors.version ? 'version-error' : undefined}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
           {errors.version && (
             <p
@@ -344,7 +336,7 @@ export function ProjectForm() {
           >
             저장소 URL
           </label>
-          <input
+          <Input
             id="repository_url"
             {...register('repository_url')}
             type="url"
@@ -354,7 +346,6 @@ export function ProjectForm() {
             aria-describedby={
               errors.repository_url ? 'repository_url-error' : undefined
             }
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
           {errors.repository_url && (
             <p
@@ -368,29 +359,28 @@ export function ProjectForm() {
         </div>
 
         <div className="flex gap-3 pt-4">
-          <button
+          <Button
             type="submit"
             disabled={createMutation.isPending || updateMutation.isPending}
             aria-label={isEditMode ? '프로젝트 수정 저장' : '프로젝트 등록'}
             aria-busy={createMutation.isPending || updateMutation.isPending}
-            className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
             {createMutation.isPending || updateMutation.isPending
               ? '처리 중...'
               : isEditMode
                 ? '수정'
                 : '등록'}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            plain
             onClick={() => navigate('/projects')}
             aria-label="프로젝트 등록 취소하고 목록으로 돌아가기"
-            className="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
           >
             취소
-          </button>
+          </Button>
         </div>
       </form>
-    </div>
+    </>
   );
 }

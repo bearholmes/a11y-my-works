@@ -1,7 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
+import { Heading } from '../components/ui/heading';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../components/ui/table';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
 import { invitationAPI, memberAPI, roleAPI } from '../services/api';
@@ -196,21 +206,11 @@ export function MemberList() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
       {/* 헤더 */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">사용자 관리</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            시스템 사용자를 관리합니다.
-          </p>
-        </div>
-        <button
-          onClick={handleInvite}
-          className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-        >
-          사용자 초대
-        </button>
+        <Heading>사용자 관리</Heading>
+        <Button onClick={handleInvite}>사용자 초대</Button>
       </div>
 
       {/* 검색 및 필터 */}
@@ -256,12 +256,7 @@ export function MemberList() {
               승인 대기 중인 사용자만 표시됩니다
             </div>
           )}
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            검색
-          </button>
+          <Button type="submit">검색</Button>
         </form>
       </div>
 
@@ -278,183 +273,104 @@ export function MemberList() {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <caption className="sr-only">
-                  사용자 목록 - 총 {data.pagination.total}건
-                </caption>
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      이름
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      계정 ID
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      이메일
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      역할
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      상태
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      업무보고
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      가입일
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      작업
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {data?.data.map((member: any) => (
-                    <tr key={member.member_id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {member.name}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
-                          {member.account_id}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
-                          {member.email}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                              member.roles?.name
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-gray-100 text-gray-600'
-                            }`}
+            <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+              <TableHead>
+                <TableRow>
+                  <TableHeader>이름</TableHeader>
+                  <TableHeader>계정 ID</TableHeader>
+                  <TableHeader>이메일</TableHeader>
+                  <TableHeader>역할</TableHeader>
+                  <TableHeader>상태</TableHeader>
+                  <TableHeader>업무보고</TableHeader>
+                  <TableHeader>가입일</TableHeader>
+                  <TableHeader className="text-right">작업</TableHeader>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data?.data.map((member: any) => (
+                  <TableRow key={member.member_id}>
+                    <TableCell className="font-medium">{member.name}</TableCell>
+                    <TableCell>{member.account_id}</TableCell>
+                    <TableCell>{member.email}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Badge color={member.roles?.name ? 'blue' : 'zinc'}>
+                          {member.roles?.name || '역할 없음'}
+                        </Badge>
+                        {isPendingUser(member) && (
+                          <Badge color="yellow">승인 대기</Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge color={member.is_active ? 'lime' : 'zinc'}>
+                        {member.is_active ? '활성' : '비활성'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        color={member.requires_daily_report ? 'purple' : 'zinc'}
+                      >
+                        {member.requires_daily_report
+                          ? '작성 필수'
+                          : '작성 불필요'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {format(new Date(member.created_at), 'yyyy-MM-dd')}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        {isPendingUser(member) ? (
+                          <Button
+                            plain
+                            onClick={() => handleApprove(member)}
+                            aria-label={`${member.name} 사용자 승인`}
+                            disabled={approveMutation.isPending}
                           >
-                            {member.roles?.name || '역할 없음'}
-                          </span>
-                          {isPendingUser(member) && (
-                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                              승인 대기
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            member.is_active
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}
-                        >
-                          {member.is_active ? '활성' : '비활성'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            member.requires_daily_report
-                              ? 'bg-purple-100 text-purple-800'
-                              : 'bg-gray-100 text-gray-600'
-                          }`}
-                        >
-                          {member.requires_daily_report
-                            ? '작성 필수'
-                            : '작성 불필요'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {format(new Date(member.created_at), 'yyyy-MM-dd')}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex items-center justify-end gap-2">
-                          {isPendingUser(member) ? (
-                            <button
-                              onClick={() => handleApprove(member)}
-                              aria-label={`${member.name} 사용자 승인`}
-                              className="text-green-600 hover:text-green-900 font-semibold"
-                              disabled={approveMutation.isPending}
+                            승인
+                          </Button>
+                        ) : (
+                          <>
+                            <Button
+                              plain
+                              href={`/members/edit/${member.member_id}`}
+                              aria-label={`${member.name} 사용자 수정`}
                             >
-                              승인
-                            </button>
-                          ) : (
-                            <>
-                              <Link
-                                to={`/members/edit/${member.member_id}`}
-                                aria-label={`${member.name} 사용자 수정`}
-                                className="text-blue-600 hover:text-blue-900"
-                              >
-                                수정
-                              </Link>
-                              <button
-                                onClick={() => handleResetPassword(member)}
-                                aria-label={`${member.name} 사용자 비밀번호 초기화`}
-                                className="text-purple-600 hover:text-purple-900"
-                                disabled={resetPasswordMutation.isPending}
-                              >
-                                비밀번호 초기화
-                              </button>
-                              <button
-                                onClick={() =>
-                                  handleToggleActive(
-                                    member.member_id,
-                                    member.is_active
-                                  )
-                                }
-                                aria-label={`${member.name} 사용자 ${member.is_active ? '비활성화' : '활성화'}`}
-                                className={`${
+                              수정
+                            </Button>
+                            <Button
+                              plain
+                              onClick={() => handleResetPassword(member)}
+                              aria-label={`${member.name} 사용자 비밀번호 초기화`}
+                              disabled={resetPasswordMutation.isPending}
+                            >
+                              비밀번호 초기화
+                            </Button>
+                            <Button
+                              plain
+                              onClick={() =>
+                                handleToggleActive(
+                                  member.member_id,
                                   member.is_active
-                                    ? 'text-red-600 hover:text-red-900'
-                                    : 'text-green-600 hover:text-green-900'
-                                }`}
-                                disabled={
-                                  activateMutation.isPending ||
-                                  deactivateMutation.isPending
-                                }
-                              >
-                                {member.is_active ? '비활성화' : '활성화'}
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                                )
+                              }
+                              aria-label={`${member.name} 사용자 ${member.is_active ? '비활성화' : '활성화'}`}
+                              disabled={
+                                activateMutation.isPending ||
+                                deactivateMutation.isPending
+                              }
+                            >
+                              {member.is_active ? '비활성화' : '활성화'}
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
 
             {/* 페이지네이션 */}
             {data && data.pagination.pageCount > 1 && (
@@ -716,6 +632,6 @@ export function MemberList() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

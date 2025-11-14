@@ -4,6 +4,10 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { Button } from '../components/ui/button';
+import { Heading } from '../components/ui/heading';
+import { Input } from '../components/ui/input';
+import { Textarea } from '../components/ui/textarea';
 import { useNotification } from '../hooks/useNotification';
 import { costGroupAPI } from '../services/api';
 
@@ -101,19 +105,12 @@ export function CostGroupForm() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
-          청구 그룹 {isEditMode ? '수정' : '등록'}
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          청구 그룹 정보를 {isEditMode ? '수정' : '입력'}합니다.
-        </p>
-      </div>
+    <>
+      <Heading>{isEditMode ? '청구 그룹 수정' : '청구 그룹 등록'}</Heading>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-white shadow-sm rounded-lg border p-6 space-y-6"
+        className="mt-8 max-w-2xl bg-white shadow-sm rounded-lg border p-6 space-y-6"
         aria-label={isEditMode ? '청구 그룹 수정 폼' : '청구 그룹 등록 폼'}
       >
         <div>
@@ -126,14 +123,13 @@ export function CostGroupForm() {
               *
             </span>
           </label>
-          <input
+          <Input
             id="name"
             {...register('name')}
             type="text"
             aria-required="true"
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? 'name-error' : undefined}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             placeholder="예: 내부사업, 구글, 애플"
           />
           {errors.name && (
@@ -154,7 +150,7 @@ export function CostGroupForm() {
           >
             설명
           </label>
-          <textarea
+          <Textarea
             id="description"
             {...register('description')}
             rows={3}
@@ -163,7 +159,6 @@ export function CostGroupForm() {
             aria-describedby={
               errors.description ? 'description-error' : undefined
             }
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             placeholder="청구 그룹에 대한 설명을 입력하세요"
           />
           {errors.description && (
@@ -178,29 +173,28 @@ export function CostGroupForm() {
         </div>
 
         <div className="flex gap-3 pt-4">
-          <button
+          <Button
             type="submit"
             disabled={createMutation.isPending || updateMutation.isPending}
             aria-label={isEditMode ? '청구 그룹 수정 저장' : '청구 그룹 등록'}
             aria-busy={createMutation.isPending || updateMutation.isPending}
-            className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
             {createMutation.isPending || updateMutation.isPending
               ? '처리 중...'
               : isEditMode
                 ? '수정'
                 : '등록'}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            plain
             onClick={() => navigate('/cost-groups')}
             aria-label="청구 그룹 등록 취소하고 목록으로 돌아가기"
-            className="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
           >
             취소
-          </button>
+          </Button>
         </div>
       </form>
-    </div>
+    </>
   );
 }

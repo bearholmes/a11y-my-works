@@ -1,7 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
+import { Heading } from '../components/ui/heading';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../components/ui/table';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
 import { roleAPI } from '../services/api';
@@ -52,21 +62,11 @@ export function RoleList() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
       {/* 헤더 */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">역할 관리</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            시스템 역할과 권한을 관리합니다.
-          </p>
-        </div>
-        <Link
-          to="/roles/new"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          역할 추가
-        </Link>
+        <Heading>역할 관리</Heading>
+        <Button href="/roles/new">역할 추가</Button>
       </div>
 
       {/* 역할 목록 */}
@@ -80,94 +80,52 @@ export function RoleList() {
           <div className="p-8 text-center text-gray-500">역할이 없습니다.</div>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <caption className="sr-only">
-                  역할 목록 - 총 {data.pagination.total}건
-                </caption>
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      역할명
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      설명
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      상태
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      생성일
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      작업
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {data?.data.map((role) => (
-                    <tr key={role.role_id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {role.name}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-500">
-                          {role.description || '-'}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            role.is_active
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}
-                        >
-                          {role.is_active ? '활성' : '비활성'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {format(new Date(role.created_at), 'yyyy-MM-dd')}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                        <Link
-                          to={`/roles/edit/${role.role_id}`}
+            <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+              <TableHead>
+                <TableRow>
+                  <TableHeader>역할명</TableHeader>
+                  <TableHeader>설명</TableHeader>
+                  <TableHeader>상태</TableHeader>
+                  <TableHeader>생성일</TableHeader>
+                  <TableHeader className="text-right">작업</TableHeader>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data?.data.map((role) => (
+                  <TableRow key={role.role_id}>
+                    <TableCell className="font-medium">{role.name}</TableCell>
+                    <TableCell>{role.description || '-'}</TableCell>
+                    <TableCell>
+                      <Badge color={role.is_active ? 'lime' : 'zinc'}>
+                        {role.is_active ? '활성' : '비활성'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {format(new Date(role.created_at), 'yyyy-MM-dd')}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          plain
+                          href={`/roles/edit/${role.role_id}`}
                           aria-label={`${role.name} 역할 수정`}
-                          className="text-blue-600 hover:text-blue-900"
                         >
                           수정
-                        </Link>
-                        <button
+                        </Button>
+                        <Button
+                          plain
                           onClick={() => handleDelete(role.role_id, role.name)}
                           aria-label={`${role.name} 역할 삭제`}
-                          className="text-red-600 hover:text-red-900"
                           disabled={deleteMutation.isPending}
                         >
                           삭제
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
 
             {/* 페이지네이션 */}
             {data && data.pagination.pageCount > 1 && (
@@ -228,6 +186,6 @@ export function RoleList() {
           </>
         )}
       </div>
-    </div>
+    </>
   );
 }

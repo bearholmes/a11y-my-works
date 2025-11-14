@@ -5,7 +5,14 @@ import { Stat } from '../components/Stat';
 import { Badge } from '../components/ui/badge';
 import { Heading, Subheading } from '../components/ui/heading';
 import { Link } from '../components/ui/link';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../components/ui/table';
 import { dashboardAPI } from '../services/api';
 
 export function Dashboard() {
@@ -53,7 +60,10 @@ export function Dashboard() {
         <Subheading>주요 지표</Subheading>
         <div className="flex gap-3">
           <div>
-            <label htmlFor="startDate" className="block text-xs font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="startDate"
+              className="block text-xs font-medium text-gray-700 mb-1"
+            >
               시작일
             </label>
             <input
@@ -65,7 +75,10 @@ export function Dashboard() {
             />
           </div>
           <div>
-            <label htmlFor="endDate" className="block text-xs font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="endDate"
+              className="block text-xs font-medium text-gray-700 mb-1"
+            >
               종료일
             </label>
             <input
@@ -242,7 +255,10 @@ export function Dashboard() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
             <Subheading>최근 업무</Subheading>
-            <Link href="/tasks" className="text-sm text-blue-600 hover:text-blue-700">
+            <Link
+              href="/tasks"
+              className="text-sm text-blue-600 hover:text-blue-700"
+            >
               전체 보기 →
             </Link>
           </div>
@@ -259,10 +275,14 @@ export function Dashboard() {
               <TableBody>
                 {recentTasks.map((task) => (
                   <TableRow key={task.task_id}>
-                    <TableCell className="font-medium">{task.task_name}</TableCell>
+                    <TableCell className="font-medium">
+                      {task.task_name}
+                    </TableCell>
                     <TableCell>{task.members?.name}</TableCell>
                     <TableCell>
-                      <Badge color="zinc">{task.projects?.name || '미지정'}</Badge>
+                      <Badge color="zinc">
+                        {task.projects?.name || '미지정'}
+                      </Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       {task.task_hours}h
@@ -273,7 +293,9 @@ export function Dashboard() {
               </TableBody>
             </Table>
           ) : (
-            <div className="text-center py-8 text-gray-500">최근 업무가 없습니다</div>
+            <div className="text-center py-8 text-gray-500">
+              최근 업무가 없습니다
+            </div>
           )}
         </div>
       </div>

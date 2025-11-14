@@ -1,7 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
+import { Heading } from '../components/ui/heading';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../components/ui/table';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
 import { projectAPI } from '../services/api';
@@ -64,19 +74,11 @@ export function ProjectList() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
       {/* 헤더 */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">프로젝트 관리</h1>
-          <p className="mt-1 text-sm text-gray-500">프로젝트를 관리합니다.</p>
-        </div>
-        <Link
-          to="/projects/new"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          + 새 프로젝트
-        </Link>
+        <Heading>프로젝트 관리</Heading>
+        <Button href="/projects/new">+ 새 프로젝트</Button>
       </div>
 
       {/* 검색 및 필터 */}
@@ -109,12 +111,7 @@ export function ProjectList() {
             <option value="APP">앱</option>
             <option value="BOTH">웹+앱</option>
           </select>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            검색
-          </button>
+          <Button type="submit">검색</Button>
         </form>
       </div>
 
@@ -131,116 +128,79 @@ export function ProjectList() {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <caption className="sr-only">
-                  프로젝트 목록 - 총 {data.pagination.total}건
-                </caption>
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      프로젝트명
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      코드
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      플랫폼
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      버전
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      생성일
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      작업
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {data?.data.map((project: any) => (
-                    <tr key={project.project_id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {project.name}
+            <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+              <TableHead>
+                <TableRow>
+                  <TableHeader>프로젝트명</TableHeader>
+                  <TableHeader>코드</TableHeader>
+                  <TableHeader>플랫폼</TableHeader>
+                  <TableHeader>버전</TableHeader>
+                  <TableHeader>생성일</TableHeader>
+                  <TableHeader className="text-right">작업</TableHeader>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data?.data.map((project: any) => (
+                  <TableRow key={project.project_id}>
+                    <TableCell>
+                      <div className="font-medium">{project.name}</div>
+                      {project.description && (
+                        <div className="text-zinc-500 text-sm">
+                          {project.description}
                         </div>
-                        {project.description && (
-                          <div className="text-sm text-gray-500">
-                            {project.description}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <code className="text-sm text-gray-900 bg-gray-100 px-2 py-1 rounded">
-                          {project.code}
-                        </code>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            project.platform === 'WEB'
-                              ? 'bg-blue-100 text-blue-800'
-                              : project.platform === 'APP'
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-purple-100 text-purple-800'
-                          }`}
-                        >
-                          {project.platform === 'WEB'
-                            ? '웹'
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <code className="text-sm bg-gray-100 px-2 py-1 rounded">
+                        {project.code}
+                      </code>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        color={
+                          project.platform === 'WEB'
+                            ? 'blue'
                             : project.platform === 'APP'
-                              ? '앱'
-                              : '웹+앱'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {project.version || '-'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {format(new Date(project.created_at), 'yyyy-MM-dd')}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                        <Link
-                          to={`/projects/edit/${project.project_id}`}
+                              ? 'lime'
+                              : 'purple'
+                        }
+                      >
+                        {project.platform === 'WEB'
+                          ? '웹'
+                          : project.platform === 'APP'
+                            ? '앱'
+                            : '웹+앱'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{project.version || '-'}</TableCell>
+                    <TableCell>
+                      {format(new Date(project.created_at), 'yyyy-MM-dd')}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          plain
+                          href={`/projects/edit/${project.project_id}`}
                           aria-label={`${project.name} 프로젝트 수정`}
-                          className="text-blue-600 hover:text-blue-900"
                         >
                           수정
-                        </Link>
-                        <button
+                        </Button>
+                        <Button
+                          plain
                           onClick={() =>
                             handleDelete(project.project_id, project.name)
                           }
                           aria-label={`${project.name} 프로젝트 삭제`}
-                          className="text-red-600 hover:text-red-900"
                           disabled={deleteMutation.isPending}
                         >
                           삭제
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
 
             {/* 페이지네이션 */}
             {data && data.pagination.pageCount > 1 && (
@@ -325,6 +285,6 @@ export function ProjectList() {
           </>
         )}
       </div>
-    </div>
+    </>
   );
 }

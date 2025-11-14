@@ -1,7 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
+import { Heading } from '../components/ui/heading';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../components/ui/table';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
 import { serviceAPI } from '../services/api';
@@ -84,19 +94,11 @@ export function ServiceList() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
       {/* 헤더 */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">서비스 관리</h1>
-          <p className="mt-1 text-sm text-gray-500">서비스를 관리합니다.</p>
-        </div>
-        <Link
-          to="/services/new"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          + 새 서비스
-        </Link>
+        <Heading>서비스 관리</Heading>
+        <Button href="/services/new">+ 새 서비스</Button>
       </div>
 
       {/* 검색 및 필터 */}
@@ -151,12 +153,7 @@ export function ServiceList() {
             <option value="true">활성</option>
             <option value="false">비활성</option>
           </select>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            검색
-          </button>
+          <Button type="submit">검색</Button>
         </form>
       </div>
 
@@ -173,96 +170,60 @@ export function ServiceList() {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <caption className="sr-only">
-                  서비스 목록 - 총 {data.pagination.total}건
-                </caption>
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      서비스명
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      청구 그룹
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      상태
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      생성일
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      작업
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {data?.data.map((service: any) => (
-                    <tr key={service.service_id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {service.name}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
-                          {service.cost_groups?.name || '-'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            service.is_active
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}
-                        >
-                          {service.is_active ? '활성' : '비활성'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {format(new Date(service.created_at), 'yyyy-MM-dd')}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                        <Link
-                          to={`/services/edit/${service.service_id}`}
+            <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+              <TableHead>
+                <TableRow>
+                  <TableHeader>서비스명</TableHeader>
+                  <TableHeader>청구 그룹</TableHeader>
+                  <TableHeader>상태</TableHeader>
+                  <TableHeader>생성일</TableHeader>
+                  <TableHeader className="text-right">작업</TableHeader>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data?.data.map((service: any) => (
+                  <TableRow key={service.service_id}>
+                    <TableCell className="font-medium">
+                      {service.name}
+                    </TableCell>
+                    <TableCell>
+                      <Badge color="purple">
+                        {service.cost_groups?.name || '-'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge color={service.is_active ? 'lime' : 'zinc'}>
+                        {service.is_active ? '활성' : '비활성'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {format(new Date(service.created_at), 'yyyy-MM-dd')}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          plain
+                          href={`/services/edit/${service.service_id}`}
                           aria-label={`${service.name} 서비스 수정`}
-                          className="text-blue-600 hover:text-blue-900"
                         >
                           수정
-                        </Link>
-                        <button
+                        </Button>
+                        <Button
+                          plain
                           onClick={() =>
                             handleDelete(service.service_id, service.name)
                           }
                           aria-label={`${service.name} 서비스 삭제`}
-                          className="text-red-600 hover:text-red-900"
                           disabled={deleteMutation.isPending}
                         >
                           삭제
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
 
             {/* 페이지네이션 */}
             {data && data.pagination.pageCount > 1 && (
@@ -347,6 +308,6 @@ export function ServiceList() {
           </>
         )}
       </div>
-    </div>
+    </>
   );
 }

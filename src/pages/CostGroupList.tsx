@@ -1,7 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
+import { Heading } from '../components/ui/heading';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../components/ui/table';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
 import { costGroupAPI } from '../services/api';
@@ -68,19 +78,11 @@ export function CostGroupList() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
       {/* 헤더 */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">청구 그룹 관리</h1>
-          <p className="mt-1 text-sm text-gray-500">청구 그룹을 관리합니다.</p>
-        </div>
-        <Link
-          to="/cost-groups/new"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          + 새 청구 그룹
-        </Link>
+        <Heading>청구 그룹 관리</Heading>
+        <Button href="/cost-groups/new">+ 새 청구 그룹</Button>
       </div>
 
       {/* 검색 */}
@@ -121,12 +123,7 @@ export function CostGroupList() {
               <option value="active">활성</option>
               <option value="inactive">비활성</option>
             </select>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              검색
-            </button>
+            <Button type="submit">검색</Button>
           </div>
         </form>
       </div>
@@ -144,78 +141,45 @@ export function CostGroupList() {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <caption className="sr-only">
-                  청구 그룹 목록 - 총 {data.pagination.total}건
-                </caption>
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      청구 그룹명
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      상태
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      생성일
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      작업
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {data?.data.map((costGroup: any) => (
-                    <tr
-                      key={costGroup.cost_group_id}
-                      className="hover:bg-gray-50"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {costGroup.name}
+            <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+              <TableHead>
+                <TableRow>
+                  <TableHeader>청구 그룹명</TableHeader>
+                  <TableHeader>상태</TableHeader>
+                  <TableHeader>생성일</TableHeader>
+                  <TableHeader className="text-right">작업</TableHeader>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data?.data.map((costGroup: any) => (
+                  <TableRow key={costGroup.cost_group_id}>
+                    <TableCell>
+                      <div className="font-medium">{costGroup.name}</div>
+                      {costGroup.description && (
+                        <div className="text-zinc-500 text-sm">
+                          {costGroup.description}
                         </div>
-                        {costGroup.description && (
-                          <div className="text-sm text-gray-500">
-                            {costGroup.description}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            costGroup.is_active
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}
-                        >
-                          {costGroup.is_active ? '활성' : '비활성'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {format(new Date(costGroup.created_at), 'yyyy-MM-dd')}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                        <Link
-                          to={`/cost-groups/edit/${costGroup.cost_group_id}`}
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Badge color={costGroup.is_active ? 'lime' : 'zinc'}>
+                        {costGroup.is_active ? '활성' : '비활성'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {format(new Date(costGroup.created_at), 'yyyy-MM-dd')}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          plain
+                          href={`/cost-groups/edit/${costGroup.cost_group_id}`}
                           aria-label={`${costGroup.name} 청구 그룹 수정`}
-                          className="text-blue-600 hover:text-blue-900"
                         >
                           수정
-                        </Link>
-                        <button
+                        </Button>
+                        <Button
+                          plain
                           onClick={() =>
                             handleDelete(
                               costGroup.cost_group_id,
@@ -223,17 +187,16 @@ export function CostGroupList() {
                             )
                           }
                           aria-label={`${costGroup.name} 청구 그룹 삭제`}
-                          className="text-red-600 hover:text-red-900"
                           disabled={deleteMutation.isPending}
                         >
                           삭제
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
 
             {/* 페이지네이션 */}
             {data && data.pagination.pageCount > 1 && (
@@ -318,6 +281,6 @@ export function CostGroupList() {
           </>
         )}
       </div>
-    </div>
+    </>
   );
 }

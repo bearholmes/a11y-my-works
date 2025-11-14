@@ -1,8 +1,8 @@
 import { useAtom, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
 import {
-  type Notification,
   clearAllNotificationsAtom,
+  type Notification,
   notificationsAtom,
   removeNotificationAtom,
 } from '../stores/notificationStore';

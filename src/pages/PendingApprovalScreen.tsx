@@ -1,3 +1,6 @@
+import { Button } from '../components/ui/button';
+import { Heading } from '../components/ui/heading';
+import { Text } from '../components/ui/text';
 import { useAuthContext } from '../providers/AuthProvider';
 
 /**
@@ -33,45 +36,48 @@ export function PendingApprovalScreen() {
           </div>
 
           {/* 메시지 */}
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <Heading level={2} className="mb-2">
             승인 대기 중
-          </h2>
-          <p className="text-gray-600 mb-6">
+          </Heading>
+          <Text className="mb-6">
             회원가입이 완료되었습니다.
             <br />
             관리자의 승인 후 시스템을 이용하실 수 있습니다.
-          </p>
+          </Text>
 
           {/* 사용자 정보 */}
           <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
-            <div className="text-sm text-gray-500 mb-1">가입 이메일</div>
-            <div className="text-gray-900 font-medium">{user?.email}</div>
+            <Text className="mb-1 text-gray-500">가입 이메일</Text>
+            <Text className="font-medium">{user?.email}</Text>
           </div>
 
           {/* 안내 사항 */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
-            <h3 className="text-sm font-semibold text-blue-900 mb-2">
+            <Text className="font-semibold text-blue-900 mb-2">
               📌 다음 단계
-            </h3>
-            <ul className="text-sm text-blue-800 space-y-1">
-              <li>• 관리자가 계정을 검토합니다</li>
-              <li>• 역할이 할당되면 이메일로 알림을 받게 됩니다</li>
-              <li>• 승인 후 다시 로그인하여 이용하실 수 있습니다</li>
+            </Text>
+            <ul className="space-y-1">
+              <Text className="text-blue-800">
+                • 관리자가 계정을 검토합니다
+              </Text>
+              <Text className="text-blue-800">
+                • 역할이 할당되면 이메일로 알림을 받게 됩니다
+              </Text>
+              <Text className="text-blue-800">
+                • 승인 후 다시 로그인하여 이용하실 수 있습니다
+              </Text>
             </ul>
           </div>
 
           {/* 로그아웃 버튼 */}
-          <button
-            onClick={handleSignOut}
-            className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
-          >
+          <Button onClick={handleSignOut} outline className="w-full">
             로그아웃
-          </button>
+          </Button>
 
           {/* 문의 안내 */}
-          <p className="mt-4 text-xs text-gray-500">
+          <Text className="mt-4 text-gray-500">
             문의사항이 있으시면 관리자에게 연락해주세요
-          </p>
+          </Text>
         </div>
       </div>
     </div>

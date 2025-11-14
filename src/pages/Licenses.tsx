@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Button } from '../components/ui/button';
+import { Heading } from '../components/ui/heading';
+import { Text } from '../components/ui/text';
 
 /**
  * 오픈소스 라이센스 고지 페이지
@@ -70,17 +72,12 @@ export function Licenses() {
                 />
               </svg>
             </div>
-            <h1 className="text-2xl font-semibold text-gray-700 mb-4">
+            <Heading level={2} className="mb-4">
               라이센스 정보 로딩 실패
-            </h1>
-            <p className="text-gray-600 mb-8">{error}</p>
+            </Heading>
+            <Text className="mb-8">{error}</Text>
           </div>
-          <Link
-            to="/"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
-          >
-            홈으로 돌아가기
-          </Link>
+          <Button href="/">홈으로 돌아가기</Button>
         </div>
       </div>
     );
@@ -91,21 +88,16 @@ export function Licenses() {
       <div className="max-w-5xl mx-auto">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-gray-900">
-              오픈소스 라이센스
-            </h1>
-            <Link
-              to="/"
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
-            >
+            <Heading>오픈소스 라이센스</Heading>
+            <Button href="/" plain>
               ← 돌아가기
-            </Link>
+            </Button>
           </div>
-          <p className="text-gray-600 text-sm">
+          <Text>
             본 소프트웨어는 다음의 오픈소스 라이브러리를 사용합니다.
             <br />
             모든 라이브러리는 상업적 사용이 가능한 오픈소스 라이센스를 따릅니다.
-          </p>
+          </Text>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -116,8 +108,8 @@ export function Licenses() {
           </div>
         </div>
 
-        <div className="mt-6 text-center text-sm text-gray-500">
-          <p>
+        <div className="mt-6 text-center">
+          <Text>
             상세한 라이센스 분석 문서는{' '}
             <a
               href="https://github.com/bearholmes/a11y-my-works/blob/main/.doc/dependency-licenses.md"
@@ -128,7 +120,7 @@ export function Licenses() {
               프로젝트 문서
             </a>
             에서 확인하실 수 있습니다.
-          </p>
+          </Text>
         </div>
       </div>
     </div>

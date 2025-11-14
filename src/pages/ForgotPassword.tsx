@@ -1,8 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
 import { z } from 'zod';
+import { Button } from '../components/ui/button';
+import { Fieldset, Label } from '../components/ui/fieldset';
+import { Heading } from '../components/ui/heading';
+import { Input } from '../components/ui/input';
+import { Text } from '../components/ui/text';
 import { useAuth } from '../hooks/useAuth';
 
 const forgotPasswordSchema = z.object({
@@ -64,21 +68,16 @@ export function ForgotPassword() {
                 />
               </svg>
             </div>
-            <h2 className="mt-6 text-2xl font-bold text-gray-900">
-              이메일을 확인해주세요
-            </h2>
-            <p className="mt-2 text-sm text-gray-600">
+            <Heading className="mt-6">이메일을 확인해주세요</Heading>
+            <Text className="mt-2">
               비밀번호 재설정 링크를 이메일로 발송했습니다.
               <br />
               이메일을 확인하고 링크를 클릭해주세요.
-            </p>
+            </Text>
             <div className="mt-6">
-              <Link
-                to="/login"
-                className="text-sm text-blue-600 hover:text-blue-500"
-              >
+              <Button href="/login" plain>
                 로그인 페이지로 돌아가기
-              </Link>
+              </Button>
             </div>
           </div>
         </div>
@@ -90,12 +89,12 @@ export function ForgotPassword() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">비밀번호 찾기</h2>
-          <p className="mt-2 text-gray-600">
+          <Heading level={1}>비밀번호 찾기</Heading>
+          <Text className="mt-2">
             가입하신 이메일 주소를 입력하시면
             <br />
             비밀번호 재설정 링크를 보내드립니다.
-          </p>
+          </Text>
         </div>
 
         <form
@@ -108,41 +107,27 @@ export function ForgotPassword() {
             </div>
           )}
 
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
-              이메일
-            </label>
-            <input
+          <Fieldset>
+            <Label htmlFor="email">이메일</Label>
+            <Input
               {...register('email')}
+              id="email"
               type="email"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="your@email.com"
             />
             {errors.email && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.email.message}
-              </p>
+              <Text className="mt-1 text-red-600">{errors.email.message}</Text>
             )}
-          </div>
+          </Fieldset>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-          >
+          <Button type="submit" disabled={submitting} className="w-full">
             {submitting ? '발송 중...' : '재설정 링크 보내기'}
-          </button>
+          </Button>
 
           <div className="text-center">
-            <Link
-              to="/login"
-              className="text-sm text-blue-600 hover:text-blue-500"
-            >
+            <Button href="/login" plain>
               로그인 페이지로 돌아가기
-            </Link>
+            </Button>
           </div>
         </form>
       </div>

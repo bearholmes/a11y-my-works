@@ -4,6 +4,10 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { Button } from '../components/ui/button';
+import { Heading } from '../components/ui/heading';
+import { Input } from '../components/ui/input';
+import { Textarea } from '../components/ui/textarea';
 import { useNotification } from '../hooks/useNotification';
 import { permissionAPI, roleAPI } from '../services/api';
 
@@ -183,19 +187,12 @@ export function RoleForm() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
-          역할 {isEditMode ? '수정' : '생성'}
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          역할 정보와 권한을 {isEditMode ? '수정' : '설정'}합니다.
-        </p>
-      </div>
+    <>
+      <Heading>{isEditMode ? '역할 수정' : '역할 생성'}</Heading>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="space-y-6"
+        className="mt-8 max-w-4xl space-y-6"
         aria-label={isEditMode ? '역할 수정 폼' : '역할 생성 폼'}
       >
         {/* 기본 정보 */}
@@ -212,14 +209,13 @@ export function RoleForm() {
                 *
               </span>
             </label>
-            <input
+            <Input
               id="name"
               {...register('name')}
               type="text"
               aria-required="true"
               aria-invalid={!!errors.name}
               aria-describedby={errors.name ? 'name-error' : undefined}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
             {errors.name && (
               <p
@@ -239,12 +235,11 @@ export function RoleForm() {
             >
               설명
             </label>
-            <textarea
+            <Textarea
               id="description"
               {...register('description')}
               rows={3}
               aria-label="역할 설명 입력"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
@@ -348,29 +343,28 @@ export function RoleForm() {
 
         {/* 버튼 */}
         <div className="flex gap-3">
-          <button
+          <Button
             type="submit"
             disabled={createMutation.isPending || updateMutation.isPending}
             aria-label={isEditMode ? '역할 수정 저장' : '역할 생성'}
             aria-busy={createMutation.isPending || updateMutation.isPending}
-            className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
             {createMutation.isPending || updateMutation.isPending
               ? '처리 중...'
               : isEditMode
                 ? '수정'
                 : '생성'}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            plain
             onClick={() => navigate('/roles')}
             aria-label="역할 등록 취소하고 목록으로 돌아가기"
-            className="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
           >
             취소
-          </button>
+          </Button>
         </div>
       </form>
-    </div>
+    </>
   );
 }

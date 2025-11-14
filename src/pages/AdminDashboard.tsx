@@ -1,5 +1,21 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
+import { Checkbox } from '../components/ui/checkbox';
+import { Heading, Subheading } from '../components/ui/heading';
+import { Input } from '../components/ui/input';
+import { Select } from '../components/ui/select';
+import { Stat } from '../components/ui/stat';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../components/ui/table';
+import { Text } from '../components/ui/text';
 import { dashboardAPI } from '../services/api';
 
 /**
@@ -93,36 +109,34 @@ export function AdminDashboard() {
   };
 
   return (
-    <div className="space-y-6">
+    <>
       {/* 헤더 */}
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              업무 작성 현황
-            </h2>
-            <p className="mt-1 text-sm text-gray-600">
+            <Heading>업무 작성 현황</Heading>
+            <Text className="mt-1">
               팀원들의 월별 업무 일지 작성 현황을 확인하세요 (기준: 8시간)
-            </p>
+            </Text>
           </div>
 
           {/* 검색 및 필터 */}
           <div className="mt-4 md:mt-0 flex flex-col gap-3">
             {/* 월 선택기 */}
             <div className="flex items-center gap-3">
-              <button
+              <Button
                 type="button"
                 onClick={handlePrevMonth}
-                className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors"
+                outline
                 aria-label="이전 달"
               >
                 ←
-              </button>
+              </Button>
               <div className="flex gap-2">
-                <select
+                <Select
                   value={year}
                   onChange={(e) => setYear(Number(e.target.value))}
-                  className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  className="text-sm"
                 >
                   {Array.from(
                     { length: 5 },
@@ -132,39 +146,39 @@ export function AdminDashboard() {
                       {y}년
                     </option>
                   ))}
-                </select>
-                <select
+                </Select>
+                <Select
                   value={month}
                   onChange={(e) => setMonth(Number(e.target.value))}
-                  className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  className="text-sm"
                 >
                   {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
                     <option key={m} value={m}>
                       {m}월
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
-              <button
+              <Button
                 type="button"
                 onClick={handleNextMonth}
-                className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors"
+                outline
                 aria-label="다음 달"
               >
                 →
-              </button>
+              </Button>
             </div>
 
             {/* 필터 컨트롤 */}
             <div className="flex flex-wrap items-center gap-3">
               {/* 사용자 검색 */}
               <div className="relative">
-                <input
+                <Input
                   type="text"
                   placeholder="사용자 이름 또는 ID 검색..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-8 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
+                  className="pl-8 w-64"
                 />
                 <svg
                   className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400"
@@ -182,14 +196,14 @@ export function AdminDashboard() {
               </div>
 
               {/* 날짜 필터 */}
-              <select
+              <Select
                 value={selectedDate ?? ''}
                 onChange={(e) =>
                   setSelectedDate(
                     e.target.value ? Number(e.target.value) : null
                   )
                 }
-                className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                className="text-sm"
               >
                 <option value="">전체 날짜</option>
                 {days
@@ -203,34 +217,32 @@ export function AdminDashboard() {
                       {month}월 {day}일 미작성자
                     </option>
                   ))}
-              </select>
+              </Select>
 
               {/* 미완료만 보기 토글 */}
               <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={showIncompleteOnly}
-                  onChange={(e) => setShowIncompleteOnly(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                  onChange={(checked) => setShowIncompleteOnly(checked)}
                 />
-                <span className="text-sm text-gray-700">미완료만 보기</span>
+                <Text>미완료만 보기</Text>
               </label>
 
               {/* 필터 초기화 */}
               {(searchQuery ||
                 selectedDate !== null ||
                 !showIncompleteOnly) && (
-                <button
+                <Button
                   type="button"
+                  plain
                   onClick={() => {
                     setSearchQuery('');
                     setSelectedDate(null);
                     setShowIncompleteOnly(true);
                   }}
-                  className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 underline"
                 >
                   필터 초기화
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -240,43 +252,29 @@ export function AdminDashboard() {
       {/* 통계 카드 */}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-gray-500">활성 사용자</h3>
-            <div className="mt-2 text-3xl font-semibold text-gray-900">
-              {stats.totalActiveMembers}명
-            </div>
-            <p className="mt-2 text-xs text-gray-600">현재 활성화된 팀원 수</p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-gray-500">전체 완료율</h3>
-            <div className="mt-2 text-3xl font-semibold text-blue-600">
-              {stats.overallCompletionRate}%
-            </div>
-            <p className="mt-2 text-xs text-gray-600">
-              {stats.totalCompletedDays} / {stats.totalWorkingDays} 일
-            </p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-gray-500">
-              완전 작성 사용자
-            </h3>
-            <div className="mt-2 text-3xl font-semibold text-green-600">
-              {stats.fullyCompletedMembers}명
-            </div>
-            <p className="mt-2 text-xs text-gray-600">100% 작성 완료한 팀원</p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-gray-500">미완료 사용자</h3>
-            <div className="mt-2 text-3xl font-semibold text-red-600">
-              {stats.totalActiveMembers - stats.fullyCompletedMembers}명
-            </div>
-            <p className="mt-2 text-xs text-gray-600">
-              미완료 일지가 있는 팀원
-            </p>
-          </div>
+          <Stat
+            title="활성 사용자"
+            value={`${stats.totalActiveMembers}명`}
+            description="현재 활성화된 팀원 수"
+          />
+          <Stat
+            title="전체 완료율"
+            value={`${stats.overallCompletionRate}%`}
+            description={`${stats.totalCompletedDays} / ${stats.totalWorkingDays} 일`}
+            className="[&_.text-gray-900]:!text-blue-600"
+          />
+          <Stat
+            title="완전 작성 사용자"
+            value={`${stats.fullyCompletedMembers}명`}
+            description="100% 작성 완료한 팀원"
+            className="[&_.text-gray-900]:!text-green-600"
+          />
+          <Stat
+            title="미완료 사용자"
+            value={`${stats.totalActiveMembers - stats.fullyCompletedMembers}명`}
+            description="미완료 일지가 있는 팀원"
+            className="[&_.text-gray-900]:!text-red-600"
+          />
         </div>
       )}
 
@@ -294,87 +292,83 @@ export function AdminDashboard() {
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">
-                  월별 업무 일지 작성 현황
-                </h3>
-                <p className="mt-1 text-sm text-gray-600">
+                <Subheading>월별 업무 일지 작성 현황</Subheading>
+                <Text className="mt-1">
                   ✅ = 완료 (8시간 이상), ❌ = 미완료, - = 주말/공휴일
-                </p>
+                </Text>
               </div>
-              <div className="text-sm text-gray-600">
-                <span className="text-blue-600 font-medium">
+              <div>
+                <Text className="text-blue-600 font-medium">
                   {filteredMembers.length}명
-                </span>
+                </Text>
                 {selectedDate && (
-                  <span className="ml-2 text-gray-500">
+                  <Text className="ml-2">
                     ({month}월 {selectedDate}일 미작성)
-                  </span>
+                  </Text>
                 )}
               </div>
             </div>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="sticky left-0 z-10 bg-gray-50 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
+            <Table className="min-w-full" bleed dense>
+              <TableHead>
+                <TableRow>
+                  <TableHeader className="sticky left-0 z-10 bg-gray-50 border-r border-gray-200">
                     사용자
-                  </th>
-                  <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-200">
+                  </TableHeader>
+                  <TableHeader className="text-center border-r border-gray-200">
                     완료율
-                  </th>
+                  </TableHeader>
                   {days.map((day) => {
                     const isWeekendDay = isWeekend(day);
                     return (
-                      <th
+                      <TableHeader
                         key={day}
-                        className={`px-2 py-3 text-center text-xs font-medium uppercase ${
-                          isWeekendDay
-                            ? 'bg-gray-100 text-gray-400'
-                            : 'text-gray-500'
+                        className={`text-center ${
+                          isWeekendDay ? 'bg-gray-100 text-gray-400' : ''
                         }`}
                       >
                         {day}
-                      </th>
+                      </TableHeader>
                     );
                   })}
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+                </TableRow>
+              </TableHead>
+              <TableBody>
                 {filteredMembers.map((member) => (
-                  <tr key={member.memberId} className="hover:bg-gray-50">
-                    <td className="sticky left-0 z-10 bg-white px-4 py-3 text-sm font-medium text-gray-900 border-r border-gray-200 hover:bg-gray-50">
+                  <TableRow key={member.memberId}>
+                    <TableCell className="sticky left-0 z-10 bg-white border-r border-gray-200 font-medium">
                       <div className="flex items-center gap-2">
                         <span>{member.memberName}</span>
                         <span className="text-xs text-gray-500">
                           ({member.accountId})
                         </span>
                       </div>
-                    </td>
-                    <td className="px-2 py-3 text-center text-sm border-r border-gray-200">
-                      <span
-                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                    </TableCell>
+                    <TableCell className="text-center border-r border-gray-200">
+                      <Badge
+                        color={
                           member.stats.completionRate === 100
-                            ? 'bg-green-100 text-green-800'
+                            ? 'green'
                             : member.stats.completionRate >= 80
-                              ? 'bg-blue-100 text-blue-800'
+                              ? 'blue'
                               : member.stats.completionRate >= 50
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-red-100 text-red-800'
-                        }`}
+                                ? 'yellow'
+                                : 'red'
+                        }
                       >
                         {member.stats.completionRate}%
-                      </span>
-                    </td>
+                      </Badge>
+                    </TableCell>
                     {days.map((day) => {
                       const date = formatDate(day);
                       const completion = member.dailyCompletion[date];
 
                       return (
-                        <td
+                        <TableCell
                           key={day}
-                          className={`px-2 py-3 text-center text-sm ${
+                          className={`text-center ${
                             completion === null
                               ? 'bg-gray-50'
                               : completion
@@ -396,13 +390,13 @@ export function AdminDashboard() {
                               ❌
                             </span>
                           )}
-                        </td>
+                        </TableCell>
                       );
                     })}
-                  </tr>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
 
           {/* 통계 요약 */}
@@ -431,32 +425,26 @@ export function AdminDashboard() {
 
       {/* 범례 */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">범례</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+        <Subheading className="mb-3">범례</Subheading>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div className="flex items-center gap-2">
             <span className="text-green-600">✅</span>
-            <span className="text-gray-700">
-              완료 - 해당 날짜에 8시간(480분) 이상 업무 작성
-            </span>
+            <Text>완료 - 해당 날짜에 8시간(480분) 이상 업무 작성</Text>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-red-600">❌</span>
-            <span className="text-gray-700">
-              미완료 - 해당 날짜에 8시간 미만 작성
-            </span>
+            <Text>미완료 - 해당 날짜에 8시간 미만 작성</Text>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-gray-400">-</span>
-            <span className="text-gray-700">주말/공휴일 - 작성 불필요</span>
+            <Text>주말/공휴일 - 작성 불필요</Text>
           </div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-              100%
-            </span>
-            <span className="text-gray-700">완료율 - 근무일 대비 작성률</span>
+            <Badge color="green">100%</Badge>
+            <Text>완료율 - 근무일 대비 작성률</Text>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

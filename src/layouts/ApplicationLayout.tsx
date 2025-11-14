@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query';
 import {
   ArrowRightStartOnRectangleIcon,
   Cog8ToothIcon,
@@ -16,6 +15,7 @@ import {
   UsersIcon,
   WrenchScrewdriverIcon,
 } from '@heroicons/react/20/solid';
+import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Avatar } from '../components/ui/avatar';
@@ -27,7 +27,12 @@ import {
   DropdownLabel,
   DropdownMenu,
 } from '../components/ui/dropdown';
-import { Navbar, NavbarItem, NavbarSection, NavbarSpacer } from '../components/ui/navbar';
+import {
+  Navbar,
+  NavbarItem,
+  NavbarSection,
+  NavbarSpacer,
+} from '../components/ui/navbar';
 import {
   Sidebar,
   SidebarBody,
@@ -52,7 +57,11 @@ interface ApplicationLayoutProps {
 /**
  * 사용자 메뉴 드롭다운 컴포넌트
  */
-function AccountDropdownMenu({ anchor }: { anchor: 'top start' | 'bottom end' }) {
+function AccountDropdownMenu({
+  anchor,
+}: {
+  anchor: 'top start' | 'bottom end';
+}) {
   const { signOut } = useAuthContext();
 
   const handleSignOut = async () => {
@@ -207,7 +216,11 @@ function getMenuIcon(href: string, icon?: string) {
   };
 
   const IconComponent = iconMap[href];
-  return IconComponent ? <IconComponent /> : <span aria-hidden="true">{icon}</span>;
+  return IconComponent ? (
+    <IconComponent />
+  ) : (
+    <span aria-hidden="true">{icon}</span>
+  );
 }
 
 /**
@@ -332,7 +345,11 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
               <DropdownButton as={SidebarItem}>
                 <span className="flex min-w-0 items-center gap-3">
                   <Avatar
-                    initials={currentMember?.name?.charAt(0) || user?.email?.charAt(0).toUpperCase() || 'U'}
+                    initials={
+                      currentMember?.name?.charAt(0) ||
+                      user?.email?.charAt(0).toUpperCase() ||
+                      'U'
+                    }
                     className="size-10"
                     square
                   />

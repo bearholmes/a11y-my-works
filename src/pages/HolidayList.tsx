@@ -1,12 +1,20 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Button } from '../components/ui/button';
+import { Heading } from '../components/ui/heading';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../components/ui/table';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
 import { holidayAPI } from '../services/api';
 
 export function HolidayList() {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [year, setYear] = useState<number>(new Date().getFullYear());
@@ -58,20 +66,10 @@ export function HolidayList() {
   }
 
   return (
-    <div>
+    <>
       <div className="mb-6 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">공휴일 관리</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            공휴일 정보를 조회하고 관리합니다.
-          </p>
-        </div>
-        <button
-          onClick={() => navigate('/holidays/new')}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          공휴일 등록
-        </button>
+        <Heading>공휴일 관리</Heading>
+        <Button href="/holidays/new">공휴일 등록</Button>
       </div>
 
       {/* 필터 */}
@@ -103,82 +101,53 @@ export function HolidayList() {
 
       {/* 목록 */}
       <div className="bg-white shadow-sm rounded-lg border overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <caption className="sr-only">
-            공휴일 목록 - 총 {data?.pagination?.total || 0}건
-          </caption>
-          <thead className="bg-gray-50">
-            <tr>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                날짜
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                공휴일명
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                설명
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                관리
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {holidays.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
-                  등록된 공휴일이 없습니다.
-                </td>
-              </tr>
-            ) : (
-              holidays.map((holiday: any) => (
-                <tr key={holiday.holiday_id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        {holidays.length === 0 ? (
+          <div className="px-6 py-8 text-center text-gray-500">
+            등록된 공휴일이 없습니다.
+          </div>
+        ) : (
+          <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+            <TableHead>
+              <TableRow>
+                <TableHeader>날짜</TableHeader>
+                <TableHeader>공휴일명</TableHeader>
+                <TableHeader>설명</TableHeader>
+                <TableHeader className="text-right">관리</TableHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {holidays.map((holiday: any) => (
+                <TableRow key={holiday.holiday_id}>
+                  <TableCell>
                     {new Date(holiday.holiday_date).toLocaleDateString('ko-KR')}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {holiday.name}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {holiday.description || '-'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button
-                      onClick={() =>
-                        navigate(`/holidays/${holiday.holiday_id}`)
-                      }
-                      aria-label={`${holiday.name} 공휴일 수정`}
-                      className="text-blue-600 hover:text-blue-900 mr-4"
-                    >
-                      수정
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleDelete(holiday.holiday_id, holiday.name)
-                      }
-                      aria-label={`${holiday.name} 공휴일 삭제`}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      삭제
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                  </TableCell>
+                  <TableCell className="font-medium">{holiday.name}</TableCell>
+                  <TableCell>{holiday.description || '-'}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        plain
+                        href={`/holidays/${holiday.holiday_id}`}
+                        aria-label={`${holiday.name} 공휴일 수정`}
+                      >
+                        수정
+                      </Button>
+                      <Button
+                        plain
+                        onClick={() =>
+                          handleDelete(holiday.holiday_id, holiday.name)
+                        }
+                        aria-label={`${holiday.name} 공휴일 삭제`}
+                      >
+                        삭제
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
 
       {/* 페이지네이션 */}
@@ -203,6 +172,6 @@ export function HolidayList() {
           </button>
         </div>
       )}
-    </div>
+    </>
   );
 }

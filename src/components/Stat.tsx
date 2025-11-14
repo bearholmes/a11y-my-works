@@ -29,7 +29,15 @@ export function Stat({ title, value, change, description }: StatProps) {
         <div className="mt-3 text-sm/6 sm:text-xs/6">
           {change && (
             <>
-              <Badge color={change.startsWith('+') ? 'lime' : change.startsWith('-') ? 'pink' : 'zinc'}>
+              <Badge
+                color={
+                  change.startsWith('+')
+                    ? 'lime'
+                    : change.startsWith('-')
+                      ? 'pink'
+                      : 'zinc'
+                }
+              >
                 {change}
               </Badge>{' '}
             </>

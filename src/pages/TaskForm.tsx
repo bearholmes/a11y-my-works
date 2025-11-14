@@ -4,6 +4,11 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { Button } from '../components/ui/button';
+import { Heading } from '../components/ui/heading';
+import { Input } from '../components/ui/input';
+import { Select } from '../components/ui/select';
+import { Textarea } from '../components/ui/textarea';
 import { businessAPI, codeAPI, taskAPI } from '../services/api';
 
 const taskSchema = z.object({
@@ -134,12 +139,9 @@ export function TaskForm() {
   }, [watchService, selectedService, setValue]);
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-6">
-          {isEdit ? '업무 보고 수정' : '업무 보고 등록'}
-        </h2>
-
+    <>
+      <Heading>{isEdit ? '업무 보고 수정' : '업무 보고 등록'}</Heading>
+      <div className="mt-8 max-w-2xl bg-white rounded-lg shadow p-6">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="space-y-6"
@@ -156,7 +158,7 @@ export function TaskForm() {
                   *
                 </span>
               </label>
-              <input
+              <Input
                 id="task_date"
                 type="date"
                 {...register('task_date')}
@@ -165,7 +167,6 @@ export function TaskForm() {
                 aria-describedby={
                   errors.task_date ? 'task_date-error' : undefined
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.task_date && (
                 <p
@@ -185,12 +186,11 @@ export function TaskForm() {
               >
                 작업 시간 (분)
               </label>
-              <input
+              <Input
                 id="work_time"
                 type="number"
                 {...register('work_time', { valueAsNumber: true })}
                 aria-label="작업 시간을 분 단위로 입력"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 min="0"
               />
             </div>
@@ -206,7 +206,7 @@ export function TaskForm() {
                 *
               </span>
             </label>
-            <input
+            <Input
               id="task_name"
               type="text"
               {...register('task_name')}
@@ -215,7 +215,6 @@ export function TaskForm() {
               aria-describedby={
                 errors.task_name ? 'task_name-error' : undefined
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="업무명을 입력하세요"
             />
             {errors.task_name && (
@@ -236,12 +235,11 @@ export function TaskForm() {
             >
               업무 상세
             </label>
-            <textarea
+            <Textarea
               id="task_detail"
               {...register('task_detail')}
               rows={3}
               aria-label="업무의 상세 내용 입력"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="업무 상세 내용을 입력하세요"
             />
           </div>
@@ -253,13 +251,12 @@ export function TaskForm() {
             >
               관련 URL
             </label>
-            <input
+            <Input
               id="task_url"
               type="url"
               {...register('task_url')}
               aria-invalid={!!errors.task_url}
               aria-describedby={errors.task_url ? 'task_url-error' : undefined}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="https://..."
             />
             {errors.task_url && (
@@ -281,12 +278,11 @@ export function TaskForm() {
               >
                 시작 시간
               </label>
-              <input
+              <Input
                 id="start_time"
                 type="time"
                 {...register('start_time')}
                 aria-label="작업 시작 시간 선택"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -297,12 +293,11 @@ export function TaskForm() {
               >
                 종료 시간
               </label>
-              <input
+              <Input
                 id="end_time"
                 type="time"
                 {...register('end_time')}
                 aria-label="작업 종료 시간 선택"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -315,11 +310,10 @@ export function TaskForm() {
               >
                 청구 그룹
               </label>
-              <select
+              <Select
                 id="cost_group_id"
                 {...register('cost_group_id', { valueAsNumber: true })}
                 aria-label="청구 그룹 선택"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">청구 그룹을 선택하세요</option>
                 {costGroups?.map((group) => (
@@ -327,7 +321,7 @@ export function TaskForm() {
                     {group.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             <div>
@@ -337,11 +331,10 @@ export function TaskForm() {
               >
                 플랫폼
               </label>
-              <select
+              <Select
                 id="platform_id"
                 {...register('platform_id', { valueAsNumber: true })}
                 aria-label="플랫폼 선택"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">플랫폼을 선택하세요</option>
                 {platforms?.map((platform) => (
@@ -349,7 +342,7 @@ export function TaskForm() {
                     {platform.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
           </div>
 
@@ -368,12 +361,11 @@ export function TaskForm() {
               >
                 서비스
               </label>
-              <select
+              <Select
                 id="service_id"
                 {...register('service_id', { valueAsNumber: true })}
                 aria-label="서비스 선택"
                 aria-disabled={!selectedCostGroup}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 disabled={!selectedCostGroup}
               >
                 <option value="">
@@ -386,7 +378,7 @@ export function TaskForm() {
                     {service.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             <div>
@@ -396,12 +388,11 @@ export function TaskForm() {
               >
                 프로젝트
               </label>
-              <select
+              <Select
                 id="project_id"
                 {...register('project_id', { valueAsNumber: true })}
                 aria-label="프로젝트 선택"
                 aria-disabled={!selectedService}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 disabled={!selectedService}
               >
                 <option value="">
@@ -414,35 +405,34 @@ export function TaskForm() {
                     {project.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
           </div>
 
           <div className="flex justify-end space-x-4">
-            <button
+            <Button
               type="button"
+              plain
               onClick={() => navigate('/tasks')}
               aria-label="업무 등록 취소하고 목록으로 돌아가기"
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
               취소
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={createMutation.isPending || updateMutation.isPending}
               aria-label={isEdit ? '업무 보고 수정 저장' : '업무 보고 등록'}
               aria-busy={createMutation.isPending || updateMutation.isPending}
-              className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
             >
               {createMutation.isPending || updateMutation.isPending
                 ? '저장 중...'
                 : isEdit
                   ? '수정'
                   : '등록'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
-    </div>
+    </>
   );
 }

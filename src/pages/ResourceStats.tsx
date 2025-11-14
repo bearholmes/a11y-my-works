@@ -1,6 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
+import { Heading, Subheading } from '../components/ui/heading';
+import { Input } from '../components/ui/input';
+import { Stat } from '../components/ui/stat';
+import { Text } from '../components/ui/text';
 import { taskAPI } from '../services/api';
 import type { Task } from '../types/database';
 
@@ -193,26 +197,25 @@ export function ResourceStats() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">월간 리소스 통계</h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <Heading>월간 리소스 통계</Heading>
+          <Text className="mt-1">
             프로젝트, 서비스, 청구그룹별 투입 리소스 현황
-          </p>
+          </Text>
         </div>
 
         <div>
           <label htmlFor="month" className="sr-only">
             조회 월 선택
           </label>
-          <input
+          <Input
             type="month"
             id="month"
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             aria-label="조회할 월 선택"
           />
         </div>
@@ -220,80 +223,24 @@ export function ResourceStats() {
 
       {/* 전체 통계 카드 */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <span className="text-3xl" aria-hidden="true">
-                  ⏱️
-                </span>
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    총 투입 시간
-                  </dt>
-                  <dd className="flex items-baseline">
-                    <div className="text-3xl font-semibold text-gray-900">
-                      {stats.totalHours.toFixed(1)}
-                    </div>
-                    <div className="ml-2 text-sm text-gray-500">시간</div>
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <span className="text-3xl" aria-hidden="true">
-                  📋
-                </span>
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    총 업무 건수
-                  </dt>
-                  <dd className="flex items-baseline">
-                    <div className="text-3xl font-semibold text-gray-900">
-                      {stats.totalTasks}
-                    </div>
-                    <div className="ml-2 text-sm text-gray-500">건</div>
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <span className="text-3xl" aria-hidden="true">
-                  👥
-                </span>
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    투입 인원
-                  </dt>
-                  <dd className="flex items-baseline">
-                    <div className="text-3xl font-semibold text-gray-900">
-                      {stats.totalMembers}
-                    </div>
-                    <div className="ml-2 text-sm text-gray-500">명</div>
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Stat
+          title="총 투입 시간"
+          value={stats.totalHours.toFixed(1)}
+          description="시간"
+          icon="⏱️"
+        />
+        <Stat
+          title="총 업무 건수"
+          value={stats.totalTasks}
+          description="건"
+          icon="📋"
+        />
+        <Stat
+          title="투입 인원"
+          value={stats.totalMembers}
+          description="명"
+          icon="👥"
+        />
       </div>
 
       {isLoading ? (
@@ -312,9 +259,7 @@ export function ResourceStats() {
           {/* 프로젝트별 통계 */}
           <div className="bg-white shadow rounded-lg overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">
-                프로젝트별 리소스
-              </h2>
+              <Subheading>프로젝트별 리소스</Subheading>
             </div>
             <div className="p-6">
               {stats.projects.length === 0 ? (
@@ -364,9 +309,7 @@ export function ResourceStats() {
           {/* 서비스별 통계 */}
           <div className="bg-white shadow rounded-lg overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">
-                서비스별 리소스
-              </h2>
+              <Subheading>서비스별 리소스</Subheading>
             </div>
             <div className="p-6">
               {stats.services.length === 0 ? (
@@ -416,9 +359,7 @@ export function ResourceStats() {
           {/* 청구 그룹별 통계 */}
           <div className="bg-white shadow rounded-lg overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">
-                청구 그룹별 리소스
-              </h2>
+              <Subheading>청구 그룹별 리소스</Subheading>
             </div>
             <div className="p-6">
               {stats.costGroups.length === 0 ? (
@@ -468,9 +409,7 @@ export function ResourceStats() {
           {/* 직원별 통계 */}
           <div className="bg-white shadow rounded-lg overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">
-                직원별 리소스
-              </h2>
+              <Subheading>직원별 리소스</Subheading>
             </div>
             <div className="p-6">
               {stats.members.length === 0 ? (
@@ -521,6 +460,6 @@ export function ResourceStats() {
           </div>
         </>
       )}
-    </div>
+    </>
   );
 }

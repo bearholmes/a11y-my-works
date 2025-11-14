@@ -1,7 +1,25 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
+import { Heading } from '../components/ui/heading';
+import { Link } from '../components/ui/link';
+import {
+  Pagination,
+  PaginationList,
+  PaginationNext,
+  PaginationPage,
+  PaginationPrevious,
+} from '../components/ui/pagination';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../components/ui/table';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
 import { businessAPI, taskAPI } from '../services/api';
@@ -112,25 +130,15 @@ export function TaskList() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
       {/* 헤더 */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">업무 보고 목록</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            등록된 업무 보고를 조회하고 관리합니다.
-          </p>
-        </div>
-        <Link
-          to="/tasks/new"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          업무 등록
-        </Link>
+        <Heading>업무 보고 목록</Heading>
+        <Button href="/tasks/new">업무 등록</Button>
       </div>
 
       {/* 검색 필터 */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border">
+      <div className="mt-8">
         <h3 className="text-lg font-medium text-gray-900 mb-4">검색 필터</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -255,229 +263,130 @@ export function TaskList() {
 
         {/* 검색 버튼 */}
         <div className="flex gap-3 mt-4">
-          <button
-            onClick={handleSearch}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            검색
-          </button>
-          <button
-            onClick={handleReset}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
-          >
+          <Button onClick={handleSearch}>검색</Button>
+          <Button onClick={handleReset} plain>
             초기화
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* 업무 목록 */}
-      <div className="bg-white shadow-sm rounded-lg border overflow-hidden">
-        {isLoading ? (
-          <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-2 text-gray-600">로딩 중...</p>
-          </div>
-        ) : data?.data.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            조회된 업무 보고가 없습니다.
-          </div>
-        ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <caption className="sr-only">
-                  업무 보고 목록 - 총 {data.pagination.total}건
-                </caption>
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+      {isLoading ? (
+        <div className="p-8 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">로딩 중...</p>
+        </div>
+      ) : data?.data.length === 0 ? (
+        <div className="p-8 text-center text-gray-500">
+          조회된 업무 보고가 없습니다.
+        </div>
+      ) : (
+        <>
+          <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+            <TableHead>
+              <TableRow>
+                <TableHeader>날짜</TableHeader>
+                <TableHeader>업무명</TableHeader>
+                <TableHeader>작성자</TableHeader>
+                <TableHeader>작업시간</TableHeader>
+                <TableHeader>프로젝트</TableHeader>
+                <TableHeader className="text-right">작업</TableHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data?.data.map((task) => (
+                <TableRow key={task.task_id}>
+                  <TableCell>
+                    {format(new Date(task.task_date), 'yyyy-MM-dd')}
+                  </TableCell>
+                  <TableCell>
+                    <button
+                      onClick={() => handleViewDetail(task)}
+                      className="font-medium text-blue-600 hover:text-blue-900 text-left"
                     >
-                      날짜
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      업무명
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      작성자
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      작업시간
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      프로젝트
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      작업
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {data?.data.map((task) => (
-                    <tr key={task.task_id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {format(new Date(task.task_date), 'yyyy-MM-dd')}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        <button
-                          onClick={() => handleViewDetail(task)}
-                          className="font-medium text-blue-600 hover:text-blue-900 text-left"
-                        >
-                          {task.task_name}
-                        </button>
-                        {task.task_detail && (
-                          <div className="text-gray-500 text-xs mt-1">
-                            {task.task_detail.length > 50
-                              ? `${task.task_detail.substring(0, 50)}...`
-                              : task.task_detail}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {(task as any).members?.name || '알 수 없음'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {task.work_time
-                          ? `${Math.floor(task.work_time / 60)}시간 ${task.work_time % 60}분`
-                          : '-'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {(task as any).projects?.name || '-'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => handleViewDetail(task)}
-                            aria-label={`${task.task_name} 업무 상세보기`}
-                            className="text-blue-600 hover:text-blue-900"
-                          >
-                            상세
-                          </button>
-                          <Link
-                            to={`/tasks/edit/${task.task_id}`}
-                            aria-label={`${task.task_name} 업무 수정`}
-                            className="text-green-600 hover:text-green-900"
-                          >
-                            수정
-                          </Link>
-                          <button
-                            onClick={() =>
-                              handleDelete(task.task_id, task.task_name)
-                            }
-                            aria-label={`${task.task_name} 업무 삭제`}
-                            className="text-red-600 hover:text-red-900"
-                            disabled={deleteMutation.isPending}
-                          >
-                            삭제
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      {task.task_name}
+                    </button>
+                    {task.task_detail && (
+                      <div className="text-gray-500 text-xs mt-1">
+                        {task.task_detail.length > 50
+                          ? `${task.task_detail.substring(0, 50)}...`
+                          : task.task_detail}
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {(task as any).members?.name || '알 수 없음'}
+                  </TableCell>
+                  <TableCell>
+                    {task.work_time
+                      ? `${Math.floor(task.work_time / 60)}시간 ${task.work_time % 60}분`
+                      : '-'}
+                  </TableCell>
+                  <TableCell>
+                    <Badge color="zinc">
+                      {(task as any).projects?.name || '미지정'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button plain onClick={() => handleViewDetail(task)}>
+                        상세
+                      </Button>
+                      <Button plain href={`/tasks/edit/${task.task_id}`}>
+                        수정
+                      </Button>
+                      <Button
+                        plain
+                        onClick={() =>
+                          handleDelete(task.task_id, task.task_name)
+                        }
+                        disabled={deleteMutation.isPending}
+                      >
+                        삭제
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
 
-            {/* 페이지네이션 */}
-            {data && data.pagination.pageCount > 1 && (
-              <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-                <div className="flex-1 flex justify-between sm:hidden">
-                  <button
-                    onClick={() => handlePageChange((query.page || 1) - 1)}
-                    disabled={(query.page || 1) <= 1}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    이전
-                  </button>
-                  <button
-                    onClick={() => handlePageChange((query.page || 1) + 1)}
-                    disabled={(query.page || 1) >= data.pagination.pageCount}
-                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    다음
-                  </button>
-                </div>
-                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm text-gray-700">
-                      전체{' '}
-                      <span className="font-medium">
-                        {data.pagination.total}
-                      </span>
-                      개 중{' '}
-                      <span className="font-medium">
-                        {((query.page || 1) - 1) * (query.pageSize || 20) + 1}
-                      </span>{' '}
-                      -{' '}
-                      <span className="font-medium">
-                        {Math.min(
-                          (query.page || 1) * (query.pageSize || 20),
-                          data.pagination.total
-                        )}
-                      </span>
-                    </p>
-                  </div>
-                  <div>
-                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                      <button
-                        onClick={() => handlePageChange((query.page || 1) - 1)}
-                        disabled={(query.page || 1) <= 1}
-                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+          {/* 페이지네이션 */}
+          {data && data.pagination.pageCount > 1 && (
+            <Pagination className="mt-6">
+              <PaginationPrevious
+                onClick={() => handlePageChange((query.page || 1) - 1)}
+                disabled={(query.page || 1) <= 1}
+              >
+                이전
+              </PaginationPrevious>
+              <PaginationList>
+                {Array.from(
+                  { length: Math.min(5, data.pagination.pageCount) },
+                  (_, i) => {
+                    const pageNum = i + 1;
+                    return (
+                      <PaginationPage
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        current={(query.page || 1) === pageNum}
                       >
-                        이전
-                      </button>
-                      {Array.from(
-                        { length: Math.min(5, data.pagination.pageCount) },
-                        (_, i) => {
-                          const pageNum = i + 1;
-                          return (
-                            <button
-                              key={pageNum}
-                              onClick={() => handlePageChange(pageNum)}
-                              className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                                (query.page || 1) === pageNum
-                                  ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                                  : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                              }`}
-                            >
-                              {pageNum}
-                            </button>
-                          );
-                        }
-                      )}
-                      <button
-                        onClick={() => handlePageChange((query.page || 1) + 1)}
-                        disabled={
-                          (query.page || 1) >= data.pagination.pageCount
-                        }
-                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                      >
-                        다음
-                      </button>
-                    </nav>
-                  </div>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+                        {pageNum}
+                      </PaginationPage>
+                    );
+                  }
+                )}
+              </PaginationList>
+              <PaginationNext
+                onClick={() => handlePageChange((query.page || 1) + 1)}
+                disabled={(query.page || 1) >= data.pagination.pageCount}
+              >
+                다음
+              </PaginationNext>
+            </Pagination>
+          )}
+        </>
+      )}
 
       {/* 상세보기 모달 */}
       {showDetailModal && selectedTask && (
@@ -612,7 +521,7 @@ export function TaskList() {
 
             <div className="flex gap-3 mt-6">
               <Link
-                to={`/tasks/edit/${selectedTask.task_id}`}
+                href={`/tasks/edit/${selectedTask.task_id}`}
                 className="flex-1 px-4 py-2 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 수정
@@ -627,6 +536,6 @@ export function TaskList() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -4,6 +4,10 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { Button } from '../components/ui/button';
+import { Heading } from '../components/ui/heading';
+import { Input } from '../components/ui/input';
+import { Select } from '../components/ui/select';
 import { useNotification } from '../hooks/useNotification';
 import { memberAPI, roleAPI } from '../services/api';
 
@@ -105,19 +109,12 @@ export function MemberForm() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
-          사용자 {isEditMode ? '수정' : '등록'}
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          사용자 정보를 {isEditMode ? '수정' : '입력'}합니다.
-        </p>
-      </div>
+    <>
+      <Heading>{isEditMode ? '사용자 수정' : '사용자 등록'}</Heading>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-white shadow-sm rounded-lg border p-6 space-y-6"
+        className="mt-8 max-w-2xl bg-white shadow-sm rounded-lg border p-6 space-y-6"
         aria-label={isEditMode ? '사용자 수정 폼' : '사용자 등록 폼'}
       >
         <div>
@@ -130,14 +127,13 @@ export function MemberForm() {
               *
             </span>
           </label>
-          <input
+          <Input
             id="name"
             {...register('name')}
             type="text"
             aria-required="true"
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? 'name-error' : undefined}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
           {errors.name && (
             <p
@@ -160,7 +156,7 @@ export function MemberForm() {
               *
             </span>
           </label>
-          <input
+          <Input
             id="account_id"
             {...register('account_id')}
             type="text"
@@ -170,7 +166,6 @@ export function MemberForm() {
             aria-describedby={
               errors.account_id ? 'account_id-error' : undefined
             }
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
           />
           {errors.account_id && (
             <p
@@ -198,7 +193,7 @@ export function MemberForm() {
               *
             </span>
           </label>
-          <input
+          <Input
             id="email"
             {...register('email')}
             type="email"
@@ -206,7 +201,6 @@ export function MemberForm() {
             aria-required="true"
             aria-invalid={!!errors.email}
             aria-describedby={errors.email ? 'email-error' : undefined}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
           />
           {errors.email && (
             <p
@@ -231,7 +225,7 @@ export function MemberForm() {
           >
             휴대폰 번호
           </label>
-          <input
+          <Input
             id="mobile"
             {...register('mobile')}
             type="tel"
@@ -239,7 +233,6 @@ export function MemberForm() {
             aria-label="휴대폰 번호 입력"
             aria-invalid={!!errors.mobile}
             aria-describedby={errors.mobile ? 'mobile-error' : undefined}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
           {errors.mobile && (
             <p
@@ -262,13 +255,12 @@ export function MemberForm() {
               *
             </span>
           </label>
-          <select
+          <Select
             id="role_id"
             {...register('role_id', { valueAsNumber: true })}
             aria-required="true"
             aria-invalid={!!errors.role_id}
             aria-describedby={errors.role_id ? 'role_id-error' : undefined}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           >
             <option value={0}>역할 선택</option>
             {rolesData?.data.map((role) => (
@@ -276,7 +268,7 @@ export function MemberForm() {
                 {role.name}
               </option>
             ))}
-          </select>
+          </Select>
           {errors.role_id && (
             <p
               id="role_id-error"
@@ -322,29 +314,28 @@ export function MemberForm() {
         </div>
 
         <div className="flex gap-3 pt-4">
-          <button
+          <Button
             type="submit"
             disabled={updateMutation.isPending}
             aria-label={isEditMode ? '사용자 정보 수정 저장' : '사용자 등록'}
             aria-busy={updateMutation.isPending}
-            className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
             {updateMutation.isPending
               ? '처리 중...'
               : isEditMode
                 ? '수정'
                 : '등록'}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            plain
             onClick={() => navigate('/members')}
             aria-label="사용자 등록 취소하고 목록으로 돌아가기"
-            className="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
           >
             취소
-          </button>
+          </Button>
         </div>
       </form>
-    </div>
+    </>
   );
 }

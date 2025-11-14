@@ -4,6 +4,10 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
+import { Button } from '../components/ui/button';
+import { Heading } from '../components/ui/heading';
+import { Input } from '../components/ui/input';
+import { Textarea } from '../components/ui/textarea';
 import { useNotification } from '../hooks/useNotification';
 import { holidayAPI } from '../services/api';
 
@@ -102,19 +106,12 @@ export function HolidayForm() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
-          공휴일 {isEditMode ? '수정' : '등록'}
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          공휴일 정보를 {isEditMode ? '수정' : '입력'}합니다.
-        </p>
-      </div>
+    <>
+      <Heading>{isEditMode ? '공휴일 수정' : '공휴일 등록'}</Heading>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-white shadow-sm rounded-lg border p-6 space-y-6"
+        className="mt-8 max-w-2xl bg-white shadow-sm rounded-lg border p-6 space-y-6"
       >
         <div>
           <label
@@ -123,11 +120,7 @@ export function HolidayForm() {
           >
             날짜 <span className="text-red-500">*</span>
           </label>
-          <input
-            {...register('holiday_date')}
-            type="date"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
+          <Input {...register('holiday_date')} type="date" />
           {errors.holiday_date && (
             <p className="mt-1 text-sm text-red-600">
               {errors.holiday_date.message}
@@ -142,12 +135,7 @@ export function HolidayForm() {
           >
             공휴일명 <span className="text-red-500">*</span>
           </label>
-          <input
-            {...register('name')}
-            type="text"
-            placeholder="예: 설날"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
+          <Input {...register('name')} type="text" placeholder="예: 설날" />
           {errors.name && (
             <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
           )}
@@ -160,11 +148,10 @@ export function HolidayForm() {
           >
             설명
           </label>
-          <textarea
+          <Textarea
             {...register('description')}
             rows={3}
             placeholder="공휴일에 대한 추가 설명을 입력하세요"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
           {errors.description && (
             <p className="mt-1 text-sm text-red-600">
@@ -174,26 +161,21 @@ export function HolidayForm() {
         </div>
 
         <div className="flex gap-3 pt-4">
-          <button
+          <Button
             type="submit"
             disabled={createMutation.isPending || updateMutation.isPending}
-            className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
             {createMutation.isPending || updateMutation.isPending
               ? '처리 중...'
               : isEditMode
                 ? '수정'
                 : '등록'}
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate('/holidays')}
-            className="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
-          >
+          </Button>
+          <Button type="button" plain onClick={() => navigate('/holidays')}>
             취소
-          </button>
+          </Button>
         </div>
       </form>
-    </div>
+    </>
   );
 }

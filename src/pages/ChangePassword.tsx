@@ -3,6 +3,11 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
+import { Button } from '../components/ui/button';
+import { Fieldset, Label } from '../components/ui/fieldset';
+import { Heading } from '../components/ui/heading';
+import { Input } from '../components/ui/input';
+import { Text } from '../components/ui/text';
 import { useAuth } from '../hooks/useAuth';
 import { useNotification } from '../hooks/useNotification';
 
@@ -75,10 +80,8 @@ export function ChangePassword() {
     <div className="max-w-2xl mx-auto">
       <div className="bg-white shadow-sm rounded-lg">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">비밀번호 변경</h2>
-          <p className="mt-1 text-sm text-gray-600">
-            새로운 비밀번호를 설정하세요.
-          </p>
+          <Heading>비밀번호 변경</Heading>
+          <Text className="mt-1">새로운 비밀번호를 설정하세요.</Text>
         </div>
 
         <form className="px-6 py-6 space-y-6" onSubmit={handleSubmit(onSubmit)}>
@@ -88,81 +91,63 @@ export function ChangePassword() {
             </div>
           )}
 
-          <div>
-            <label
-              htmlFor="currentPassword"
-              className="block text-sm font-medium text-gray-700"
-            >
-              현재 비밀번호
-            </label>
-            <input
+          <Fieldset>
+            <Label htmlFor="currentPassword">현재 비밀번호</Label>
+            <Input
               {...register('currentPassword')}
+              id="currentPassword"
               type="password"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="••••••••"
             />
             {errors.currentPassword && (
-              <p className="mt-1 text-sm text-red-600">
+              <Text className="mt-1 text-red-600">
                 {errors.currentPassword.message}
-              </p>
+              </Text>
             )}
-          </div>
+          </Fieldset>
 
-          <div>
-            <label
-              htmlFor="newPassword"
-              className="block text-sm font-medium text-gray-700"
-            >
-              새 비밀번호
-            </label>
-            <input
+          <Fieldset>
+            <Label htmlFor="newPassword">새 비밀번호</Label>
+            <Input
               {...register('newPassword')}
+              id="newPassword"
               type="password"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="••••••••"
             />
             {errors.newPassword && (
-              <p className="mt-1 text-sm text-red-600">
+              <Text className="mt-1 text-red-600">
                 {errors.newPassword.message}
-              </p>
+              </Text>
             )}
-          </div>
+          </Fieldset>
 
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="block text-sm font-medium text-gray-700"
-            >
-              새 비밀번호 확인
-            </label>
-            <input
+          <Fieldset>
+            <Label htmlFor="confirmPassword">새 비밀번호 확인</Label>
+            <Input
               {...register('confirmPassword')}
+              id="confirmPassword"
               type="password"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="••••••••"
             />
             {errors.confirmPassword && (
-              <p className="mt-1 text-sm text-red-600">
+              <Text className="mt-1 text-red-600">
                 {errors.confirmPassword.message}
-              </p>
+              </Text>
             )}
-          </div>
+          </Fieldset>
 
           <div className="flex gap-3">
-            <button
-              type="submit"
-              disabled={submitting}
-              className="flex-1 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-            >
+            <Button type="submit" disabled={submitting} className="flex-1">
               {submitting ? '변경 중...' : '비밀번호 변경'}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() => navigate('/')}
-              className="flex-1 flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              outline
+              className="flex-1"
             >
               취소
-            </button>
+            </Button>
           </div>
         </form>
       </div>

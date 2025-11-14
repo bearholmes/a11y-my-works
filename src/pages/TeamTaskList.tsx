@@ -1,7 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
+import { Heading } from '../components/ui/heading';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../components/ui/table';
 import { memberAPI, taskAPI } from '../services/api';
 import type { Member, Task } from '../types/database';
 
@@ -82,15 +92,10 @@ export function TeamTaskList() {
   const isLoading = loadingMembers || loadingTasks;
 
   return (
-    <div className="space-y-6">
+    <>
       {/* 헤더 */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">팀 업무 조회</h1>
-          <p className="mt-1 text-sm text-gray-600">
-            팀원들의 업무 보고를 조회하고 관리합니다
-          </p>
-        </div>
+        <Heading>팀 업무 조회</Heading>
       </div>
 
       {/* 통계 카드 */}
@@ -238,105 +243,60 @@ export function TeamTaskList() {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    팀원
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    업무명
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    업무 유형
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    작업 시간
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    시작-종료
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    작업
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {tasks.map((task) => (
-                  <tr
-                    key={task.task_id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {task.member_name}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            @{task.member_account_id}
-                          </div>
-                        </div>
+          <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+            <TableHead>
+              <TableRow>
+                <TableHeader>팀원</TableHeader>
+                <TableHeader>업무명</TableHeader>
+                <TableHeader>업무 유형</TableHeader>
+                <TableHeader>작업 시간</TableHeader>
+                <TableHeader>시작-종료</TableHeader>
+                <TableHeader className="text-right">작업</TableHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {tasks.map((task) => (
+                <TableRow key={task.task_id}>
+                  <TableCell>
+                    <div className="font-medium">{task.member_name}</div>
+                    <div className="text-zinc-500 text-sm">
+                      @{task.member_account_id}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-medium">{task.task_name}</div>
+                    {task.task_detail && (
+                      <div className="text-zinc-500 text-sm line-clamp-2">
+                        {task.task_detail}
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">
-                        {task.task_name}
-                      </div>
-                      {task.task_detail && (
-                        <div className="text-sm text-gray-500 line-clamp-2">
-                          {task.task_detail}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {task.task_type || '일반'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {task.work_time || 0}h
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {task.start_time && task.end_time
-                        ? `${task.start_time} - ${task.end_time}`
-                        : '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Link
-                        to={`/tasks/edit/${task.task_id}`}
-                        className="text-blue-600 hover:text-blue-900"
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Badge color="blue">{task.task_type || '일반'}</Badge>
+                  </TableCell>
+                  <TableCell>{task.work_time || 0}h</TableCell>
+                  <TableCell>
+                    {task.start_time && task.end_time
+                      ? `${task.start_time} - ${task.end_time}`
+                      : '-'}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        plain
+                        href={`/tasks/edit/${task.task_id}`}
                         aria-label={`${task.task_name} 상세보기`}
                       >
                         상세보기
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
       </div>
-    </div>
+    </>
   );
 }

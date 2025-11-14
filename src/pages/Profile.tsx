@@ -1,5 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
+import { Heading, Subheading } from '../components/ui/heading';
+import { Text } from '../components/ui/text';
 import { useAuthContext } from '../providers/AuthProvider';
 import { memberAPI } from '../services/api';
 
@@ -33,10 +36,8 @@ export function Profile() {
     <div className="space-y-6">
       {/* 헤더 */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">내 프로필</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          개인 정보를 확인할 수 있습니다.
-        </p>
+        <Heading>내 프로필</Heading>
+        <Text className="mt-1">개인 정보를 확인할 수 있습니다.</Text>
       </div>
 
       <div className="max-w-2xl">
@@ -50,10 +51,8 @@ export function Profile() {
                 </span>
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">
-                  {profile.name}
-                </h2>
-                <p className="text-sm text-gray-500">@{profile.account_id}</p>
+                <Subheading>{profile.name}</Subheading>
+                <Text>@{profile.account_id}</Text>
               </div>
             </div>
           </div>
@@ -61,41 +60,28 @@ export function Profile() {
           {/* 프로필 정보 */}
           <div className="p-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-500 mb-1">
-                이메일
-              </label>
-              <p className="text-base text-gray-900">{profile.email}</p>
+              <Text className="font-medium text-gray-500 mb-1">이메일</Text>
+              <Text className="text-gray-900">{profile.email}</Text>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-500 mb-1">
-                역할
-              </label>
-              <p className="text-base text-gray-900">
+              <Text className="font-medium text-gray-500 mb-1">역할</Text>
+              <Text className="text-gray-900">
                 {profile.roles?.name || '-'}
-              </p>
+              </Text>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-500 mb-1">
-                상태
-              </label>
-              <p
-                className={`text-base font-medium ${profile.is_active ? 'text-green-600' : 'text-gray-600'}`}
-              >
+              <Text className="font-medium text-gray-500 mb-1">상태</Text>
+              <Badge color={profile.is_active ? 'green' : 'zinc'}>
                 {profile.is_active ? '활성' : '비활성'}
-              </p>
+              </Badge>
             </div>
           </div>
 
           {/* 액션 버튼 */}
           <div className="p-6 border-t border-gray-200 bg-gray-50">
-            <Link
-              to="/change-password"
-              className="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-            >
-              비밀번호 변경
-            </Link>
+            <Button href="/change-password">비밀번호 변경</Button>
           </div>
         </div>
       </div>

@@ -3,6 +3,11 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
+import { Button } from '../components/ui/button';
+import { Fieldset, Label } from '../components/ui/fieldset';
+import { Heading } from '../components/ui/heading';
+import { Input } from '../components/ui/input';
+import { Text } from '../components/ui/text';
 import { useAuth } from '../hooks/useAuth';
 import { useNotification } from '../hooks/useNotification';
 
@@ -57,8 +62,8 @@ export function ResetPassword() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">비밀번호 재설정</h2>
-          <p className="mt-2 text-gray-600">새로운 비밀번호를 입력해주세요.</p>
+          <Heading level={1}>비밀번호 재설정</Heading>
+          <Text className="mt-2">새로운 비밀번호를 입력해주세요.</Text>
         </div>
 
         <form
@@ -71,53 +76,39 @@ export function ResetPassword() {
             </div>
           )}
 
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              새 비밀번호
-            </label>
-            <input
+          <Fieldset>
+            <Label htmlFor="password">새 비밀번호</Label>
+            <Input
               {...register('password')}
+              id="password"
               type="password"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="••••••••"
             />
             {errors.password && (
-              <p className="mt-1 text-sm text-red-600">
+              <Text className="mt-1 text-red-600">
                 {errors.password.message}
-              </p>
+              </Text>
             )}
-          </div>
+          </Fieldset>
 
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="block text-sm font-medium text-gray-700"
-            >
-              비밀번호 확인
-            </label>
-            <input
+          <Fieldset>
+            <Label htmlFor="confirmPassword">비밀번호 확인</Label>
+            <Input
               {...register('confirmPassword')}
+              id="confirmPassword"
               type="password"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="••••••••"
             />
             {errors.confirmPassword && (
-              <p className="mt-1 text-sm text-red-600">
+              <Text className="mt-1 text-red-600">
                 {errors.confirmPassword.message}
-              </p>
+              </Text>
             )}
-          </div>
+          </Fieldset>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-          >
+          <Button type="submit" disabled={submitting} className="w-full">
             {submitting ? '변경 중...' : '비밀번호 변경'}
-          </button>
+          </Button>
         </form>
       </div>
     </div>
