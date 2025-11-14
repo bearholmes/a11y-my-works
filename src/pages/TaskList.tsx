@@ -108,7 +108,7 @@ export function TaskList() {
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDate = new Date(e.target.value);
-    if (!isNaN(newDate.getTime())) {
+    if (!Number.isNaN(newDate.getTime())) {
       setSelectedDate(newDate);
     }
   };
