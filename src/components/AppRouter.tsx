@@ -2,8 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { ApplicationLayout } from '../layouts/ApplicationLayout';
 import { memberAPI } from '../services/api';
-import { Layout } from './Layout';
 import { LoginForm } from './LoginForm';
 import { PermissionGuard } from './PermissionGuard';
 
@@ -164,9 +164,9 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <Layout>
+    <ApplicationLayout>
       <Suspense fallback={<PageLoader />}>{children}</Suspense>
-    </Layout>
+    </ApplicationLayout>
   );
 }
 

@@ -10,7 +10,9 @@
       "Bash(pnpm build:*)",
       "Bash(pnpm dev)",
       "Bash(pnpm lint:*)",
-      "Bash(pnpm lint:fix:*)"
+      "Bash(pnpm lint:fix:*)",
+      "Bash(tree:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []
