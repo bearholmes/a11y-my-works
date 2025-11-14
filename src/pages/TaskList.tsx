@@ -1,5 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { addDays, format, subDays } from 'date-fns';
+import {
+  addDays,
+  eachDayOfInterval,
+  endOfWeek,
+  format,
+  isSameDay,
+  startOfWeek,
+  subDays,
+} from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { useState } from 'react';
 import { Badge } from '../components/ui/badge';
@@ -46,6 +54,11 @@ export function TaskList() {
 
   // 날짜를 YYYY-MM-DD 형식으로 변환
   const formatDateForQuery = (date: Date) => format(date, 'yyyy-MM-dd');
+
+  // 선택된 날짜가 포함된 주의 모든 날짜 계산
+  const weekStart = startOfWeek(selectedDate, { weekStartsOn: 0 }); // 일요일부터 시작
+  const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 0 }); // 토요일로 끝
+  const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd });
 
   // 쿼리 파라미터 생성
   const query: TaskQuery = {
@@ -118,6 +131,42 @@ export function TaskList() {
           <Button href="/tasks/new">업무 등록</Button>
         </div>
 
+        {/* 주 단위 캘린더 */}
+        <div className="bg-white dark:bg-zinc-900 rounded-lg p-4 mb-4">
+          <div className="grid grid-cols-7 gap-2">
+            {weekDays.map((day) => {
+              const isSelected = isSameDay(day, selectedDate);
+              const isToday = isSameDay(day, new Date());
+
+              return (
+                <button
+                  key={day.toISOString()}
+                  onClick={() => setSelectedDate(day)}
+                  className={`
+                    p-3 rounded-lg text-center transition-colors
+                    ${
+                      isSelected
+                        ? 'bg-blue-600 text-white dark:bg-blue-500'
+                        : isToday
+                          ? 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400'
+                          : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
+                    }
+                  `}
+                  aria-label={format(day, 'yyyy년 M월 d일 EEEE', {
+                    locale: ko,
+                  })}
+                >
+                  <div className="text-xs font-medium mb-1">
+                    {format(day, 'EEE', { locale: ko })}
+                  </div>
+                  <div className="text-lg font-bold">{format(day, 'd')}</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 날짜 네비게이션 */}
         <div className="flex items-center justify-center gap-4 p-4 bg-white dark:bg-zinc-900 rounded-lg">
           {/* 이전 날짜 버튼 */}
           <Button
