@@ -103,7 +103,10 @@ export function RoleList() {
               </TableHead>
               <TableBody>
                 {data?.data.map((role) => (
-                  <TableRow key={role.role_id}>
+                  <TableRow
+                    key={role.role_id}
+                    href={`/roles/edit/${role.role_id}`}
+                  >
                     <TableCell className="font-medium">{role.name}</TableCell>
                     <TableCell>{role.description || '-'}</TableCell>
                     <TableCell>
@@ -115,23 +118,18 @@ export function RoleList() {
                       {format(new Date(role.created_at), 'yyyy-MM-dd')}
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          plain
-                          href={`/roles/edit/${role.role_id}`}
-                          aria-label={`${role.name} 역할 수정`}
-                        >
-                          수정
-                        </Button>
-                        <Button
-                          plain
-                          onClick={() => handleDelete(role.role_id, role.name)}
-                          aria-label={`${role.name} 역할 삭제`}
-                          disabled={deleteMutation.isPending}
-                        >
-                          삭제
-                        </Button>
-                      </div>
+                      <Button
+                        plain
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDelete(role.role_id, role.name);
+                        }}
+                        aria-label={`${role.name} 역할 삭제`}
+                        disabled={deleteMutation.isPending}
+                      >
+                        삭제
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

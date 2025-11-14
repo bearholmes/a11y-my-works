@@ -8,7 +8,6 @@ import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { Badge } from '../components/ui/badge';
-import { Button } from '../components/ui/button';
 import { Field, Label } from '../components/ui/fieldset';
 import { Heading, Subheading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
@@ -229,12 +228,14 @@ export function TeamTaskList() {
                 <TableHeader>업무 유형</TableHeader>
                 <TableHeader>작업 시간</TableHeader>
                 <TableHeader>시작-종료</TableHeader>
-                <TableHeader className="text-right">작업</TableHeader>
               </TableRow>
             </TableHead>
             <TableBody>
               {tasks.map((task) => (
-                <TableRow key={task.task_id}>
+                <TableRow
+                  key={task.task_id}
+                  href={`/tasks/edit/${task.task_id}`}
+                >
                   <TableCell>
                     <div className="font-medium">{task.member_name}</div>
                     <div className="text-zinc-500 text-sm">
@@ -257,17 +258,6 @@ export function TeamTaskList() {
                     {task.start_time && task.end_time
                       ? `${task.start_time} - ${task.end_time}`
                       : '-'}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        plain
-                        href={`/tasks/edit/${task.task_id}`}
-                        aria-label={`${task.task_name} 상세보기`}
-                      >
-                        상세보기
-                      </Button>
-                    </div>
                   </TableCell>
                 </TableRow>
               ))}

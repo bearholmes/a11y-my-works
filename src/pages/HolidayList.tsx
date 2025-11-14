@@ -123,31 +123,27 @@ export function HolidayList() {
             </TableHead>
             <TableBody>
               {holidays.map((holiday: any) => (
-                <TableRow key={holiday.holiday_id}>
+                <TableRow
+                  key={holiday.holiday_id}
+                  href={`/holidays/${holiday.holiday_id}`}
+                >
                   <TableCell>
                     {new Date(holiday.holiday_date).toLocaleDateString('ko-KR')}
                   </TableCell>
                   <TableCell className="font-medium">{holiday.name}</TableCell>
                   <TableCell>{holiday.description || '-'}</TableCell>
                   <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        plain
-                        href={`/holidays/${holiday.holiday_id}`}
-                        aria-label={`${holiday.name} 공휴일 수정`}
-                      >
-                        수정
-                      </Button>
-                      <Button
-                        plain
-                        onClick={() =>
-                          handleDelete(holiday.holiday_id, holiday.name)
-                        }
-                        aria-label={`${holiday.name} 공휴일 삭제`}
-                      >
-                        삭제
-                      </Button>
-                    </div>
+                    <Button
+                      plain
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleDelete(holiday.holiday_id, holiday.name);
+                      }}
+                      aria-label={`${holiday.name} 공휴일 삭제`}
+                    >
+                      삭제
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
