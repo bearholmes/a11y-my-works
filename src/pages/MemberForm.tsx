@@ -5,9 +5,16 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { Button } from '../components/ui/button';
+import {
+  Description,
+  ErrorMessage,
+  Field,
+  Label,
+} from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
+import { Text } from '../components/ui/text';
 import { useNotification } from '../hooks/useNotification';
 import { memberAPI, roleAPI } from '../services/api';
 
@@ -102,7 +109,7 @@ export function MemberForm() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">로딩 중...</p>
+          <Text className="mt-4">로딩 중...</Text>
         </div>
       </div>
     );
@@ -114,48 +121,33 @@ export function MemberForm() {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mt-8 max-w-2xl bg-white shadow-sm rounded-lg border p-6 space-y-6"
+        className="mt-8 max-w-2xl bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6 space-y-6"
         aria-label={isEditMode ? '사용자 수정 폼' : '사용자 등록 폼'}
       >
-        <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
-          >
+        <Field>
+          <Label>
             이름{' '}
             <span className="text-red-600" aria-label="필수 항목">
               *
             </span>
-          </label>
+          </Label>
           <Input
             id="name"
             {...register('name')}
             type="text"
             aria-required="true"
             aria-invalid={!!errors.name}
-            aria-describedby={errors.name ? 'name-error' : undefined}
           />
-          {errors.name && (
-            <p
-              id="name-error"
-              className="mt-1 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.name.message}
-            </p>
-          )}
-        </div>
+          {errors.name && <ErrorMessage>{errors.name.message}</ErrorMessage>}
+        </Field>
 
-        <div>
-          <label
-            htmlFor="account_id"
-            className="block text-sm font-medium text-gray-700"
-          >
+        <Field>
+          <Label>
             계정 ID{' '}
             <span className="text-red-600" aria-label="필수 항목">
               *
             </span>
-          </label>
+          </Label>
           <Input
             id="account_id"
             {...register('account_id')}
@@ -163,36 +155,22 @@ export function MemberForm() {
             disabled={isEditMode}
             aria-required="true"
             aria-invalid={!!errors.account_id}
-            aria-describedby={
-              errors.account_id ? 'account_id-error' : undefined
-            }
           />
           {errors.account_id && (
-            <p
-              id="account_id-error"
-              className="mt-1 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.account_id.message}
-            </p>
+            <ErrorMessage>{errors.account_id.message}</ErrorMessage>
           )}
           {isEditMode && (
-            <p className="mt-1 text-sm text-gray-500">
-              계정 ID는 수정할 수 없습니다.
-            </p>
+            <Description>계정 ID는 수정할 수 없습니다.</Description>
           )}
-        </div>
+        </Field>
 
-        <div>
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700"
-          >
+        <Field>
+          <Label>
             이메일{' '}
             <span className="text-red-600" aria-label="필수 항목">
               *
             </span>
-          </label>
+          </Label>
           <Input
             id="email"
             {...register('email')}
@@ -200,31 +178,15 @@ export function MemberForm() {
             disabled={isEditMode}
             aria-required="true"
             aria-invalid={!!errors.email}
-            aria-describedby={errors.email ? 'email-error' : undefined}
           />
-          {errors.email && (
-            <p
-              id="email-error"
-              className="mt-1 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.email.message}
-            </p>
-          )}
+          {errors.email && <ErrorMessage>{errors.email.message}</ErrorMessage>}
           {isEditMode && (
-            <p className="mt-1 text-sm text-gray-500">
-              이메일은 수정할 수 없습니다.
-            </p>
+            <Description>이메일은 수정할 수 없습니다.</Description>
           )}
-        </div>
+        </Field>
 
-        <div>
-          <label
-            htmlFor="mobile"
-            className="block text-sm font-medium text-gray-700"
-          >
-            휴대폰 번호
-          </label>
+        <Field>
+          <Label>휴대폰 번호</Label>
           <Input
             id="mobile"
             {...register('mobile')}
@@ -232,35 +194,24 @@ export function MemberForm() {
             placeholder="010-1234-5678"
             aria-label="휴대폰 번호 입력"
             aria-invalid={!!errors.mobile}
-            aria-describedby={errors.mobile ? 'mobile-error' : undefined}
           />
           {errors.mobile && (
-            <p
-              id="mobile-error"
-              className="mt-1 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.mobile.message}
-            </p>
+            <ErrorMessage>{errors.mobile.message}</ErrorMessage>
           )}
-        </div>
+        </Field>
 
-        <div>
-          <label
-            htmlFor="role_id"
-            className="block text-sm font-medium text-gray-700"
-          >
+        <Field>
+          <Label>
             역할{' '}
             <span className="text-red-600" aria-label="필수 항목">
               *
             </span>
-          </label>
+          </Label>
           <Select
             id="role_id"
             {...register('role_id', { valueAsNumber: true })}
             aria-required="true"
             aria-invalid={!!errors.role_id}
-            aria-describedby={errors.role_id ? 'role_id-error' : undefined}
           >
             <option value={0}>역할 선택</option>
             {rolesData?.data.map((role) => (
@@ -270,15 +221,9 @@ export function MemberForm() {
             ))}
           </Select>
           {errors.role_id && (
-            <p
-              id="role_id-error"
-              className="mt-1 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.role_id.message}
-            </p>
+            <ErrorMessage>{errors.role_id.message}</ErrorMessage>
           )}
-        </div>
+        </Field>
 
         <div className="flex items-center">
           <input
@@ -286,11 +231,11 @@ export function MemberForm() {
             {...register('is_active')}
             type="checkbox"
             aria-label="사용자 활성 상태"
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-300 dark:border-zinc-600 rounded"
           />
           <label
             htmlFor="is_active"
-            className="ml-2 block text-sm text-gray-900"
+            className="ml-2 block text-sm text-zinc-950 dark:text-white"
           >
             활성 상태
           </label>
@@ -298,19 +243,20 @@ export function MemberForm() {
 
         <div className="flex items-center">
           <input
+            id="requires_daily_report"
             {...register('requires_daily_report')}
             type="checkbox"
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-300 dark:border-zinc-600 rounded"
           />
           <label
             htmlFor="requires_daily_report"
-            className="ml-2 block text-sm text-gray-900"
+            className="ml-2 block text-sm text-zinc-950 dark:text-white"
           >
             업무보고 작성 의무
           </label>
-          <span className="ml-2 text-xs text-gray-500">
+          <Text className="ml-2 text-xs">
             (체크 시 일일 업무보고 작성 대상자로 분류됩니다)
-          </span>
+          </Text>
         </div>
 
         <div className="flex gap-3 pt-4">

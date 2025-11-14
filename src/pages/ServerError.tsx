@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Button } from '../components/ui/button';
 
 /**
  * 500 서버 에러 페이지
@@ -9,52 +9,36 @@ import { Link } from 'react-router-dom';
  */
 export function ServerError() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="max-w-md w-full text-center">
-        <div className="mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-4">
-            <svg
-              className="w-10 h-10 text-red-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <title>서버 오류</title>
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">500</h1>
-          <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-            서버 오류가 발생했습니다
-          </h2>
-          <p className="text-gray-600 mb-8">
-            일시적인 오류가 발생했습니다.
-            <br />
-            잠시 후 다시 시도해주세요.
-          </p>
-        </div>
-
-        <div className="space-y-3">
-          <button
+    <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8 dark:bg-zinc-950">
+      <div className="text-center">
+        <p className="text-base font-semibold text-red-600 dark:text-red-400">
+          500
+        </p>
+        <h1 className="mt-4 text-5xl font-semibold tracking-tight text-balance text-zinc-900 sm:text-7xl dark:text-white">
+          서버 오류가 발생했습니다
+        </h1>
+        <p className="mt-6 text-lg font-medium text-pretty text-zinc-500 sm:text-xl/8 dark:text-zinc-400">
+          일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.
+        </p>
+        <div className="mt-10 flex items-center justify-center gap-x-6">
+          <Button
             type="button"
             onClick={() => window.location.reload()}
-            className="block w-full px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
+            color="blue"
           >
             페이지 새로고침
-          </button>
-          <Link
-            to="/"
-            className="block w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
+          </Button>
+          <button
+            type="button"
+            onClick={() => {
+              window.location.href = '/';
+            }}
+            className="text-sm font-semibold text-zinc-900 dark:text-white"
           >
-            홈으로 돌아가기
-          </Link>
+            홈으로 돌아가기 <span aria-hidden="true">&rarr;</span>
+          </button>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

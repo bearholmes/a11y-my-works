@@ -78,15 +78,15 @@ export function ChangePassword() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="bg-white shadow-sm rounded-lg">
-        <div className="px-6 py-4 border-b border-gray-200">
+      <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg">
+        <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
           <Heading>비밀번호 변경</Heading>
           <Text className="mt-1">새로운 비밀번호를 설정하세요.</Text>
         </div>
 
         <form className="px-6 py-6 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
+            <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 px-4 py-3 rounded">
               {error}
             </div>
           )}

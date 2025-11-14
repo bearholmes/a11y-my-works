@@ -5,9 +5,11 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { Button } from '../components/ui/button';
+import { ErrorMessage, Field, Label } from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
+import { Text } from '../components/ui/text';
 import { useNotification } from '../hooks/useNotification';
 import { serviceAPI } from '../services/api';
 
@@ -104,7 +106,7 @@ export function ServiceForm() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">로딩 중...</p>
+          <Text className="mt-4">로딩 중...</Text>
         </div>
       </div>
     );
@@ -116,27 +118,21 @@ export function ServiceForm() {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mt-8 max-w-2xl bg-white shadow-sm rounded-lg border p-6 space-y-6"
+        className="mt-8 max-w-2xl bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6 space-y-6"
         aria-label={isEditMode ? '서비스 수정 폼' : '서비스 등록 폼'}
       >
-        <div>
-          <label
-            htmlFor="cost_group_id"
-            className="block text-sm font-medium text-gray-700"
-          >
+        <Field>
+          <Label>
             청구 그룹{' '}
             <span className="text-red-600" aria-label="필수 항목">
               *
             </span>
-          </label>
+          </Label>
           <Select
             id="cost_group_id"
             {...register('cost_group_id', { valueAsNumber: true })}
             aria-required="true"
             aria-invalid={!!errors.cost_group_id}
-            aria-describedby={
-              errors.cost_group_id ? 'cost_group_id-error' : undefined
-            }
           >
             <option value={0}>청구 그룹 선택</option>
             {costGroups?.map((group: any) => (
@@ -146,44 +142,26 @@ export function ServiceForm() {
             ))}
           </Select>
           {errors.cost_group_id && (
-            <p
-              id="cost_group_id-error"
-              className="mt-1 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.cost_group_id.message}
-            </p>
+            <ErrorMessage>{errors.cost_group_id.message}</ErrorMessage>
           )}
-        </div>
+        </Field>
 
-        <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
-          >
+        <Field>
+          <Label>
             서비스명{' '}
             <span className="text-red-600" aria-label="필수 항목">
               *
             </span>
-          </label>
+          </Label>
           <Input
             id="name"
             {...register('name')}
             type="text"
             aria-required="true"
             aria-invalid={!!errors.name}
-            aria-describedby={errors.name ? 'name-error' : undefined}
           />
-          {errors.name && (
-            <p
-              id="name-error"
-              className="mt-1 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.name.message}
-            </p>
-          )}
-        </div>
+          {errors.name && <ErrorMessage>{errors.name.message}</ErrorMessage>}
+        </Field>
 
         <div className="flex gap-3 pt-4">
           <Button

@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { Button } from '../components/ui/button';
+import { ErrorMessage, Field, Label } from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
@@ -141,51 +142,34 @@ export function TaskForm() {
   return (
     <>
       <Heading>{isEdit ? '업무 보고 수정' : '업무 보고 등록'}</Heading>
-      <div className="mt-8 max-w-2xl bg-white rounded-lg shadow p-6">
+      <div className="mt-8 max-w-2xl bg-white dark:bg-zinc-900 rounded-lg shadow p-6">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="space-y-6"
           aria-label={isEdit ? '업무 보고 수정 폼' : '업무 보고 등록 폼'}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label
-                htmlFor="task_date"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
+            <Field>
+              <Label>
                 날짜{' '}
                 <span className="text-red-600" aria-label="필수 항목">
                   *
                 </span>
-              </label>
+              </Label>
               <Input
                 id="task_date"
                 type="date"
                 {...register('task_date')}
                 aria-required="true"
                 aria-invalid={!!errors.task_date}
-                aria-describedby={
-                  errors.task_date ? 'task_date-error' : undefined
-                }
               />
               {errors.task_date && (
-                <p
-                  id="task_date-error"
-                  className="mt-1 text-sm text-red-600"
-                  role="alert"
-                >
-                  {errors.task_date.message}
-                </p>
+                <ErrorMessage>{errors.task_date.message}</ErrorMessage>
               )}
-            </div>
+            </Field>
 
-            <div>
-              <label
-                htmlFor="work_time"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                작업 시간 (분)
-              </label>
+            <Field>
+              <Label>작업 시간 (분)</Label>
               <Input
                 id="work_time"
                 type="number"
@@ -193,48 +177,31 @@ export function TaskForm() {
                 aria-label="작업 시간을 분 단위로 입력"
                 min="0"
               />
-            </div>
+            </Field>
           </div>
 
-          <div>
-            <label
-              htmlFor="task_name"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
+          <Field>
+            <Label>
               업무명{' '}
               <span className="text-red-600" aria-label="필수 항목">
                 *
               </span>
-            </label>
+            </Label>
             <Input
               id="task_name"
               type="text"
               {...register('task_name')}
               aria-required="true"
               aria-invalid={!!errors.task_name}
-              aria-describedby={
-                errors.task_name ? 'task_name-error' : undefined
-              }
               placeholder="업무명을 입력하세요"
             />
             {errors.task_name && (
-              <p
-                id="task_name-error"
-                className="mt-1 text-sm text-red-600"
-                role="alert"
-              >
-                {errors.task_name.message}
-              </p>
+              <ErrorMessage>{errors.task_name.message}</ErrorMessage>
             )}
-          </div>
+          </Field>
 
-          <div>
-            <label
-              htmlFor="task_detail"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              업무 상세
-            </label>
+          <Field>
+            <Label>업무 상세</Label>
             <Textarea
               id="task_detail"
               {...register('task_detail')}
@@ -242,74 +209,47 @@ export function TaskForm() {
               aria-label="업무의 상세 내용 입력"
               placeholder="업무 상세 내용을 입력하세요"
             />
-          </div>
+          </Field>
 
-          <div>
-            <label
-              htmlFor="task_url"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              관련 URL
-            </label>
+          <Field>
+            <Label>관련 URL</Label>
             <Input
               id="task_url"
               type="url"
               {...register('task_url')}
               aria-invalid={!!errors.task_url}
-              aria-describedby={errors.task_url ? 'task_url-error' : undefined}
               placeholder="https://..."
             />
             {errors.task_url && (
-              <p
-                id="task_url-error"
-                className="mt-1 text-sm text-red-600"
-                role="alert"
-              >
-                {errors.task_url.message}
-              </p>
+              <ErrorMessage>{errors.task_url.message}</ErrorMessage>
             )}
-          </div>
+          </Field>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label
-                htmlFor="start_time"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                시작 시간
-              </label>
+            <Field>
+              <Label>시작 시간</Label>
               <Input
                 id="start_time"
                 type="time"
                 {...register('start_time')}
                 aria-label="작업 시작 시간 선택"
               />
-            </div>
+            </Field>
 
-            <div>
-              <label
-                htmlFor="end_time"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                종료 시간
-              </label>
+            <Field>
+              <Label>종료 시간</Label>
               <Input
                 id="end_time"
                 type="time"
                 {...register('end_time')}
                 aria-label="작업 종료 시간 선택"
               />
-            </div>
+            </Field>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label
-                htmlFor="cost_group_id"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                청구 그룹
-              </label>
+            <Field>
+              <Label>청구 그룹</Label>
               <Select
                 id="cost_group_id"
                 {...register('cost_group_id', { valueAsNumber: true })}
@@ -322,15 +262,10 @@ export function TaskForm() {
                   </option>
                 ))}
               </Select>
-            </div>
+            </Field>
 
-            <div>
-              <label
-                htmlFor="platform_id"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                플랫폼
-              </label>
+            <Field>
+              <Label>플랫폼</Label>
               <Select
                 id="platform_id"
                 {...register('platform_id', { valueAsNumber: true })}
@@ -343,7 +278,7 @@ export function TaskForm() {
                   </option>
                 ))}
               </Select>
-            </div>
+            </Field>
           </div>
 
           <div
@@ -354,13 +289,8 @@ export function TaskForm() {
             <span id="project-selection-label" className="sr-only">
               프로젝트 선택 (청구 그룹, 서비스, 프로젝트 순서)
             </span>
-            <div>
-              <label
-                htmlFor="service_id"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                서비스
-              </label>
+            <Field>
+              <Label>서비스</Label>
               <Select
                 id="service_id"
                 {...register('service_id', { valueAsNumber: true })}
@@ -379,15 +309,10 @@ export function TaskForm() {
                   </option>
                 ))}
               </Select>
-            </div>
+            </Field>
 
-            <div>
-              <label
-                htmlFor="project_id"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                프로젝트
-              </label>
+            <Field>
+              <Label>프로젝트</Label>
               <Select
                 id="project_id"
                 {...register('project_id', { valueAsNumber: true })}
@@ -406,7 +331,7 @@ export function TaskForm() {
                   </option>
                 ))}
               </Select>
-            </div>
+            </Field>
           </div>
 
           <div className="flex justify-end space-x-4">

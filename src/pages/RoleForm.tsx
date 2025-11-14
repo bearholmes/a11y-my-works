@@ -5,8 +5,10 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { Button } from '../components/ui/button';
+import { ErrorMessage, Field, Label } from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
+import { Text } from '../components/ui/text';
 import { Textarea } from '../components/ui/textarea';
 import { useNotification } from '../hooks/useNotification';
 import { permissionAPI, roleAPI } from '../services/api';
@@ -180,7 +182,7 @@ export function RoleForm() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">로딩 중...</p>
+          <Text className="mt-4">로딩 중...</Text>
         </div>
       </div>
     );
@@ -196,52 +198,37 @@ export function RoleForm() {
         aria-label={isEditMode ? '역할 수정 폼' : '역할 생성 폼'}
       >
         {/* 기본 정보 */}
-        <div className="bg-white shadow-sm rounded-lg border p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-gray-900">기본 정보</h2>
+        <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-zinc-950 dark:text-white">
+            기본 정보
+          </h2>
 
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700"
-            >
+          <Field>
+            <Label>
               역할명{' '}
               <span className="text-red-600" aria-label="필수 항목">
                 *
               </span>
-            </label>
+            </Label>
             <Input
               id="name"
               {...register('name')}
               type="text"
               aria-required="true"
               aria-invalid={!!errors.name}
-              aria-describedby={errors.name ? 'name-error' : undefined}
             />
-            {errors.name && (
-              <p
-                id="name-error"
-                className="mt-1 text-sm text-red-600"
-                role="alert"
-              >
-                {errors.name.message}
-              </p>
-            )}
-          </div>
+            {errors.name && <ErrorMessage>{errors.name.message}</ErrorMessage>}
+          </Field>
 
-          <div>
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700"
-            >
-              설명
-            </label>
+          <Field>
+            <Label>설명</Label>
             <Textarea
               id="description"
               {...register('description')}
               rows={3}
               aria-label="역할 설명 입력"
             />
-          </div>
+          </Field>
 
           <div className="flex items-center">
             <input
@@ -249,11 +236,11 @@ export function RoleForm() {
               {...register('is_active')}
               type="checkbox"
               aria-label="역할 활성 상태"
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-300 dark:border-zinc-600 rounded"
             />
             <label
               htmlFor="is_active"
-              className="ml-2 block text-sm text-gray-900"
+              className="ml-2 block text-sm text-zinc-950 dark:text-white"
             >
               활성 상태
             </label>
@@ -261,46 +248,46 @@ export function RoleForm() {
         </div>
 
         {/* 권한 설정 */}
-        <div className="bg-white shadow-sm rounded-lg border p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6">
+          <h2 className="text-lg font-semibold text-zinc-950 dark:text-white mb-4">
             권한 설정
           </h2>
 
           <div className="overflow-x-auto">
             <table
-              className="min-w-full divide-y divide-gray-200"
+              className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700"
               aria-label="역할 권한 설정 테이블"
             >
-              <thead className="bg-gray-50">
+              <thead className="bg-zinc-50 dark:bg-zinc-800">
                 <tr>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider"
                   >
                     권한
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider"
                   >
                     읽기
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider"
                   >
                     쓰기
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-zinc-900 divide-y divide-zinc-200 dark:divide-zinc-700">
                 {permissions.map((permission) => (
                   <tr key={permission.permissionId}>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-zinc-950 dark:text-white">
                         {permission.name}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-zinc-500 dark:text-zinc-400">
                         {permission.key}
                       </div>
                     </td>
@@ -316,7 +303,7 @@ export function RoleForm() {
                           )
                         }
                         aria-label={`${permission.name} 읽기 권한`}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-300 dark:border-zinc-600 rounded"
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -331,7 +318,7 @@ export function RoleForm() {
                           )
                         }
                         aria-label={`${permission.name} 쓰기 권한`}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-300 dark:border-zinc-600 rounded"
                       />
                     </td>
                   </tr>
