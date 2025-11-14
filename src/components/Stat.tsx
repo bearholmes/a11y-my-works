@@ -3,9 +3,11 @@ import { Divider } from './ui/divider';
 
 interface StatProps {
   title: string;
-  value: string;
+  value: string | number;
   change?: string;
   description?: string;
+  className?: string;
+  icon?: string;
 }
 
 /**
@@ -17,11 +19,18 @@ interface StatProps {
  *   value="128"
  *   change="+12.5%"
  *   description="이번 주"
+ *   className="custom-class"
  * />
  */
-export function Stat({ title, value, change, description }: StatProps) {
+export function Stat({
+  title,
+  value,
+  change,
+  description,
+  className,
+}: StatProps) {
   return (
-    <div>
+    <div className={className}>
       <Divider />
       <div className="mt-6 text-lg/6 font-medium sm:text-sm/6">{title}</div>
       <div className="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">{value}</div>

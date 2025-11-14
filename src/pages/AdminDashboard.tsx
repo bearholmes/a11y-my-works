@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { Stat } from '../components/Stat';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Checkbox } from '../components/ui/checkbox';
 import { Heading, Subheading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
-import { Stat } from '../components/ui/stat';
 import {
   Table,
   TableBody,
@@ -220,13 +220,13 @@ export function AdminDashboard() {
               </Select>
 
               {/* 미완료만 보기 토글 */}
-              <label className="flex items-center gap-2 cursor-pointer">
+              <div className="flex items-center gap-2">
                 <Checkbox
                   checked={showIncompleteOnly}
                   onChange={(checked) => setShowIncompleteOnly(checked)}
                 />
                 <Text>미완료만 보기</Text>
-              </label>
+              </div>
 
               {/* 필터 초기화 */}
               {(searchQuery ||

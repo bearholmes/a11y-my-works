@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { format, subDays } from 'date-fns';
 import { useState } from 'react';
-import { Stat } from '../components/Stat';
 import { Badge } from '../components/ui/badge';
 import { Heading, Subheading } from '../components/ui/heading';
 import { Link } from '../components/ui/link';
@@ -92,28 +91,55 @@ export function Dashboard() {
         </div>
       </div>
 
-      <div className="mt-4 grid gap-8 sm:grid-cols-2 xl:grid-cols-4">
-        <Stat
-          title="총 업무 수"
-          value={`${stats?.totalTasks || 0}`}
-          description="선택한 기간 내 등록"
-        />
-        <Stat
-          title="총 작업 시간"
-          value={`${stats?.totalHours || 0}h`}
-          description="정규 + 초과 시간"
-        />
-        <Stat
-          title="활성 사용자"
-          value={`${stats?.activeMembers || 0}`}
-          description="현재 활동 중"
-        />
-        <Stat
-          title="진행 중 프로젝트"
-          value={`${stats?.activeProjects || 0}`}
-          description="활성 상태"
-        />
-      </div>
+      <dl className="mt-4 grid grid-cols-1 gap-px bg-gray-900/5 sm:grid-cols-2 xl:grid-cols-4 dark:bg-white/10">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8 dark:bg-gray-900">
+          <dt className="text-sm/6 font-medium text-gray-500 dark:text-gray-400">
+            총 업무 수
+          </dt>
+          <dd className="text-xs font-medium text-gray-700 dark:text-gray-300">
+            선택한 기간 내 등록
+          </dd>
+          <dd className="w-full flex-none text-3xl/10 font-medium tracking-tight text-gray-900 dark:text-white">
+            {stats?.totalTasks || 0}
+          </dd>
+        </div>
+
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8 dark:bg-gray-900">
+          <dt className="text-sm/6 font-medium text-gray-500 dark:text-gray-400">
+            총 작업 시간
+          </dt>
+          <dd className="text-xs font-medium text-gray-700 dark:text-gray-300">
+            정규 + 초과 시간
+          </dd>
+          <dd className="w-full flex-none text-3xl/10 font-medium tracking-tight text-gray-900 dark:text-white">
+            {stats?.totalHours || 0}h
+          </dd>
+        </div>
+
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8 dark:bg-gray-900">
+          <dt className="text-sm/6 font-medium text-gray-500 dark:text-gray-400">
+            활성 사용자
+          </dt>
+          <dd className="text-xs font-medium text-gray-700 dark:text-gray-300">
+            현재 활동 중
+          </dd>
+          <dd className="w-full flex-none text-3xl/10 font-medium tracking-tight text-gray-900 dark:text-white">
+            {stats?.activeMembers || 0}
+          </dd>
+        </div>
+
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8 dark:bg-gray-900">
+          <dt className="text-sm/6 font-medium text-gray-500 dark:text-gray-400">
+            진행 중 프로젝트
+          </dt>
+          <dd className="text-xs font-medium text-gray-700 dark:text-gray-300">
+            활성 상태
+          </dd>
+          <dd className="w-full flex-none text-3xl/10 font-medium tracking-tight text-gray-900 dark:text-white">
+            {stats?.activeProjects || 0}
+          </dd>
+        </div>
+      </dl>
 
       {/* 차트 섹션 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
