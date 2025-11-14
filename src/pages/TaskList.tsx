@@ -1,12 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   addDays,
+  addWeeks,
   eachDayOfInterval,
   endOfWeek,
   format,
   isSameDay,
   startOfWeek,
   subDays,
+  subWeeks,
 } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { useState } from 'react';
@@ -95,6 +97,14 @@ export function TaskList() {
     setSelectedDate((prev) => addDays(prev, 1));
   };
 
+  const handlePreviousWeek = () => {
+    setSelectedDate((prev) => subWeeks(prev, 1));
+  };
+
+  const handleNextWeek = () => {
+    setSelectedDate((prev) => addWeeks(prev, 1));
+  };
+
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDate = new Date(e.target.value);
     if (!isNaN(newDate.getTime())) {
@@ -133,36 +143,64 @@ export function TaskList() {
 
         {/* 주 단위 캘린더 */}
         <div className="bg-white dark:bg-zinc-900 rounded-lg p-4 mb-4">
-          <div className="grid grid-cols-7 gap-2">
-            {weekDays.map((day) => {
-              const isSelected = isSameDay(day, selectedDate);
-              const isToday = isSameDay(day, new Date());
+          <div className="flex items-center gap-4">
+            {/* 이전 주 버튼 */}
+            <Button
+              plain
+              onClick={handlePreviousWeek}
+              aria-label="이전 주"
+              className="text-xl shrink-0"
+            >
+              ◀
+            </Button>
 
-              return (
-                <button
-                  key={day.toISOString()}
-                  onClick={() => setSelectedDate(day)}
-                  className={`
-                    p-3 rounded-lg text-center transition-colors
-                    ${
-                      isSelected
-                        ? 'bg-blue-600 text-white dark:bg-blue-500'
-                        : isToday
-                          ? 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400'
-                          : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
-                    }
-                  `}
-                  aria-label={format(day, 'yyyy년 M월 d일 EEEE', {
-                    locale: ko,
-                  })}
-                >
-                  <div className="text-xs font-medium mb-1">
-                    {format(day, 'EEE', { locale: ko })}
-                  </div>
-                  <div className="text-lg font-bold">{format(day, 'd')}</div>
-                </button>
-              );
-            })}
+            {/* 주간 캘린더 */}
+            <div className="flex-1 grid grid-cols-7 gap-2">
+              {weekDays.map((day) => {
+                const isSelected = isSameDay(day, selectedDate);
+                const isToday = isSameDay(day, new Date());
+
+                return (
+                  <button
+                    key={day.toISOString()}
+                    onClick={() => setSelectedDate(day)}
+                    className={`
+                      p-3 rounded-lg text-center transition-colors
+                      ${
+                        isSelected
+                          ? 'bg-blue-600 text-white dark:bg-blue-500'
+                          : isToday
+                            ? 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400'
+                            : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
+                      }
+                    `}
+                    aria-label={format(day, 'yyyy년 M월 d일 EEEE', {
+                      locale: ko,
+                    })}
+                  >
+                    <div className="text-xs font-medium mb-1">
+                      {format(day, 'EEE', { locale: ko })}
+                    </div>
+                    <div className="text-lg font-bold">{format(day, 'd')}</div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* 다음 주 버튼 */}
+            <Button
+              plain
+              onClick={handleNextWeek}
+              aria-label="다음 주"
+              className="text-xl shrink-0"
+            >
+              ▶
+            </Button>
+          </div>
+
+          {/* 주간 범위 표시 */}
+          <div className="text-center text-sm text-zinc-600 dark:text-zinc-400 mt-3">
+            {format(weekStart, 'M월 d일')} - {format(weekEnd, 'M월 d일')}
           </div>
         </div>
 
