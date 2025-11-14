@@ -166,7 +166,10 @@ export function CostGroupList() {
               </TableHead>
               <TableBody>
                 {data?.data.map((costGroup: any) => (
-                  <TableRow key={costGroup.cost_group_id}>
+                  <TableRow
+                    key={costGroup.cost_group_id}
+                    href={`/cost-groups/edit/${costGroup.cost_group_id}`}
+                  >
                     <TableCell>
                       <div className="font-medium">{costGroup.name}</div>
                       {costGroup.description && (
@@ -184,28 +187,18 @@ export function CostGroupList() {
                       {format(new Date(costGroup.created_at), 'yyyy-MM-dd')}
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          plain
-                          href={`/cost-groups/edit/${costGroup.cost_group_id}`}
-                          aria-label={`${costGroup.name} 청구 그룹 수정`}
-                        >
-                          수정
-                        </Button>
-                        <Button
-                          plain
-                          onClick={() =>
-                            handleDelete(
-                              costGroup.cost_group_id,
-                              costGroup.name
-                            )
-                          }
-                          aria-label={`${costGroup.name} 청구 그룹 삭제`}
-                          disabled={deleteMutation.isPending}
-                        >
-                          삭제
-                        </Button>
-                      </div>
+                      <Button
+                        plain
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDelete(costGroup.cost_group_id, costGroup.name);
+                        }}
+                        aria-label={`${costGroup.name} 청구 그룹 삭제`}
+                        disabled={deleteMutation.isPending}
+                      >
+                        삭제
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

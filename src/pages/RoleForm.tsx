@@ -52,7 +52,7 @@ export function RoleForm() {
 
   // 전체 권한 목록 조회
   const { data: allPermissions } = useQuery({
-    queryKey: ['permissions'],
+    queryKey: ['allPermissions'],
     queryFn: () => permissionAPI.getPermissions(),
   });
 

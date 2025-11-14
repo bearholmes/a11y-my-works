@@ -203,7 +203,10 @@ export function ServiceList() {
               </TableHead>
               <TableBody>
                 {data?.data.map((service: any) => (
-                  <TableRow key={service.service_id}>
+                  <TableRow
+                    key={service.service_id}
+                    href={`/services/edit/${service.service_id}`}
+                  >
                     <TableCell className="font-medium">
                       {service.name}
                     </TableCell>
@@ -221,25 +224,18 @@ export function ServiceList() {
                       {format(new Date(service.created_at), 'yyyy-MM-dd')}
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          plain
-                          href={`/services/edit/${service.service_id}`}
-                          aria-label={`${service.name} 서비스 수정`}
-                        >
-                          수정
-                        </Button>
-                        <Button
-                          plain
-                          onClick={() =>
-                            handleDelete(service.service_id, service.name)
-                          }
-                          aria-label={`${service.name} 서비스 삭제`}
-                          disabled={deleteMutation.isPending}
-                        >
-                          삭제
-                        </Button>
-                      </div>
+                      <Button
+                        plain
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDelete(service.service_id, service.name);
+                        }}
+                        aria-label={`${service.name} 서비스 삭제`}
+                        disabled={deleteMutation.isPending}
+                      >
+                        삭제
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

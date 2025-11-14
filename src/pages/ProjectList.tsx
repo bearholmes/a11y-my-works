@@ -157,7 +157,10 @@ export function ProjectList() {
               </TableHead>
               <TableBody>
                 {data?.data.map((project: any) => (
-                  <TableRow key={project.project_id}>
+                  <TableRow
+                    key={project.project_id}
+                    href={`/projects/edit/${project.project_id}`}
+                  >
                     <TableCell>
                       <div className="font-medium">{project.name}</div>
                       {project.description && (
@@ -193,25 +196,18 @@ export function ProjectList() {
                       {format(new Date(project.created_at), 'yyyy-MM-dd')}
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          plain
-                          href={`/projects/edit/${project.project_id}`}
-                          aria-label={`${project.name} 프로젝트 수정`}
-                        >
-                          수정
-                        </Button>
-                        <Button
-                          plain
-                          onClick={() =>
-                            handleDelete(project.project_id, project.name)
-                          }
-                          aria-label={`${project.name} 프로젝트 삭제`}
-                          disabled={deleteMutation.isPending}
-                        >
-                          삭제
-                        </Button>
-                      </div>
+                      <Button
+                        plain
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDelete(project.project_id, project.name);
+                        }}
+                        aria-label={`${project.name} 프로젝트 삭제`}
+                        disabled={deleteMutation.isPending}
+                      >
+                        삭제
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
