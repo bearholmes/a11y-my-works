@@ -6,7 +6,6 @@ import {
   UserCircleIcon,
 } from '@heroicons/react/16/solid';
 import {
-  Bars3Icon,
   CalendarDaysIcon,
   ChartBarIcon,
   ClipboardDocumentListIcon,
@@ -18,7 +17,6 @@ import {
   WrenchScrewdriverIcon,
 } from '@heroicons/react/20/solid';
 import type { ReactNode } from 'react';
-import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Avatar } from '../components/ui/avatar';
 import {
@@ -219,7 +217,6 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
   const location = useLocation();
   const { user } = useAuthContext();
   const { filterAccessibleMenus, isLoading } = usePermissions();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // 현재 로그인한 사용자의 멤버 정보 조회
   const { data: currentMember } = useQuery({
@@ -260,17 +257,6 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
     <SidebarLayout
       navbar={
         <Navbar>
-          {/* 모바일 메뉴 토글 버튼 */}
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-            aria-label="메뉴 열기"
-            aria-expanded={mobileMenuOpen}
-          >
-            <Bars3Icon className="w-6 h-6" />
-          </button>
-
           <NavbarSpacer />
           <NavbarSection>
             <Dropdown>
@@ -288,14 +274,10 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
       sidebar={
         <Sidebar>
           <SidebarHeader>
-            <div className="flex items-center gap-3 px-2">
-              <Avatar
-                initials={import.meta.env.VITE_APP_TITLE?.charAt(0) || 'A'}
-                className="bg-blue-600 text-white"
-              />
-              <SidebarLabel className="text-lg font-semibold">
+            <div className="flex items-center px-4 py-1">
+              <span className="text-lg font-bold text-zinc-950 dark:text-white">
                 {import.meta.env.VITE_APP_TITLE || '업무 보고'}
-              </SidebarLabel>
+              </span>
             </div>
           </SidebarHeader>
 
