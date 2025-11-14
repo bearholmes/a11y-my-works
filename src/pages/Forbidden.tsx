@@ -1,43 +1,38 @@
-import { LockClosedIcon } from '@heroicons/react/24/outline';
 import { Button } from '../components/ui/button';
-import { Heading } from '../components/ui/heading';
-import { Text } from '../components/ui/text';
 
+/**
+ * 403 접근 권한 없음 에러 페이지
+ *
+ * 사용자가 권한이 없는 페이지에 접근했을 때 표시됩니다.
+ *
+ * @returns 403 에러 페이지 컴포넌트
+ */
 export function Forbidden() {
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center px-4">
-      <div className="max-w-md w-full text-center">
-        <div className="mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-red-100 dark:bg-red-950 rounded-full mb-4">
-            <LockClosedIcon className="w-10 h-10 text-red-600" />
-          </div>
-          <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
-            403
-          </h1>
-          <Heading level={2} className="mb-4">
-            접근 권한이 없습니다
-          </Heading>
-          <Text className="mb-8">
-            이 페이지에 접근할 권한이 없습니다.
-            <br />
-            관리자에게 문의하시거나 홈으로 돌아가세요.
-          </Text>
-        </div>
-
-        <div className="space-y-3">
-          <Button href="/" className="w-full">
+    <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8 dark:bg-zinc-950">
+      <div className="text-center">
+        <p className="text-base font-semibold text-red-600 dark:text-red-400">
+          403
+        </p>
+        <h1 className="mt-4 text-5xl font-semibold tracking-tight text-balance text-zinc-900 sm:text-7xl dark:text-white">
+          접근 권한이 없습니다
+        </h1>
+        <p className="mt-6 text-lg font-medium text-pretty text-zinc-500 sm:text-xl/8 dark:text-zinc-400">
+          이 페이지에 접근할 권한이 없습니다. 관리자에게 문의하세요.
+        </p>
+        <div className="mt-10 flex items-center justify-center gap-x-6">
+          <Button href="/" color="blue">
             홈으로 돌아가기
           </Button>
-          <Button
+          <button
             type="button"
             onClick={() => window.history.back()}
-            outline
-            className="w-full"
+            className="text-sm font-semibold text-zinc-900 dark:text-white"
           >
-            이전 페이지로
-          </Button>
+            이전 페이지로 <span aria-hidden="true">&larr;</span>
+          </button>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
