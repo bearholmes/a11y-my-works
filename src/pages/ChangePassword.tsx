@@ -78,8 +78,8 @@ export function ChangePassword() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg">
-        <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
+      <div className="bg-white dark:bg-zinc-900 rounded-lg">
+        <div className="px-6 py-4 border-b">
           <Heading>비밀번호 변경</Heading>
           <Text className="mt-1">새로운 비밀번호를 설정하세요.</Text>
         </div>

@@ -222,7 +222,7 @@ export function MemberList() {
       </div>
 
       {/* 검색 및 필터 */}
-      <div className="bg-white dark:bg-zinc-900 p-4 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-800">
+      <div className="bg-white dark:bg-zinc-900 p-4 rounded-lg">
         <form onSubmit={handleSearch} className="flex gap-4">
           <Field className="flex-1">
             <Label htmlFor="member-search" className="sr-only">
@@ -273,7 +273,7 @@ export function MemberList() {
       </div>
 
       {/* 사용자 목록 테이블 */}
-      <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+      <div className="bg-white dark:bg-zinc-900 rounded-lg overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
@@ -390,12 +390,12 @@ export function MemberList() {
 
             {/* 페이지네이션 */}
             {data && data.pagination.pageCount > 1 && (
-              <div className="bg-white dark:bg-zinc-900 px-4 py-3 flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800 sm:px-6">
+              <div className="bg-white dark:bg-zinc-900 px-4 py-3 flex items-center justify-between border-t sm:px-6">
                 <div className="flex-1 flex justify-between sm:hidden">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="relative inline-flex items-center px-4 py-2 border border-zinc-300 dark:border-zinc-700 text-sm font-medium rounded-md text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
+                    className="relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
                   >
                     이전
                   </button>
@@ -404,7 +404,7 @@ export function MemberList() {
                       setPage((p) => Math.min(data.pagination.pageCount, p + 1))
                     }
                     disabled={page === data.pagination.pageCount}
-                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-zinc-300 dark:border-zinc-700 text-sm font-medium rounded-md text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
+                    className="ml-3 relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
                   >
                     다음
                   </button>
@@ -425,11 +425,11 @@ export function MemberList() {
                     </Text>
                   </div>
                   <div>
-                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                    <nav className="relative z-0 inline-flex rounded-md -space-x-px">
                       <button
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
                         disabled={page === 1}
-                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
+                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border bg-white dark:bg-zinc-800 text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
                       >
                         이전
                       </button>
@@ -444,7 +444,7 @@ export function MemberList() {
                               className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                                 page === pageNum
                                   ? 'z-10 bg-blue-50 dark:bg-blue-950 border-blue-500 dark:border-blue-600 text-blue-600 dark:text-blue-400'
-                                  : 'bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700'
+                                  : 'bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700'
                               }`}
                             >
                               {pageNum}
@@ -459,7 +459,7 @@ export function MemberList() {
                           )
                         }
                         disabled={page === data.pagination.pageCount}
-                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
+                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border bg-white dark:bg-zinc-800 text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
                       >
                         다음
                       </button>
@@ -475,7 +475,7 @@ export function MemberList() {
       {/* 승인 모달 */}
       {showApprovalModal && selectedMember && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+          <div className="bg-white dark:bg-zinc-900 rounded-lg-xl p-6 max-w-md w-full mx-4">
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
               사용자 승인
             </h2>
@@ -542,7 +542,7 @@ export function MemberList() {
       {/* 초대 모달 (Supabase Auth 사용) */}
       {showInvitationModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+          <div className="bg-white dark:bg-zinc-900 rounded-lg-xl p-6 max-w-md w-full mx-4">
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
               사용자 초대
             </h2>

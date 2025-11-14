@@ -116,7 +116,7 @@ export function AdminDashboard() {
   return (
     <>
       {/* 헤더 */}
-      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-zinc-900 rounded-lg p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
             <Heading>업무 작성 현황</Heading>
@@ -273,8 +273,8 @@ export function AdminDashboard() {
 
       {/* 로딩 상태 */}
       {isLoading && (
-        <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-12 text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-zinc-300 dark:border-zinc-700 border-t-blue-600" />
+        <div className="bg-white dark:bg-zinc-900 rounded-lg p-12 text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-t-blue-600" />
           <p className="mt-4 text-zinc-600 dark:text-zinc-400">
             데이터를 불러오는 중...
           </p>
@@ -283,8 +283,8 @@ export function AdminDashboard() {
 
       {/* 월별 캘린더 테이블 */}
       {stats && !isLoading && (
-        <div className="bg-white dark:bg-zinc-900 rounded-lg shadow overflow-hidden">
-          <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
+        <div className="bg-white dark:bg-zinc-900 rounded-lg overflow-hidden">
+          <div className="px-6 py-4 border-b">
             <div className="flex items-center justify-between">
               <div>
                 <Subheading>월별 업무 일지 작성 현황</Subheading>
@@ -309,10 +309,10 @@ export function AdminDashboard() {
             <Table className="min-w-full" bleed dense>
               <TableHead>
                 <TableRow>
-                  <TableHeader className="sticky left-0 z-10 bg-zinc-50 dark:bg-zinc-800 border-r border-zinc-200 dark:border-zinc-700">
+                  <TableHeader className="sticky left-0 z-10 bg-zinc-50 dark:bg-zinc-800 border-r">
                     사용자
                   </TableHeader>
-                  <TableHeader className="text-center border-r border-zinc-200 dark:border-zinc-700">
+                  <TableHeader className="text-center border-r">
                     완료율
                   </TableHeader>
                   {days.map((day) => {
@@ -335,7 +335,7 @@ export function AdminDashboard() {
               <TableBody>
                 {filteredMembers.map((member) => (
                   <TableRow key={member.memberId}>
-                    <TableCell className="sticky left-0 z-10 bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-700 font-medium">
+                    <TableCell className="sticky left-0 z-10 bg-white dark:bg-zinc-900 border-r font-medium">
                       <div className="flex items-center gap-2">
                         <span>{member.memberName}</span>
                         <span className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -343,7 +343,7 @@ export function AdminDashboard() {
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-center border-r border-zinc-200 dark:border-zinc-700">
+                    <TableCell className="text-center border-r">
                       <Badge
                         color={
                           member.stats.completionRate === 100
@@ -420,7 +420,7 @@ export function AdminDashboard() {
       )}
 
       {/* 범례 */}
-      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-zinc-900 rounded-lg p-6">
         <Subheading className="mb-3">범례</Subheading>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div className="flex items-center gap-2">

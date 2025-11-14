@@ -198,7 +198,7 @@ export function RoleForm() {
         aria-label={isEditMode ? '역할 수정 폼' : '역할 생성 폼'}
       >
         {/* 기본 정보 */}
-        <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6 space-y-4">
+        <div className="bg-white dark:bg-zinc-900 rounded-lg p-6 space-y-4">
           <h2 className="text-lg font-semibold text-zinc-950 dark:text-white">
             기본 정보
           </h2>
@@ -236,7 +236,7 @@ export function RoleForm() {
               {...register('is_active')}
               type="checkbox"
               aria-label="역할 활성 상태"
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-300 dark:border-zinc-600 rounded"
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 dark:border-zinc-600 rounded"
             />
             <label
               htmlFor="is_active"
@@ -248,7 +248,7 @@ export function RoleForm() {
         </div>
 
         {/* 권한 설정 */}
-        <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6">
+        <div className="bg-white dark:bg-zinc-900 rounded-lg p-6">
           <h2 className="text-lg font-semibold text-zinc-950 dark:text-white mb-4">
             권한 설정
           </h2>
@@ -303,7 +303,7 @@ export function RoleForm() {
                           )
                         }
                         aria-label={`${permission.name} 읽기 권한`}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-300 dark:border-zinc-600 rounded"
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 dark:border-zinc-600 rounded"
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -318,7 +318,7 @@ export function RoleForm() {
                           )
                         }
                         aria-label={`${permission.name} 쓰기 권한`}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-zinc-300 dark:border-zinc-600 rounded"
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 dark:border-zinc-600 rounded"
                       />
                     </td>
                   </tr>

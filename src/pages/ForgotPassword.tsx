@@ -52,7 +52,7 @@ export function ForgotPassword() {
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center">
         <div className="max-w-md w-full space-y-8">
-          <div className="bg-white dark:bg-zinc-900 p-8 rounded-lg shadow-sm text-center">
+          <div className="bg-white dark:bg-zinc-900 p-8 rounded-lg text-center">
             <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-950">
               <svg
                 className="h-6 w-6 text-green-600"
@@ -98,7 +98,7 @@ export function ForgotPassword() {
         </div>
 
         <form
-          className="bg-white dark:bg-zinc-900 p-8 rounded-lg shadow-sm space-y-6"
+          className="bg-white dark:bg-zinc-900 p-8 rounded-lg space-y-6"
           onSubmit={handleSubmit(onSubmit)}
         >
           {error && (
