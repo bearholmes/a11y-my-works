@@ -3,7 +3,10 @@ import { format } from 'date-fns';
 import { useState } from 'react';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
+import { Field, Label } from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
+import { Input } from '../components/ui/input';
+import { Select } from '../components/ui/select';
 import {
   Table,
   TableBody,
@@ -12,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '../components/ui/table';
+import { Text } from '../components/ui/text';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
 import { invitationAPI, memberAPI, roleAPI } from '../services/api';
@@ -198,9 +202,13 @@ export function MemberList() {
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-red-600">사용자 목록을 불러오는데 실패했습니다.</p>
-        <p className="text-sm text-red-500 mt-1">{(error as Error).message}</p>
+      <div className="p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
+        <Text className="text-red-600 dark:text-red-400">
+          사용자 목록을 불러오는데 실패했습니다.
+        </Text>
+        <Text className="text-sm text-red-500 dark:text-red-400 mt-1">
+          {(error as Error).message}
+        </Text>
       </div>
     );
   }
@@ -214,45 +222,49 @@ export function MemberList() {
       </div>
 
       {/* 검색 및 필터 */}
-      <div className="bg-white p-4 rounded-lg shadow-sm border">
+      <div className="bg-white dark:bg-zinc-900 p-4 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-800">
         <form onSubmit={handleSearch} className="flex gap-4">
-          <div className="flex-1">
-            <label htmlFor="member-search" className="sr-only">
+          <Field className="flex-1">
+            <Label htmlFor="member-search" className="sr-only">
               이름, 이메일, 계정 ID로 검색
-            </label>
-            <input
+            </Label>
+            <Input
               id="member-search"
               type="search"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="이름, 이메일, 계정 ID로 검색"
               aria-label="이름, 이메일, 계정 ID로 검색"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
-          <select
-            value={
-              isActiveFilter === undefined
-                ? 'all'
-                : isActiveFilter
-                  ? 'active'
-                  : 'inactive'
-            }
-            onChange={(e) => {
-              const value = e.target.value;
-              setIsActiveFilter(
-                value === 'all' ? undefined : value === 'active'
-              );
-              setPage(1);
-            }}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">전체</option>
-            <option value="active">활성</option>
-            <option value="inactive">비활성</option>
-          </select>
+          </Field>
+          <Field>
+            <Label htmlFor="status-filter" className="sr-only">
+              상태 필터
+            </Label>
+            <Select
+              id="status-filter"
+              value={
+                isActiveFilter === undefined
+                  ? 'all'
+                  : isActiveFilter
+                    ? 'active'
+                    : 'inactive'
+              }
+              onChange={(e) => {
+                const value = e.target.value;
+                setIsActiveFilter(
+                  value === 'all' ? undefined : value === 'active'
+                );
+                setPage(1);
+              }}
+            >
+              <option value="all">전체</option>
+              <option value="active">활성</option>
+              <option value="inactive">비활성</option>
+            </Select>
+          </Field>
           {isActiveFilter === false && (
-            <div className="px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-md text-sm text-yellow-800">
+            <div className="px-3 py-2 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-md text-sm text-yellow-800 dark:text-yellow-200">
               승인 대기 중인 사용자만 표시됩니다
             </div>
           )}
@@ -261,15 +273,19 @@ export function MemberList() {
       </div>
 
       {/* 사용자 목록 테이블 */}
-      <div className="bg-white shadow-sm rounded-lg border overflow-hidden">
+      <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-2 text-gray-600">로딩 중...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
+            <Text className="mt-2 text-zinc-600 dark:text-zinc-400">
+              로딩 중...
+            </Text>
           </div>
         ) : data?.data.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            사용자가 없습니다.
+          <div className="p-8 text-center">
+            <Text className="text-zinc-500 dark:text-zinc-400">
+              사용자가 없습니다.
+            </Text>
           </div>
         ) : (
           <>
@@ -374,12 +390,12 @@ export function MemberList() {
 
             {/* 페이지네이션 */}
             {data && data.pagination.pageCount > 1 && (
-              <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+              <div className="bg-white dark:bg-zinc-900 px-4 py-3 flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800 sm:px-6">
                 <div className="flex-1 flex justify-between sm:hidden">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    className="relative inline-flex items-center px-4 py-2 border border-zinc-300 dark:border-zinc-700 text-sm font-medium rounded-md text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
                   >
                     이전
                   </button>
@@ -388,14 +404,14 @@ export function MemberList() {
                       setPage((p) => Math.min(data.pagination.pageCount, p + 1))
                     }
                     disabled={page === data.pagination.pageCount}
-                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-zinc-300 dark:border-zinc-700 text-sm font-medium rounded-md text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
                   >
                     다음
                   </button>
                 </div>
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-sm text-gray-700">
+                    <Text className="text-sm text-zinc-700 dark:text-zinc-300">
                       전체{' '}
                       <span className="font-medium">
                         {data.pagination.total}
@@ -406,14 +422,14 @@ export function MemberList() {
                       <span className="font-medium">
                         {Math.min(page * 20, data.pagination.total)}
                       </span>
-                    </p>
+                    </Text>
                   </div>
                   <div>
                     <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                       <button
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
                         disabled={page === 1}
-                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
                       >
                         이전
                       </button>
@@ -427,8 +443,8 @@ export function MemberList() {
                               onClick={() => setPage(pageNum)}
                               className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                                 page === pageNum
-                                  ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                                  : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                  ? 'z-10 bg-blue-50 dark:bg-blue-950 border-blue-500 dark:border-blue-600 text-blue-600 dark:text-blue-400'
+                                  : 'bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700'
                               }`}
                             >
                               {pageNum}
@@ -443,7 +459,7 @@ export function MemberList() {
                           )
                         }
                         disabled={page === data.pagination.pageCount}
-                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
                       >
                         다음
                       </button>
@@ -459,28 +475,33 @@ export function MemberList() {
       {/* 승인 모달 */}
       {showApprovalModal && selectedMember && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
+          <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
               사용자 승인
             </h2>
 
-            <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-              <div className="text-sm text-gray-500 mb-1">이름</div>
-              <div className="text-gray-900 font-medium">
+            <div className="mb-4 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
+              <Text className="text-sm text-zinc-500 dark:text-zinc-400 mb-1">
+                이름
+              </Text>
+              <Text className="text-zinc-900 dark:text-zinc-100 font-medium">
                 {selectedMember.name}
-              </div>
-              <div className="text-sm text-gray-500 mt-2 mb-1">이메일</div>
-              <div className="text-gray-900">{selectedMember.email}</div>
+              </Text>
+              <Text className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 mb-1">
+                이메일
+              </Text>
+              <Text className="text-zinc-900 dark:text-zinc-100">
+                {selectedMember.email}
+              </Text>
             </div>
 
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <Field className="mb-6">
+              <Label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                 역할 선택 *
-              </label>
-              <select
+              </Label>
+              <Select
                 value={selectedRoleId || ''}
                 onChange={(e) => setSelectedRoleId(Number(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">역할을 선택하세요</option>
                 {rolesData?.data.map((role: any) => (
@@ -488,11 +509,11 @@ export function MemberList() {
                     {role.name}
                   </option>
                 ))}
-              </select>
-              <p className="mt-1 text-sm text-gray-500">
+              </Select>
+              <Text className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                 승인 후 이 역할의 권한으로 시스템을 이용할 수 있습니다.
-              </p>
-            </div>
+              </Text>
+            </Field>
 
             <div className="flex gap-3">
               <button
@@ -509,7 +530,7 @@ export function MemberList() {
                   setSelectedRoleId(null);
                 }}
                 disabled={approveMutation.isPending}
-                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                className="flex-1 px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-md hover:bg-zinc-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-zinc-500"
               >
                 취소
               </button>
@@ -521,55 +542,52 @@ export function MemberList() {
       {/* 초대 모달 (Supabase Auth 사용) */}
       {showInvitationModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
+          <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
               사용자 초대
             </h2>
 
             {!invitationSuccess ? (
               <>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Field className="mb-4">
+                  <Label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                     이메일 *
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="email"
                     value={invitationEmail}
                     onChange={(e) => setInvitationEmail(e.target.value)}
                     placeholder="user@example.com"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
-                  <p className="mt-1 text-sm text-gray-500">
+                  <Text className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                     초대할 사용자의 이메일 주소를 입력하세요.
-                  </p>
-                </div>
+                  </Text>
+                </Field>
 
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Field className="mb-4">
+                  <Label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                     이름
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="text"
                     value={invitationName}
                     onChange={(e) => setInvitationName(e.target.value)}
                     placeholder="홍길동"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
-                  <p className="mt-1 text-sm text-gray-500">
+                  <Text className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                     사용자 이름 (선택사항)
-                  </p>
-                </div>
+                  </Text>
+                </Field>
 
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Field className="mb-6">
+                  <Label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                     역할 선택 *
-                  </label>
-                  <select
+                  </Label>
+                  <Select
                     value={invitationRoleId || ''}
                     onChange={(e) =>
                       setInvitationRoleId(Number(e.target.value))
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option value="">역할을 선택하세요</option>
                     {rolesData?.data.map((role: any) => (
@@ -577,11 +595,11 @@ export function MemberList() {
                         {role.name}
                       </option>
                     ))}
-                  </select>
-                  <p className="mt-1 text-sm text-gray-500">
+                  </Select>
+                  <Text className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                     초대받은 사용자에게 할당될 역할입니다.
-                  </p>
-                </div>
+                  </Text>
+                </Field>
 
                 <div className="flex gap-3">
                   <button
@@ -600,7 +618,7 @@ export function MemberList() {
                   <button
                     onClick={handleCloseInvitationModal}
                     disabled={inviteUserMutation.isPending}
-                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="flex-1 px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-md hover:bg-zinc-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-zinc-500"
                   >
                     취소
                   </button>
@@ -608,22 +626,22 @@ export function MemberList() {
               </>
             ) : (
               <>
-                <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-green-800 font-medium mb-2">
+                <div className="mb-6 p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
+                  <Text className="text-green-800 dark:text-green-200 font-medium mb-2">
                     초대 이메일이 발송되었습니다!
-                  </p>
-                  <p className="text-sm text-green-700 mb-2">
+                  </Text>
+                  <Text className="text-sm text-green-700 dark:text-green-300 mb-2">
                     {invitationEmail}님에게 초대 이메일이 발송되었습니다.
-                  </p>
-                  <p className="text-sm text-green-700">
+                  </Text>
+                  <Text className="text-sm text-green-700 dark:text-green-300">
                     사용자가 이메일의 링크를 클릭하면 가입 절차를 진행할 수
                     있습니다.
-                  </p>
+                  </Text>
                 </div>
 
                 <button
                   onClick={handleCloseInvitationModal}
-                  className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className="w-full px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-md hover:bg-zinc-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-zinc-500"
                 >
                   닫기
                 </button>

@@ -50,10 +50,10 @@ export function ForgotPassword() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center">
         <div className="max-w-md w-full space-y-8">
-          <div className="bg-white p-8 rounded-lg shadow-sm text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+          <div className="bg-white dark:bg-zinc-900 p-8 rounded-lg shadow-sm text-center">
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-950">
               <svg
                 className="h-6 w-6 text-green-600"
                 fill="none"
@@ -86,7 +86,7 @@ export function ForgotPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <Heading level={1}>비밀번호 찾기</Heading>
@@ -98,11 +98,11 @@ export function ForgotPassword() {
         </div>
 
         <form
-          className="bg-white p-8 rounded-lg shadow-sm space-y-6"
+          className="bg-white dark:bg-zinc-900 p-8 rounded-lg shadow-sm space-y-6"
           onSubmit={handleSubmit(onSubmit)}
         >
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
+            <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 px-4 py-3 rounded">
               {error}
             </div>
           )}

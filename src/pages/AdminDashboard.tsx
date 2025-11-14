@@ -1,3 +1,8 @@
+import {
+  CheckCircleIcon,
+  MagnifyingGlassIcon,
+  XCircleIcon,
+} from '@heroicons/react/24/outline';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Stat } from '../components/Stat';
@@ -111,7 +116,7 @@ export function AdminDashboard() {
   return (
     <>
       {/* 헤더 */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
             <Heading>업무 작성 현황</Heading>
@@ -180,19 +185,7 @@ export function AdminDashboard() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-8 w-64"
                 />
-                <svg
-                  className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
+                <MagnifyingGlassIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-400" />
               </div>
 
               {/* 날짜 필터 */}
@@ -280,21 +273,23 @@ export function AdminDashboard() {
 
       {/* 로딩 상태 */}
       {isLoading && (
-        <div className="bg-white rounded-lg shadow p-12 text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-blue-600" />
-          <p className="mt-4 text-gray-600">데이터를 불러오는 중...</p>
+        <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-12 text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-zinc-300 dark:border-zinc-700 border-t-blue-600" />
+          <p className="mt-4 text-zinc-600 dark:text-zinc-400">
+            데이터를 불러오는 중...
+          </p>
         </div>
       )}
 
       {/* 월별 캘린더 테이블 */}
       {stats && !isLoading && (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
+        <div className="bg-white dark:bg-zinc-900 rounded-lg shadow overflow-hidden">
+          <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
             <div className="flex items-center justify-between">
               <div>
                 <Subheading>월별 업무 일지 작성 현황</Subheading>
                 <Text className="mt-1">
-                  ✅ = 완료 (8시간 이상), ❌ = 미완료, - = 주말/공휴일
+                  완료 = 8시간 이상, 미완료 = 8시간 미만, - = 주말/공휴일
                 </Text>
               </div>
               <div>
@@ -314,10 +309,10 @@ export function AdminDashboard() {
             <Table className="min-w-full" bleed dense>
               <TableHead>
                 <TableRow>
-                  <TableHeader className="sticky left-0 z-10 bg-gray-50 border-r border-gray-200">
+                  <TableHeader className="sticky left-0 z-10 bg-zinc-50 dark:bg-zinc-800 border-r border-zinc-200 dark:border-zinc-700">
                     사용자
                   </TableHeader>
-                  <TableHeader className="text-center border-r border-gray-200">
+                  <TableHeader className="text-center border-r border-zinc-200 dark:border-zinc-700">
                     완료율
                   </TableHeader>
                   {days.map((day) => {
@@ -326,7 +321,9 @@ export function AdminDashboard() {
                       <TableHeader
                         key={day}
                         className={`text-center ${
-                          isWeekendDay ? 'bg-gray-100 text-gray-400' : ''
+                          isWeekendDay
+                            ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400'
+                            : ''
                         }`}
                       >
                         {day}
@@ -338,15 +335,15 @@ export function AdminDashboard() {
               <TableBody>
                 {filteredMembers.map((member) => (
                   <TableRow key={member.memberId}>
-                    <TableCell className="sticky left-0 z-10 bg-white border-r border-gray-200 font-medium">
+                    <TableCell className="sticky left-0 z-10 bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-700 font-medium">
                       <div className="flex items-center gap-2">
                         <span>{member.memberName}</span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
                           ({member.accountId})
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-center border-r border-gray-200">
+                    <TableCell className="text-center border-r border-zinc-200 dark:border-zinc-700">
                       <Badge
                         color={
                           member.stats.completionRate === 100
@@ -370,25 +367,24 @@ export function AdminDashboard() {
                           key={day}
                           className={`text-center ${
                             completion === null
-                              ? 'bg-gray-50'
+                              ? 'bg-zinc-50 dark:bg-zinc-800'
                               : completion
-                                ? 'bg-green-50'
-                                : 'bg-red-50'
+                                ? 'bg-green-50 dark:bg-green-950'
+                                : 'bg-red-50 dark:bg-red-950'
                           }`}
                         >
                           {completion === null ? (
-                            <span className="text-gray-400">-</span>
+                            <span className="text-zinc-400">-</span>
                           ) : completion ? (
-                            <span
-                              className="text-green-600"
+                            <CheckCircleIcon
+                              className="h-5 w-5 text-green-600 mx-auto"
                               title="완료 (8시간 이상)"
-                            >
-                              ✅
-                            </span>
+                            />
                           ) : (
-                            <span className="text-red-600" title="미완료">
-                              ❌
-                            </span>
+                            <XCircleIcon
+                              className="h-5 w-5 text-red-600 mx-auto"
+                              title="미완료"
+                            />
                           )}
                         </TableCell>
                       );
@@ -401,11 +397,11 @@ export function AdminDashboard() {
 
           {/* 통계 요약 */}
           {filteredMembers.length === 0 && (
-            <div className="px-6 py-12 text-center text-gray-500">
+            <div className="px-6 py-12 text-center text-zinc-500 dark:text-zinc-400">
               {selectedDate ? (
                 <div>
                   <p className="text-lg">
-                    {month}월 {selectedDate}일에 미작성한 사용자가 없습니다! 🎉
+                    {month}월 {selectedDate}일에 미작성한 사용자가 없습니다!
                   </p>
                   <p className="mt-2 text-sm">
                     모든 사용자가 해당 날짜의 업무 일지를 작성했습니다.
@@ -414,7 +410,7 @@ export function AdminDashboard() {
               ) : searchQuery ? (
                 <p>검색 결과가 없습니다.</p>
               ) : showIncompleteOnly ? (
-                <p>모든 사용자가 업무 일지를 완료했습니다! 🎉</p>
+                <p>모든 사용자가 업무 일지를 완료했습니다!</p>
               ) : (
                 <p>활성화된 사용자가 없습니다.</p>
               )}
@@ -424,19 +420,19 @@ export function AdminDashboard() {
       )}
 
       {/* 범례 */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6">
         <Subheading className="mb-3">범례</Subheading>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-green-600">✅</span>
+            <CheckCircleIcon className="h-5 w-5 text-green-600" />
             <Text>완료 - 해당 날짜에 8시간(480분) 이상 업무 작성</Text>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-red-600">❌</span>
+            <XCircleIcon className="h-5 w-5 text-red-600" />
             <Text>미완료 - 해당 날짜에 8시간 미만 작성</Text>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-gray-400">-</span>
+            <span className="text-zinc-400">-</span>
             <Text>주말/공휴일 - 작성 불필요</Text>
           </div>
           <div className="flex items-center gap-2">

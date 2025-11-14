@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '../components/ui/table';
+import { Text } from '../components/ui/text';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
 import { roleAPI } from '../services/api';
@@ -54,9 +55,13 @@ export function RoleList() {
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-red-600">역할 목록을 불러오는데 실패했습니다.</p>
-        <p className="text-sm text-red-500 mt-1">{(error as Error).message}</p>
+      <div className="p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
+        <Text className="text-red-600 dark:text-red-400">
+          역할 목록을 불러오는데 실패했습니다.
+        </Text>
+        <Text className="text-sm text-red-500 dark:text-red-400 mt-1">
+          {(error as Error).message}
+        </Text>
       </div>
     );
   }
@@ -70,14 +75,20 @@ export function RoleList() {
       </div>
 
       {/* 역할 목록 */}
-      <div className="bg-white shadow-sm rounded-lg border overflow-hidden">
+      <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-2 text-gray-600">로딩 중...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
+            <Text className="mt-2 text-zinc-600 dark:text-zinc-400">
+              로딩 중...
+            </Text>
           </div>
         ) : data?.data.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">역할이 없습니다.</div>
+          <div className="p-8 text-center">
+            <Text className="text-zinc-500 dark:text-zinc-400">
+              역할이 없습니다.
+            </Text>
+          </div>
         ) : (
           <>
             <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
@@ -129,12 +140,12 @@ export function RoleList() {
 
             {/* 페이지네이션 */}
             {data && data.pagination.pageCount > 1 && (
-              <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+              <div className="bg-white dark:bg-zinc-900 px-4 py-3 flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800 sm:px-6">
                 <div className="flex-1 flex justify-between sm:hidden">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    className="relative inline-flex items-center px-4 py-2 border border-zinc-300 dark:border-zinc-700 text-sm font-medium rounded-md text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
                   >
                     이전
                   </button>
@@ -143,27 +154,27 @@ export function RoleList() {
                       setPage((p) => Math.min(data.pagination.pageCount, p + 1))
                     }
                     disabled={page === data.pagination.pageCount}
-                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-zinc-300 dark:border-zinc-700 text-sm font-medium rounded-md text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
                   >
                     다음
                   </button>
                 </div>
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-sm text-gray-700">
+                    <Text className="text-sm text-zinc-700 dark:text-zinc-300">
                       전체{' '}
                       <span className="font-medium">
                         {data.pagination.total}
                       </span>
                       개
-                    </p>
+                    </Text>
                   </div>
                   <div>
                     <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                       <button
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
                         disabled={page === 1}
-                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
                       >
                         이전
                       </button>
@@ -174,7 +185,7 @@ export function RoleList() {
                           )
                         }
                         disabled={page === data.pagination.pageCount}
-                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
                       >
                         다음
                       </button>

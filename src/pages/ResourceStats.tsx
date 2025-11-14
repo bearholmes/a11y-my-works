@@ -1,3 +1,8 @@
+import {
+  ClockIcon,
+  DocumentTextIcon,
+  UserGroupIcon,
+} from '@heroicons/react/24/outline';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
@@ -227,19 +232,19 @@ export function ResourceStats() {
           title="총 투입 시간"
           value={stats.totalHours.toFixed(1)}
           description="시간"
-          icon="⏱️"
+          icon={<ClockIcon className="h-6 w-6" />}
         />
         <Stat
           title="총 업무 건수"
           value={stats.totalTasks}
           description="건"
-          icon="📋"
+          icon={<DocumentTextIcon className="h-6 w-6" />}
         />
         <Stat
           title="투입 인원"
           value={stats.totalMembers}
           description="명"
-          icon="👥"
+          icon={<UserGroupIcon className="h-6 w-6" />}
         />
       </div>
 
@@ -252,18 +257,18 @@ export function ResourceStats() {
           <div
             className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
             aria-label="로딩 중"
-          ></div>
+          />
         </div>
       ) : (
         <>
           {/* 프로젝트별 통계 */}
-          <div className="bg-white shadow rounded-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
+          <div className="bg-white dark:bg-zinc-900 shadow rounded-lg overflow-hidden">
+            <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
               <Subheading>프로젝트별 리소스</Subheading>
             </div>
             <div className="p-6">
               {stats.projects.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">
+                <p className="text-center text-zinc-500 dark:text-zinc-400 py-8">
                   프로젝트 데이터가 없습니다
                 </p>
               ) : (
@@ -272,23 +277,23 @@ export function ResourceStats() {
                     <div key={project.id} className="space-y-2">
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                             {project.name}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-zinc-500 dark:text-zinc-400">
                             {project.taskCount}건 업무
                           </div>
                         </div>
                         <div className="text-right ml-4">
-                          <div className="text-sm font-semibold text-gray-900">
+                          <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                             {project.totalHours.toFixed(1)}h
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-zinc-500 dark:text-zinc-400">
                             {project.percentage.toFixed(1)}%
                           </div>
                         </div>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-2">
                         <div
                           className="bg-blue-600 h-2 rounded-full transition-all"
                           style={{ width: `${project.percentage}%` }}
@@ -297,7 +302,7 @@ export function ResourceStats() {
                           aria-valuemin={0}
                           aria-valuemax={100}
                           aria-label={`${project.name} 비율`}
-                        ></div>
+                        />
                       </div>
                     </div>
                   ))}
@@ -307,13 +312,13 @@ export function ResourceStats() {
           </div>
 
           {/* 서비스별 통계 */}
-          <div className="bg-white shadow rounded-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
+          <div className="bg-white dark:bg-zinc-900 shadow rounded-lg overflow-hidden">
+            <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
               <Subheading>서비스별 리소스</Subheading>
             </div>
             <div className="p-6">
               {stats.services.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">
+                <p className="text-center text-zinc-500 dark:text-zinc-400 py-8">
                   서비스 데이터가 없습니다
                 </p>
               ) : (
@@ -322,23 +327,23 @@ export function ResourceStats() {
                     <div key={service.id} className="space-y-2">
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                             {service.name}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-zinc-500 dark:text-zinc-400">
                             {service.taskCount}건 업무
                           </div>
                         </div>
                         <div className="text-right ml-4">
-                          <div className="text-sm font-semibold text-gray-900">
+                          <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                             {service.totalHours.toFixed(1)}h
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-zinc-500 dark:text-zinc-400">
                             {service.percentage.toFixed(1)}%
                           </div>
                         </div>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-2">
                         <div
                           className="bg-green-600 h-2 rounded-full transition-all"
                           style={{ width: `${service.percentage}%` }}
@@ -347,7 +352,7 @@ export function ResourceStats() {
                           aria-valuemin={0}
                           aria-valuemax={100}
                           aria-label={`${service.name} 비율`}
-                        ></div>
+                        />
                       </div>
                     </div>
                   ))}
@@ -357,13 +362,13 @@ export function ResourceStats() {
           </div>
 
           {/* 청구 그룹별 통계 */}
-          <div className="bg-white shadow rounded-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
+          <div className="bg-white dark:bg-zinc-900 shadow rounded-lg overflow-hidden">
+            <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
               <Subheading>청구 그룹별 리소스</Subheading>
             </div>
             <div className="p-6">
               {stats.costGroups.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">
+                <p className="text-center text-zinc-500 dark:text-zinc-400 py-8">
                   청구 그룹 데이터가 없습니다
                 </p>
               ) : (
@@ -372,23 +377,23 @@ export function ResourceStats() {
                     <div key={costGroup.id} className="space-y-2">
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                             {costGroup.name}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-zinc-500 dark:text-zinc-400">
                             {costGroup.taskCount}건 업무
                           </div>
                         </div>
                         <div className="text-right ml-4">
-                          <div className="text-sm font-semibold text-gray-900">
+                          <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                             {costGroup.totalHours.toFixed(1)}h
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-zinc-500 dark:text-zinc-400">
                             {costGroup.percentage.toFixed(1)}%
                           </div>
                         </div>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-2">
                         <div
                           className="bg-purple-600 h-2 rounded-full transition-all"
                           style={{ width: `${costGroup.percentage}%` }}
@@ -397,7 +402,7 @@ export function ResourceStats() {
                           aria-valuemin={0}
                           aria-valuemax={100}
                           aria-label={`${costGroup.name} 비율`}
-                        ></div>
+                        />
                       </div>
                     </div>
                   ))}
@@ -407,13 +412,13 @@ export function ResourceStats() {
           </div>
 
           {/* 직원별 통계 */}
-          <div className="bg-white shadow rounded-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
+          <div className="bg-white dark:bg-zinc-900 shadow rounded-lg overflow-hidden">
+            <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
               <Subheading>직원별 리소스</Subheading>
             </div>
             <div className="p-6">
               {stats.members.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">
+                <p className="text-center text-zinc-500 dark:text-zinc-400 py-8">
                   직원 데이터가 없습니다
                 </p>
               ) : (
@@ -422,26 +427,26 @@ export function ResourceStats() {
                     <div key={member.id} className="space-y-2">
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                             {member.name}{' '}
-                            <span className="text-gray-500">
+                            <span className="text-zinc-500 dark:text-zinc-400">
                               (@{member.accountId})
                             </span>
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-zinc-500 dark:text-zinc-400">
                             {member.taskCount}건 업무
                           </div>
                         </div>
                         <div className="text-right ml-4">
-                          <div className="text-sm font-semibold text-gray-900">
+                          <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                             {member.totalHours.toFixed(1)}h
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-zinc-500 dark:text-zinc-400">
                             {member.percentage.toFixed(1)}%
                           </div>
                         </div>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-2">
                         <div
                           className="bg-orange-600 h-2 rounded-full transition-all"
                           style={{ width: `${member.percentage}%` }}
@@ -450,7 +455,7 @@ export function ResourceStats() {
                           aria-valuemin={0}
                           aria-valuemax={100}
                           aria-label={`${member.name} 비율`}
-                        ></div>
+                        />
                       </div>
                     </div>
                   ))}

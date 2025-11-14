@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Button } from '../components/ui/button';
+import { Field, Label } from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
+import { Select } from '../components/ui/select';
 import {
   Table,
   TableBody,
@@ -10,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '../components/ui/table';
+import { Text } from '../components/ui/text';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
 import { holidayAPI } from '../services/api';
@@ -58,8 +61,10 @@ export function HolidayList() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">로딩 중...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
+          <Text className="mt-4 text-zinc-600 dark:text-zinc-400">
+            로딩 중...
+          </Text>
         </div>
       </div>
     );
@@ -74,36 +79,37 @@ export function HolidayList() {
 
       {/* 필터 */}
       <div className="mb-4 flex gap-4">
-        <div>
-          <label
+        <Field>
+          <Label
             htmlFor="year"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1"
           >
             연도
-          </label>
-          <select
+          </Label>
+          <Select
             id="year"
             value={year}
             onChange={(e) => {
               setYear(Number(e.target.value));
               setPage(1);
             }}
-            className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           >
             {yearOptions.map((y) => (
               <option key={y} value={y}>
                 {y}년
               </option>
             ))}
-          </select>
-        </div>
+          </Select>
+        </Field>
       </div>
 
       {/* 목록 */}
-      <div className="bg-white shadow-sm rounded-lg border overflow-hidden">
+      <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
         {holidays.length === 0 ? (
-          <div className="px-6 py-8 text-center text-gray-500">
-            등록된 공휴일이 없습니다.
+          <div className="px-6 py-8 text-center">
+            <Text className="text-zinc-500 dark:text-zinc-400">
+              등록된 공휴일이 없습니다.
+            </Text>
           </div>
         ) : (
           <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
@@ -156,17 +162,17 @@ export function HolidayList() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-3 py-1 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            className="px-3 py-1 border border-zinc-300 dark:border-zinc-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-zinc-50 dark:hover:bg-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300"
           >
             이전
           </button>
-          <span className="px-3 py-1">
+          <Text className="px-3 py-1 text-zinc-700 dark:text-zinc-300">
             {page} / {totalPages}
-          </span>
+          </Text>
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="px-3 py-1 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            className="px-3 py-1 border border-zinc-300 dark:border-zinc-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-zinc-50 dark:hover:bg-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300"
           >
             다음
           </button>

@@ -5,9 +5,16 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { Button } from '../components/ui/button';
+import {
+  Description,
+  ErrorMessage,
+  Field,
+  Label,
+} from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
+import { Text } from '../components/ui/text';
 import { Textarea } from '../components/ui/textarea';
 import { useNotification } from '../hooks/useNotification';
 import { projectAPI } from '../services/api';
@@ -122,7 +129,7 @@ export function ProjectForm() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">로딩 중...</p>
+          <Text className="mt-4">로딩 중...</Text>
         </div>
       </div>
     );
@@ -134,56 +141,38 @@ export function ProjectForm() {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mt-8 max-w-2xl bg-white shadow-sm rounded-lg border p-6 space-y-6"
+        className="mt-8 max-w-2xl bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6 space-y-6"
         aria-label={isEditMode ? '프로젝트 수정 폼' : '프로젝트 등록 폼'}
       >
-        <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
-          >
+        <Field>
+          <Label>
             프로젝트명{' '}
             <span className="text-red-600" aria-label="필수 항목">
               *
             </span>
-          </label>
+          </Label>
           <Input
             id="name"
             {...register('name')}
             type="text"
             aria-required="true"
             aria-invalid={!!errors.name}
-            aria-describedby={errors.name ? 'name-error' : undefined}
           />
-          {errors.name && (
-            <p
-              id="name-error"
-              className="mt-1 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.name.message}
-            </p>
-          )}
-        </div>
+          {errors.name && <ErrorMessage>{errors.name.message}</ErrorMessage>}
+        </Field>
 
-        <div>
-          <label
-            htmlFor="service_id"
-            className="block text-sm font-medium text-gray-700"
-          >
+        <Field>
+          <Label>
             서비스{' '}
             <span className="text-red-600" aria-label="필수 항목">
               *
             </span>
-          </label>
+          </Label>
           <Select
             id="service_id"
             {...register('service_id', { valueAsNumber: true })}
             aria-required="true"
             aria-invalid={!!errors.service_id}
-            aria-describedby={
-              errors.service_id ? 'service_id-error' : undefined
-            }
           >
             <option value={0}>서비스 선택</option>
             {services?.map((service: any) => (
@@ -193,29 +182,18 @@ export function ProjectForm() {
             ))}
           </Select>
           {errors.service_id && (
-            <p
-              id="service_id-error"
-              className="mt-1 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.service_id.message}
-            </p>
+            <ErrorMessage>{errors.service_id.message}</ErrorMessage>
           )}
-          <p className="mt-1 text-sm text-gray-500">
-            이 프로젝트가 속한 서비스를 선택하세요
-          </p>
-        </div>
+          <Description>이 프로젝트가 속한 서비스를 선택하세요</Description>
+        </Field>
 
-        <div>
-          <label
-            htmlFor="code"
-            className="block text-sm font-medium text-gray-700"
-          >
+        <Field>
+          <Label>
             프로젝트 코드{' '}
             <span className="text-red-600" aria-label="필수 항목">
               *
             </span>
-          </label>
+          </Label>
           <Input
             id="code"
             {...register('code')}
@@ -224,67 +202,40 @@ export function ProjectForm() {
             disabled={isEditMode}
             aria-required="true"
             aria-invalid={!!errors.code}
-            aria-describedby={errors.code ? 'code-error' : undefined}
           />
-          {errors.code && (
-            <p
-              id="code-error"
-              className="mt-1 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.code.message}
-            </p>
-          )}
-          <p className="mt-1 text-sm text-gray-500">
+          {errors.code && <ErrorMessage>{errors.code.message}</ErrorMessage>}
+          <Description>
             대문자, 숫자, 언더스코어만 사용 가능합니다.{' '}
             {isEditMode && '(코드는 수정할 수 없습니다)'}
-          </p>
-        </div>
+          </Description>
+        </Field>
 
-        <div>
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700"
-          >
-            설명
-          </label>
+        <Field>
+          <Label>설명</Label>
           <Textarea
             id="description"
             {...register('description')}
             rows={3}
             aria-label="프로젝트 설명 입력"
             aria-invalid={!!errors.description}
-            aria-describedby={
-              errors.description ? 'description-error' : undefined
-            }
           />
           {errors.description && (
-            <p
-              id="description-error"
-              className="mt-1 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.description.message}
-            </p>
+            <ErrorMessage>{errors.description.message}</ErrorMessage>
           )}
-        </div>
+        </Field>
 
-        <div>
-          <label
-            htmlFor="platform"
-            className="block text-sm font-medium text-gray-700"
-          >
+        <Field>
+          <Label>
             플랫폼{' '}
             <span className="text-red-600" aria-label="필수 항목">
               *
             </span>
-          </label>
+          </Label>
           <Select
             id="platform"
             {...register('platform')}
             aria-required="true"
             aria-invalid={!!errors.platform}
-            aria-describedby={errors.platform ? 'platform-error' : undefined}
           >
             <option value="">플랫폼 선택</option>
             <option value="WEB">웹</option>
@@ -292,23 +243,12 @@ export function ProjectForm() {
             <option value="BOTH">웹+앱</option>
           </Select>
           {errors.platform && (
-            <p
-              id="platform-error"
-              className="mt-1 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.platform.message}
-            </p>
+            <ErrorMessage>{errors.platform.message}</ErrorMessage>
           )}
-        </div>
+        </Field>
 
-        <div>
-          <label
-            htmlFor="version"
-            className="block text-sm font-medium text-gray-700"
-          >
-            버전
-          </label>
+        <Field>
+          <Label>버전</Label>
           <Input
             id="version"
             {...register('version')}
@@ -316,26 +256,14 @@ export function ProjectForm() {
             placeholder="1.0.0"
             aria-label="프로젝트 버전 입력"
             aria-invalid={!!errors.version}
-            aria-describedby={errors.version ? 'version-error' : undefined}
           />
           {errors.version && (
-            <p
-              id="version-error"
-              className="mt-1 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.version.message}
-            </p>
+            <ErrorMessage>{errors.version.message}</ErrorMessage>
           )}
-        </div>
+        </Field>
 
-        <div>
-          <label
-            htmlFor="repository_url"
-            className="block text-sm font-medium text-gray-700"
-          >
-            저장소 URL
-          </label>
+        <Field>
+          <Label>저장소 URL</Label>
           <Input
             id="repository_url"
             {...register('repository_url')}
@@ -343,20 +271,11 @@ export function ProjectForm() {
             placeholder="https://github.com/..."
             aria-label="저장소 URL 입력"
             aria-invalid={!!errors.repository_url}
-            aria-describedby={
-              errors.repository_url ? 'repository_url-error' : undefined
-            }
           />
           {errors.repository_url && (
-            <p
-              id="repository_url-error"
-              className="mt-1 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.repository_url.message}
-            </p>
+            <ErrorMessage>{errors.repository_url.message}</ErrorMessage>
           )}
-        </div>
+        </Field>
 
         <div className="flex gap-3 pt-4">
           <Button

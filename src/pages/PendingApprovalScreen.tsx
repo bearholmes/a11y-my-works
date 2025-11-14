@@ -1,3 +1,4 @@
+import { ClockIcon } from '@heroicons/react/24/outline';
 import { Button } from '../components/ui/button';
 import { Heading } from '../components/ui/heading';
 import { Text } from '../components/ui/text';
@@ -15,24 +16,12 @@ export function PendingApprovalScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
+        <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-sm p-8 text-center">
           {/* 아이콘 */}
-          <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg
-              className="w-8 h-8 text-yellow-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+          <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-950 rounded-full flex items-center justify-center mx-auto mb-4">
+            <ClockIcon className="w-8 h-8 text-yellow-600" />
           </div>
 
           {/* 메시지 */}
@@ -46,24 +35,26 @@ export function PendingApprovalScreen() {
           </Text>
 
           {/* 사용자 정보 */}
-          <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
-            <Text className="mb-1 text-gray-500">가입 이메일</Text>
+          <div className="bg-zinc-50 dark:bg-zinc-800 rounded-lg p-4 mb-6 text-left">
+            <Text className="mb-1 text-zinc-500 dark:text-zinc-400">
+              가입 이메일
+            </Text>
             <Text className="font-medium">{user?.email}</Text>
           </div>
 
           {/* 안내 사항 */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
-            <Text className="font-semibold text-blue-900 mb-2">
-              📌 다음 단계
+          <div className="bg-blue-50 dark:bg-blue-950 rounded-lg p-4 mb-6 text-left">
+            <Text className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+              다음 단계
             </Text>
             <ul className="space-y-1">
-              <Text className="text-blue-800">
+              <Text className="text-blue-800 dark:text-blue-200">
                 • 관리자가 계정을 검토합니다
               </Text>
-              <Text className="text-blue-800">
+              <Text className="text-blue-800 dark:text-blue-200">
                 • 역할이 할당되면 이메일로 알림을 받게 됩니다
               </Text>
-              <Text className="text-blue-800">
+              <Text className="text-blue-800 dark:text-blue-200">
                 • 승인 후 다시 로그인하여 이용하실 수 있습니다
               </Text>
             </ul>
@@ -75,7 +66,7 @@ export function PendingApprovalScreen() {
           </Button>
 
           {/* 문의 안내 */}
-          <Text className="mt-4 text-gray-500">
+          <Text className="mt-4 text-zinc-500 dark:text-zinc-400">
             문의사항이 있으시면 관리자에게 연락해주세요
           </Text>
         </div>

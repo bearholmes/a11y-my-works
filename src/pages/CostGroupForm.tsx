@@ -5,8 +5,10 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { Button } from '../components/ui/button';
+import { ErrorMessage, Field, Label } from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
+import { Text } from '../components/ui/text';
 import { Textarea } from '../components/ui/textarea';
 import { useNotification } from '../hooks/useNotification';
 import { costGroupAPI } from '../services/api';
@@ -98,7 +100,7 @@ export function CostGroupForm() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">로딩 중...</p>
+          <Text className="mt-4">로딩 중...</Text>
         </div>
       </div>
     );
@@ -110,67 +112,41 @@ export function CostGroupForm() {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mt-8 max-w-2xl bg-white shadow-sm rounded-lg border p-6 space-y-6"
+        className="mt-8 max-w-2xl bg-white dark:bg-zinc-900 shadow-sm rounded-lg p-6 space-y-6"
         aria-label={isEditMode ? '청구 그룹 수정 폼' : '청구 그룹 등록 폼'}
       >
-        <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
-          >
+        <Field>
+          <Label>
             청구 그룹명{' '}
             <span className="text-red-600" aria-label="필수 항목">
               *
             </span>
-          </label>
+          </Label>
           <Input
             id="name"
             {...register('name')}
             type="text"
             aria-required="true"
             aria-invalid={!!errors.name}
-            aria-describedby={errors.name ? 'name-error' : undefined}
             placeholder="예: 내부사업, 구글, 애플"
           />
-          {errors.name && (
-            <p
-              id="name-error"
-              className="mt-1 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.name.message}
-            </p>
-          )}
-        </div>
+          {errors.name && <ErrorMessage>{errors.name.message}</ErrorMessage>}
+        </Field>
 
-        <div>
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700"
-          >
-            설명
-          </label>
+        <Field>
+          <Label>설명</Label>
           <Textarea
             id="description"
             {...register('description')}
             rows={3}
             aria-label="청구 그룹 설명 입력"
             aria-invalid={!!errors.description}
-            aria-describedby={
-              errors.description ? 'description-error' : undefined
-            }
             placeholder="청구 그룹에 대한 설명을 입력하세요"
           />
           {errors.description && (
-            <p
-              id="description-error"
-              className="mt-1 text-sm text-red-600"
-              role="alert"
-            >
-              {errors.description.message}
-            </p>
+            <ErrorMessage>{errors.description.message}</ErrorMessage>
           )}
-        </div>
+        </Field>
 
         <div className="flex gap-3 pt-4">
           <Button
