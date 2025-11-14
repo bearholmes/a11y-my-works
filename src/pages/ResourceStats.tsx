@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
+import { Stat } from '../components/Stat';
 import { Heading, Subheading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
-import { Stat } from '../components/ui/stat';
 import { Text } from '../components/ui/text';
 import { taskAPI } from '../services/api';
 import type { Task } from '../types/database';
