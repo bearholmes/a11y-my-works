@@ -136,7 +136,7 @@ export function CostGroupList() {
                 <option value="inactive">비활성</option>
               </Select>
             </Field>
-            <Button type="submit">검색</Button>
+            <Button type="submit" className="self-end">검색</Button>
           </div>
         </form>
       </div>

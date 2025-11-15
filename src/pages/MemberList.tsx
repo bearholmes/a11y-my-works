@@ -278,7 +278,7 @@ export function MemberList() {
               승인 대기 중인 사용자만 표시됩니다
             </div>
           )}
-          <Button type="submit">검색</Button>
+          <Button type="submit" className="self-end">검색</Button>
         </form>
       </div>
 

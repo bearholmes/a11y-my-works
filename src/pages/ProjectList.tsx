@@ -126,7 +126,7 @@ export function ProjectList() {
               <option value="BOTH">웹+앱</option>
             </Select>
           </Field>
-          <Button type="submit">검색</Button>
+          <Button type="submit" className="self-end">검색</Button>
         </form>
       </div>
 
