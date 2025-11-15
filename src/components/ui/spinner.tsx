@@ -12,7 +12,7 @@ export interface SpinnerProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   /**
    * 스피너의 색상 클래스
-   * @default 'text-neutral-tertiary'
+   * @default 'text-gray-500'
    */
   className?: string;
   /**
@@ -61,9 +61,9 @@ export function Spinner({
       <svg
         aria-hidden="true"
         className={clsx(
-          'animate-spin fill-dark dark:fill-quaternary',
+          'animate-spin fill-gray-800 dark:fill-gray-500',
           sizeStyles[size],
-          className || 'text-neutral-tertiary'
+          className || 'text-gray-200'
         )}
         viewBox="0 0 100 101"
         fill="none"
