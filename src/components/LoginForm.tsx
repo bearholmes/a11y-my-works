@@ -120,7 +120,7 @@ export function LoginForm() {
   return (
     <AuthLayout>
       <form
-        className="grid w-full max-w-sm grid-cols-1 gap-8"
+        className="grid w-full max-w-sm grid-cols-1 gap-6"
         onSubmit={
           isSignUp
             ? signUpForm.handleSubmit(onSubmit)
@@ -128,15 +128,8 @@ export function LoginForm() {
         }
         aria-label={isSignUp ? '회원가입 폼' : '로그인 폼'}
       >
-        {/* 로고 또는 앱 타이틀 */}
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-zinc-950 dark:text-white">
-            {import.meta.env.VITE_APP_NAME || '업무 보고 시스템'}
-          </h1>
-        </div>
-
         {/* 헤딩 */}
-        <Heading>{isSignUp ? '계정 만들기' : '로그인'}</Heading>
+        <Heading>{isSignUp ? '계정 만들기' : '계정에 로그인'}</Heading>
 
         {/* 에러 메시지 */}
         {error && (

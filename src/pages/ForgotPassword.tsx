@@ -52,7 +52,7 @@ export function ForgotPassword() {
   if (success) {
     return (
       <AuthLayout>
-        <div className="grid w-full max-w-sm grid-cols-1 gap-8 text-center">
+        <div className="grid w-full max-w-sm grid-cols-1 gap-6 text-center">
           <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-950">
             <svg
               className="h-6 w-6 text-green-600"
@@ -84,23 +84,11 @@ export function ForgotPassword() {
   return (
     <AuthLayout>
       <form
-        className="grid w-full max-w-sm grid-cols-1 gap-8"
+        className="grid w-full max-w-sm grid-cols-1 gap-6"
         onSubmit={handleSubmit(onSubmit)}
       >
-        {/* 로고 또는 앱 타이틀 */}
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-zinc-950 dark:text-white">
-            {import.meta.env.VITE_APP_NAME || '업무 보고 시스템'}
-          </h1>
-        </div>
-
         {/* 헤딩 */}
-        <Heading>비밀번호 재설정</Heading>
-
-        {/* 설명 */}
-        <Text>
-          이메일 주소를 입력하시면 비밀번호 재설정 링크를 보내드립니다.
-        </Text>
+        <Heading>비밀번호 찾기</Heading>
 
         {/* 에러 메시지 */}
         {error && (
@@ -135,14 +123,14 @@ export function ForgotPassword() {
           color="blue"
           aria-busy={submitting}
         >
-          {submitting ? '발송 중...' : '비밀번호 재설정'}
+          {submitting ? '발송 중...' : '재설정 링크 보내기'}
         </Button>
 
         {/* 로그인 링크 */}
         <Text className="text-center">
-          계정이 없나요?{' '}
+          비밀번호가 기억나셨나요?{' '}
           <TextLink href="/login">
-            <Strong>회원가입</Strong>
+            <Strong>로그인</Strong>
           </TextLink>
         </Text>
       </form>
