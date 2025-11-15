@@ -153,7 +153,7 @@ export function Dashboard() {
                       <div className="flex-1">
                         <div className="bg-zinc-200 rounded-full h-6 relative dark:bg-zinc-700">
                           <div
-                            className="bg-blue-600 h-6 rounded-full flex items-center justify-end pr-2 dark:bg-blue-500"
+                            className="bg-zinc-600 h-6 rounded-full flex items-center justify-end pr-2 dark:bg-zinc-500"
                             style={{
                               width: `${Math.min((stat.totalHours / 40) * 100, 100)}%`,
                             }}
@@ -255,7 +255,7 @@ export function Dashboard() {
             <Subheading>최근 업무</Subheading>
             <Link
               href="/tasks"
-              className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+              className="inline-flex items-center gap-1 text-sm text-zinc-700 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-300"
             >
               전체 보기
               <ChevronRightIcon className="size-4" />

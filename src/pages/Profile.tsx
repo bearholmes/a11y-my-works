@@ -46,8 +46,8 @@ export function Profile() {
           {/* 프로필 헤더 */}
           <div className="p-6 border-b">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-blue-100 dark:bg-blue-950 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+              <div className="w-16 h-16 bg-zinc-200 dark:bg-zinc-900 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl font-bold text-zinc-700 dark:text-zinc-400">
                   {profile.name.charAt(0)}
                 </span>
               </div>

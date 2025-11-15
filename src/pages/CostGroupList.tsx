@@ -260,7 +260,7 @@ export function CostGroupList() {
                               onClick={() => setPage(pageNum)}
                               className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                                 page === pageNum
-                                  ? 'z-10 bg-blue-50 dark:bg-blue-950 border-blue-500 dark:border-blue-600 text-blue-600 dark:text-blue-400'
+                                  ? 'z-10 bg-zinc-100 dark:bg-zinc-900 border-zinc-500 dark:border-zinc-600 text-zinc-700 dark:text-zinc-400'
                                   : 'bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700'
                               }`}
                             >

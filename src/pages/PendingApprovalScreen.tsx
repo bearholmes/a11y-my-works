@@ -43,18 +43,18 @@ export function PendingApprovalScreen() {
           </div>
 
           {/* 안내 사항 */}
-          <div className="bg-blue-50 dark:bg-blue-950 rounded-lg p-4 mb-6 text-left">
-            <Text className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+          <div className="bg-zinc-100 dark:bg-zinc-900 rounded-lg p-4 mb-6 text-left">
+            <Text className="font-semibold text-zinc-800 dark:text-zinc-100 mb-2">
               다음 단계
             </Text>
             <ul className="space-y-1">
-              <Text className="text-blue-800 dark:text-blue-200">
+              <Text className="text-zinc-700 dark:text-zinc-200">
                 • 관리자가 계정을 검토합니다
               </Text>
-              <Text className="text-blue-800 dark:text-blue-200">
+              <Text className="text-zinc-700 dark:text-zinc-200">
                 • 역할이 할당되면 이메일로 알림을 받게 됩니다
               </Text>
-              <Text className="text-blue-800 dark:text-blue-200">
+              <Text className="text-zinc-700 dark:text-zinc-200">
                 • 승인 후 다시 로그인하여 이용하실 수 있습니다
               </Text>
             </ul>

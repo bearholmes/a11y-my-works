@@ -113,7 +113,7 @@ export function Licenses() {
               href="https://github.com/bearholmes/a11y-my-works/blob/main/.doc/dependency-licenses.md"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
+              className="text-zinc-700 hover:underline"
             >
               프로젝트 문서
             </a>

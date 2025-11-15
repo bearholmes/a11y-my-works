@@ -222,9 +222,9 @@ export function TaskList() {
                     p-3 rounded-lg text-center transition-colors
                     ${
                       isSelected
-                        ? 'bg-blue-600 text-white dark:bg-blue-500'
+                        ? 'bg-zinc-600 text-white dark:bg-zinc-1000'
                         : isToday
-                          ? 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400'
+                          ? 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-400'
                           : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
                     }
                   `}
@@ -290,7 +290,7 @@ export function TaskList() {
                 <TableCell>
                   <button
                     onClick={() => handleViewDetail(task)}
-                    className="font-medium text-blue-600 hover:text-blue-900 text-left dark:text-blue-400 dark:hover:text-blue-300"
+                    className="font-medium text-zinc-700 hover:text-zinc-800 text-left dark:text-zinc-400 dark:hover:text-zinc-300"
                   >
                     {task.task_name}
                   </button>
@@ -396,7 +396,7 @@ export function TaskList() {
         </DialogBody>
         <DialogActions>
           {selectedTask && (
-            <Button color="blue" href={`/tasks/edit/${selectedTask.task_id}`}>
+            <Button color="zinc" href={`/tasks/edit/${selectedTask.task_id}`}>
               수정
             </Button>
           )}

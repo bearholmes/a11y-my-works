@@ -24,7 +24,7 @@ export function ServerError() {
           <Button
             type="button"
             onClick={() => window.location.reload()}
-            color="blue"
+            color="zinc"
           >
             페이지 새로고침
           </Button>

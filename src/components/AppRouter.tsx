@@ -6,6 +6,7 @@ import { ApplicationLayout } from '../layouts/ApplicationLayout';
 import { memberAPI } from '../services/api';
 import { LoginForm } from './LoginForm';
 import { PermissionGuard } from './PermissionGuard';
+import { Spinner } from './ui/spinner';
 
 // 로딩 컴포넌트
 function PageLoader() {
@@ -15,11 +16,7 @@ function PageLoader() {
       role="status"
       aria-live="polite"
     >
-      <div
-        className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
-        aria-label="페이지 로딩 중"
-      ></div>
-      <span className="sr-only">페이지 로딩 중...</span>
+      <Spinner size="lg" label="페이지 로딩 중" />
     </div>
   );
 }
@@ -143,10 +140,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center" role="status" aria-live="polite">
-          <div
-            className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"
-            aria-label="인증 확인 중"
-          ></div>
+          <Spinner size="lg" label="인증 확인 중" />
           <p className="mt-4 text-gray-600">로딩 중...</p>
         </div>
       </div>

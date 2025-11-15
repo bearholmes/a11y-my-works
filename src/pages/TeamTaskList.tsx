@@ -252,7 +252,7 @@ export function TeamTaskList() {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Badge color="blue">{task.task_type || '일반'}</Badge>
+                    <Badge color="zinc">{task.task_type || '일반'}</Badge>
                   </TableCell>
                   <TableCell>{task.work_time || 0}h</TableCell>
                   <TableCell>

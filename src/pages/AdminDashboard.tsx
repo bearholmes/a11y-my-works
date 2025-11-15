@@ -250,7 +250,7 @@ export function AdminDashboard() {
             title="전체 완료율"
             value={`${stats.overallCompletionRate}%`}
             description={`${stats.totalCompletedDays} / ${stats.totalWorkingDays} 일`}
-            className="[&_.text-gray-900]:!text-blue-600"
+            className="[&_.text-gray-900]:!text-zinc-700"
           />
           <Stat
             title="완전 작성 사용자"
@@ -289,7 +289,7 @@ export function AdminDashboard() {
                 </Text>
               </div>
               <div>
-                <Text className="text-blue-600 font-medium">
+                <Text className="text-zinc-700 font-medium">
                   {filteredMembers.length}명
                 </Text>
                 {selectedDate && (

@@ -21,7 +21,7 @@ export function Forbidden() {
           이 페이지에 접근할 권한이 없습니다. 관리자에게 문의하세요.
         </p>
         <div className="mt-10 flex items-center justify-center gap-x-6">
-          <Button href="/" color="blue">
+          <Button href="/" color="zinc">
             홈으로 돌아가기
           </Button>
           <button

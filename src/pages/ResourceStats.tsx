@@ -289,7 +289,7 @@ export function ResourceStats() {
                       </div>
                       <div className="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-2">
                         <div
-                          className="bg-blue-600 h-2 rounded-full transition-all"
+                          className="bg-zinc-600 h-2 rounded-full transition-all"
                           style={{ width: `${project.percentage}%` }}
                           role="progressbar"
                           aria-valuenow={project.percentage}

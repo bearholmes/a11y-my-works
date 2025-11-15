@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { usePermission } from '../hooks/usePermission';
+import { Spinner } from './ui/spinner';
 
 interface PermissionGuardProps {
   children: ReactNode;
@@ -27,10 +28,7 @@ export function PermissionGuard({
         role="status"
         aria-live="polite"
       >
-        <div
-          className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
-          aria-label="권한 확인 중"
-        ></div>
+        <Spinner size="lg" label="권한 확인 중" />
       </div>
     );
   }

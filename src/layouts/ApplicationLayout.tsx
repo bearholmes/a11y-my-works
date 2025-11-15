@@ -19,6 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Avatar } from '../components/ui/avatar';
+import { Spinner } from '../components/ui/spinner';
 import {
   Dropdown,
   DropdownButton,
@@ -260,10 +261,7 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center" role="status" aria-live="polite">
-          <div
-            className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"
-            aria-label="레이아웃 로딩 중"
-          />
+          <Spinner size="lg" label="레이아웃 로딩 중" />
           <p className="mt-4 text-gray-600">로딩 중...</p>
         </div>
       </div>

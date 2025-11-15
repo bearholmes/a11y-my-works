@@ -11,7 +11,7 @@ export function NotFound() {
   return (
     <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8 dark:bg-zinc-950">
       <div className="text-center">
-        <p className="text-base font-semibold text-blue-600 dark:text-blue-400">
+        <p className="text-base font-semibold text-zinc-700 dark:text-zinc-400">
           404
         </p>
         <h1 className="mt-4 text-5xl font-semibold tracking-tight text-balance text-zinc-900 sm:text-7xl dark:text-white">
@@ -21,7 +21,7 @@ export function NotFound() {
           요청하신 페이지가 존재하지 않거나 이동되었습니다.
         </p>
         <div className="mt-10 flex items-center justify-center gap-x-6">
-          <Button href="/" color="blue">
+          <Button href="/" color="zinc">
             홈으로 돌아가기
           </Button>
           <button
