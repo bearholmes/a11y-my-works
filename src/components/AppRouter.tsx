@@ -58,6 +58,9 @@ const ServerError = lazy(() =>
 const Licenses = lazy(() =>
   import('../pages/Licenses').then((m) => ({ default: m.Licenses }))
 );
+const Logout = lazy(() =>
+  import('../pages/Logout').then((m) => ({ default: m.Logout }))
+);
 
 // 프로젝트 관리
 const ProjectList = lazy(() =>
@@ -197,6 +200,14 @@ export function AppRouter() {
           element={
             <Suspense fallback={<PageLoader />}>
               <Licenses />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/logout"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <Logout />
             </Suspense>
           }
         />

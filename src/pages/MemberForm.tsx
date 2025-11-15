@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { Button } from '../components/ui/button';
+import { Checkbox, CheckboxField } from '../components/ui/checkbox';
 import {
   Description,
   ErrorMessage,
@@ -42,6 +43,7 @@ export function MemberForm() {
     handleSubmit,
     formState: { errors },
     reset,
+    control,
   } = useForm<MemberFormData>({
     resolver: zodResolver(memberSchema),
     defaultValues: {
@@ -225,39 +227,34 @@ export function MemberForm() {
           )}
         </Field>
 
-        <div className="flex items-center">
-          <input
-            id="is_active"
-            {...register('is_active')}
-            type="checkbox"
-            aria-label="사용자 활성 상태"
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 dark:border-zinc-600 rounded"
-          />
-          <label
-            htmlFor="is_active"
-            className="ml-2 block text-sm text-zinc-950 dark:text-white"
-          >
-            활성 상태
-          </label>
-        </div>
+        <Controller
+          name="is_active"
+          control={control}
+          render={({ field }) => (
+            <CheckboxField>
+              <Checkbox
+                checked={field.value}
+                onChange={field.onChange}
+                aria-label="사용자 활성 상태"
+              />
+              <Label>활성 상태</Label>
+            </CheckboxField>
+          )}
+        />
 
-        <div className="flex items-center">
-          <input
-            id="requires_daily_report"
-            {...register('requires_daily_report')}
-            type="checkbox"
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 dark:border-zinc-600 rounded"
-          />
-          <label
-            htmlFor="requires_daily_report"
-            className="ml-2 block text-sm text-zinc-950 dark:text-white"
-          >
-            업무보고 작성 의무
-          </label>
-          <Text className="ml-2 text-xs">
-            (체크 시 일일 업무보고 작성 대상자로 분류됩니다)
-          </Text>
-        </div>
+        <Controller
+          name="requires_daily_report"
+          control={control}
+          render={({ field }) => (
+            <CheckboxField>
+              <Checkbox checked={field.value} onChange={field.onChange} />
+              <Label>업무보고 작성 의무</Label>
+              <Description>
+                체크 시 일일 업무보고 작성 대상자로 분류됩니다
+              </Description>
+            </CheckboxField>
+          )}
+        />
 
         <div className="flex gap-3 pt-4">
           <Button

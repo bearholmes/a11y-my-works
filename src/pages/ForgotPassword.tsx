@@ -2,11 +2,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { AuthLayout } from '../components/ui/auth-layout';
 import { Button } from '../components/ui/button';
-import { Fieldset, Label } from '../components/ui/fieldset';
+import { ErrorMessage, Field, Label } from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
-import { Text } from '../components/ui/text';
+import { Strong, Text, TextLink } from '../components/ui/text';
 import { useAuth } from '../hooks/useAuth';
 
 const forgotPasswordSchema = z.object({
@@ -50,87 +51,88 @@ export function ForgotPassword() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center">
-        <div className="max-w-md w-full space-y-8">
-          <div className="bg-white dark:bg-zinc-900 p-8 rounded-lg text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-950">
-              <svg
-                className="h-6 w-6 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </div>
-            <Heading className="mt-6">이메일을 확인해주세요</Heading>
-            <Text className="mt-2">
-              비밀번호 재설정 링크를 이메일로 발송했습니다.
-              <br />
-              이메일을 확인하고 링크를 클릭해주세요.
-            </Text>
-            <div className="mt-6">
-              <Button href="/login" plain>
-                로그인 페이지로 돌아가기
-              </Button>
-            </div>
+      <AuthLayout>
+        <div className="grid w-full max-w-sm grid-cols-1 gap-8 text-center">
+          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-950">
+            <svg
+              className="h-6 w-6 text-green-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
           </div>
+          <Heading>이메일을 확인해주세요</Heading>
+          <Text>
+            비밀번호 재설정 링크를 이메일로 발송했습니다. 이메일을 확인하고
+            링크를 클릭해주세요.
+          </Text>
+          <Button href="/login" plain className="w-full">
+            로그인 페이지로 돌아가기
+          </Button>
         </div>
-      </div>
+      </AuthLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <Heading level={1}>비밀번호 찾기</Heading>
-          <Text className="mt-2">
-            가입하신 이메일 주소를 입력하시면
-            <br />
-            비밀번호 재설정 링크를 보내드립니다.
-          </Text>
-        </div>
+    <AuthLayout>
+      <form
+        className="grid w-full max-w-sm grid-cols-1 gap-8"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        {/* 헤딩 */}
+        <Heading>비밀번호 찾기</Heading>
 
-        <form
-          className="bg-white dark:bg-zinc-900 p-8 rounded-lg space-y-6"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          {error && (
-            <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
-
-          <Fieldset>
-            <Label htmlFor="email">이메일</Label>
-            <Input
-              {...register('email')}
-              id="email"
-              type="email"
-              placeholder="your@email.com"
-            />
-            {errors.email && (
-              <Text className="mt-1 text-red-600">{errors.email.message}</Text>
-            )}
-          </Fieldset>
-
-          <Button type="submit" disabled={submitting} className="w-full">
-            {submitting ? '발송 중...' : '재설정 링크 보내기'}
-          </Button>
-
-          <div className="text-center">
-            <Button href="/login" plain>
-              로그인 페이지로 돌아가기
-            </Button>
+        {/* 에러 메시지 */}
+        {error && (
+          <div
+            className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg dark:bg-red-900/20 dark:border-red-800"
+            role="alert"
+            aria-live="assertive"
+          >
+            {error}
           </div>
-        </form>
-      </div>
-    </div>
+        )}
+
+        {/* 이메일 필드 */}
+        <Field>
+          <Label>이메일</Label>
+          <Input
+            {...register('email')}
+            type="email"
+            name="email"
+            placeholder="your@email.com"
+            aria-required="true"
+            invalid={!!errors.email}
+          />
+          {errors.email && <ErrorMessage>{errors.email.message}</ErrorMessage>}
+        </Field>
+
+        {/* 제출 버튼 */}
+        <Button
+          type="submit"
+          disabled={submitting}
+          className="w-full"
+          aria-busy={submitting}
+        >
+          {submitting ? '발송 중...' : '재설정 링크 보내기'}
+        </Button>
+
+        {/* 로그인 링크 */}
+        <Text>
+          비밀번호가 기억나셨나요?{' '}
+          <TextLink href="/login">
+            <Strong>로그인</Strong>
+          </TextLink>
+        </Text>
+      </form>
+    </AuthLayout>
   );
 }

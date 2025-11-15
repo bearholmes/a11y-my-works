@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { Button } from '../components/ui/button';
+import { Checkbox } from '../components/ui/checkbox';
 import { ErrorMessage, Field, Label } from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
@@ -43,6 +44,7 @@ export function RoleForm() {
     handleSubmit,
     formState: { errors },
     reset,
+    control,
   } = useForm<RoleFormData>({
     resolver: zodResolver(roleSchema),
     defaultValues: {
@@ -230,21 +232,20 @@ export function RoleForm() {
             />
           </Field>
 
-          <div className="flex items-center">
-            <input
-              id="is_active"
-              {...register('is_active')}
-              type="checkbox"
-              aria-label="역할 활성 상태"
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 dark:border-zinc-600 rounded"
-            />
-            <label
-              htmlFor="is_active"
-              className="ml-2 block text-sm text-zinc-950 dark:text-white"
-            >
-              활성 상태
-            </label>
-          </div>
+          <Controller
+            name="is_active"
+            control={control}
+            render={({ field }) => (
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  checked={field.value}
+                  onChange={field.onChange}
+                  aria-label="역할 활성 상태"
+                />
+                <Label>활성 상태</Label>
+              </div>
+            )}
+          />
         </div>
 
         {/* 권한 설정 */}
@@ -292,33 +293,29 @@ export function RoleForm() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
-                      <input
-                        type="checkbox"
+                      <Checkbox
                         checked={permission.readAccess}
-                        onChange={(e) =>
+                        onChange={(checked) =>
                           handlePermissionChange(
                             permission.permissionId,
                             'readAccess',
-                            e.target.checked
+                            checked
                           )
                         }
                         aria-label={`${permission.name} 읽기 권한`}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 dark:border-zinc-600 rounded"
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
-                      <input
-                        type="checkbox"
+                      <Checkbox
                         checked={permission.writeAccess}
-                        onChange={(e) =>
+                        onChange={(checked) =>
                           handlePermissionChange(
                             permission.permissionId,
                             'writeAccess',
-                            e.target.checked
+                            checked
                           )
                         }
                         aria-label={`${permission.name} 쓰기 권한`}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 dark:border-zinc-600 rounded"
                       />
                     </td>
                   </tr>

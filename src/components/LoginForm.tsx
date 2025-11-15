@@ -1,10 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useNotification } from '../hooks/useNotification';
 import { useAuthContext } from '../providers/AuthProvider';
+import { AuthLayout } from './ui/auth-layout';
+import { Button } from './ui/button';
+import { Checkbox, CheckboxField } from './ui/checkbox';
+import { ErrorMessage, Field, Label } from './ui/fieldset';
+import { Heading } from './ui/heading';
+import { Input } from './ui/input';
+import { Strong, Text, TextLink } from './ui/text';
 
 const loginSchema = z.object({
   email: z.string().trim().email('올바른 이메일을 입력해주세요'),
@@ -45,15 +52,15 @@ export function LoginForm() {
   // 로딩 중에는 아무것도 렌더링하지 않음
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <AuthLayout>
         <div className="text-center" role="status" aria-live="polite">
           <div
-            className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"
+            className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mx-auto"
             aria-label="로딩 중"
-          ></div>
-          <p className="mt-4 text-gray-600">로딩 중...</p>
+          />
+          <Text className="mt-4">로딩 중...</Text>
         </div>
-      </div>
+      </AuthLayout>
     );
   }
 
@@ -111,271 +118,186 @@ export function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900">
-            {isSignUp ? '회원가입' : '로그인'}
-          </h1>
-          <p className="mt-2 text-gray-600">
-            {import.meta.env.VITE_APP_DESCRIPTION}
-          </p>
-        </div>
+    <AuthLayout>
+      <form
+        className="grid w-full max-w-sm grid-cols-1 gap-8"
+        onSubmit={
+          isSignUp
+            ? signUpForm.handleSubmit(onSubmit)
+            : loginForm.handleSubmit(onSubmit)
+        }
+        aria-label={isSignUp ? '회원가입 폼' : '로그인 폼'}
+      >
+        {/* 헤딩 */}
+        <Heading level={1}>A11yWork</Heading>
+        <Heading level={2}>{isSignUp ? '계정 만들기' : '계정에 로그인'}</Heading>
 
-        <form
-          className="bg-white p-8 rounded-lg shadow-sm space-y-6"
-          onSubmit={
-            isSignUp
-              ? signUpForm.handleSubmit(onSubmit)
-              : loginForm.handleSubmit(onSubmit)
-          }
-          aria-label={isSignUp ? '회원가입 폼' : '로그인 폼'}
-        >
-          {error && (
-            <div
-              className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded"
-              role="alert"
-              aria-live="assertive"
-            >
-              {error}
-            </div>
-          )}
-
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
-              이메일
-            </label>
-            <input
-              {...(isSignUp
-                ? signUpForm.register('email')
-                : loginForm.register('email'))}
-              id="email"
-              type="email"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="your@email.com"
-              aria-required="true"
-              aria-invalid={
-                !!(isSignUp
-                  ? signUpForm.formState.errors.email
-                  : loginForm.formState.errors.email)
-              }
-              aria-describedby={
-                (
-                  isSignUp
-                    ? signUpForm.formState.errors.email
-                    : loginForm.formState.errors.email
-                )
-                  ? 'email-error'
-                  : undefined
-              }
-            />
-            {(isSignUp
-              ? signUpForm.formState.errors.email
-              : loginForm.formState.errors.email) && (
-              <p
-                id="email-error"
-                className="mt-1 text-sm text-red-600"
-                role="alert"
-              >
-                {
-                  (isSignUp
-                    ? signUpForm.formState.errors.email
-                    : loginForm.formState.errors.email
-                  )?.message
-                }
-              </p>
-            )}
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between">
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                비밀번호
-              </label>
-              {!isSignUp && (
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-blue-600 hover:text-blue-500"
-                >
-                  비밀번호를 잊으셨나요?
-                </Link>
-              )}
-            </div>
-            <input
-              {...(isSignUp
-                ? signUpForm.register('password')
-                : loginForm.register('password'))}
-              id="password"
-              type="password"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="••••••••"
-              aria-required="true"
-              aria-invalid={
-                !!(isSignUp
-                  ? signUpForm.formState.errors.password
-                  : loginForm.formState.errors.password)
-              }
-              aria-describedby={
-                (
-                  isSignUp
-                    ? signUpForm.formState.errors.password
-                    : loginForm.formState.errors.password
-                )
-                  ? 'password-error'
-                  : undefined
-              }
-            />
-            {(isSignUp
-              ? signUpForm.formState.errors.password
-              : loginForm.formState.errors.password) && (
-              <p
-                id="password-error"
-                className="mt-1 text-sm text-red-600"
-                role="alert"
-              >
-                {
-                  (isSignUp
-                    ? signUpForm.formState.errors.password
-                    : loginForm.formState.errors.password
-                  )?.message
-                }
-              </p>
-            )}
-          </div>
-
-          {isSignUp && (
-            <>
-              <div>
-                <label
-                  htmlFor="confirmPassword"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  비밀번호 확인
-                </label>
-                <input
-                  {...signUpForm.register('confirmPassword')}
-                  id="confirmPassword"
-                  type="password"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="••••••••"
-                  aria-required="true"
-                  aria-invalid={!!signUpForm.formState.errors.confirmPassword}
-                  aria-describedby={
-                    signUpForm.formState.errors.confirmPassword
-                      ? 'confirmPassword-error'
-                      : undefined
-                  }
-                />
-                {signUpForm.formState.errors.confirmPassword && (
-                  <p
-                    id="confirmPassword-error"
-                    className="mt-1 text-sm text-red-600"
-                    role="alert"
-                  >
-                    {signUpForm.formState.errors.confirmPassword.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  이름
-                </label>
-                <input
-                  {...signUpForm.register('name')}
-                  id="name"
-                  type="text"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="홍길동"
-                  aria-required="true"
-                  aria-invalid={!!signUpForm.formState.errors.name}
-                  aria-describedby={
-                    signUpForm.formState.errors.name ? 'name-error' : undefined
-                  }
-                />
-                {signUpForm.formState.errors.name && (
-                  <p
-                    id="name-error"
-                    className="mt-1 text-sm text-red-600"
-                    role="alert"
-                  >
-                    {signUpForm.formState.errors.name.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="accountId"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  계정 ID
-                </label>
-                <input
-                  {...signUpForm.register('accountId')}
-                  id="accountId"
-                  type="text"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="user123"
-                  aria-required="true"
-                  aria-invalid={!!signUpForm.formState.errors.accountId}
-                  aria-describedby={
-                    signUpForm.formState.errors.accountId
-                      ? 'accountId-error'
-                      : undefined
-                  }
-                />
-                {signUpForm.formState.errors.accountId && (
-                  <p
-                    id="accountId-error"
-                    className="mt-1 text-sm text-red-600"
-                    role="alert"
-                  >
-                    {signUpForm.formState.errors.accountId.message}
-                  </p>
-                )}
-              </div>
-            </>
-          )}
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-            aria-busy={submitting}
-            aria-label={
-              submitting
-                ? '처리 중'
-                : isSignUp
-                  ? '회원가입 제출'
-                  : '로그인 제출'
-            }
+        {/* 에러 메시지 */}
+        {error && (
+          <div
+            className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg dark:bg-red-900/20 dark:border-red-800"
+            role="alert"
+            aria-live="assertive"
           >
-            {submitting ? '처리 중...' : isSignUp ? '회원가입' : '로그인'}
-          </button>
-
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={toggleMode}
-              className="text-sm text-blue-600 hover:text-blue-500"
-            >
-              {isSignUp
-                ? '이미 계정이 있나요? 로그인'
-                : '계정이 없나요? 회원가입'}
-            </button>
+            {error}
           </div>
-        </form>
-      </div>
-    </div>
+        )}
+
+        {/* 이메일 필드 */}
+        <Field>
+          <Label>이메일</Label>
+          <Input
+            {...(isSignUp
+              ? signUpForm.register('email')
+              : loginForm.register('email'))}
+            type="email"
+            name="email"
+            placeholder="your@email.com"
+            aria-required="true"
+            invalid={
+              !!(isSignUp
+                ? signUpForm.formState.errors.email
+                : loginForm.formState.errors.email)
+            }
+          />
+          {(isSignUp
+            ? signUpForm.formState.errors.email
+            : loginForm.formState.errors.email) && (
+            <ErrorMessage>
+              {
+                (isSignUp
+                  ? signUpForm.formState.errors.email
+                  : loginForm.formState.errors.email
+                )?.message
+              }
+            </ErrorMessage>
+          )}
+        </Field>
+
+        {/* 비밀번호 필드 */}
+        <Field>
+          <Label>비밀번호</Label>
+          <Input
+            {...(isSignUp
+              ? signUpForm.register('password')
+              : loginForm.register('password'))}
+            type="password"
+            name="password"
+            placeholder="••••••••"
+            aria-required="true"
+            invalid={
+              !!(isSignUp
+                ? signUpForm.formState.errors.password
+                : loginForm.formState.errors.password)
+            }
+          />
+          {(isSignUp
+            ? signUpForm.formState.errors.password
+            : loginForm.formState.errors.password) && (
+            <ErrorMessage>
+              {
+                (isSignUp
+                  ? signUpForm.formState.errors.password
+                  : loginForm.formState.errors.password
+                )?.message
+              }
+            </ErrorMessage>
+          )}
+        </Field>
+
+        {/* 회원가입 추가 필드 */}
+        {isSignUp && (
+          <>
+            <Field>
+              <Label>비밀번호 확인</Label>
+              <Input
+                {...signUpForm.register('confirmPassword')}
+                type="password"
+                name="confirmPassword"
+                placeholder="••••••••"
+                aria-required="true"
+                invalid={!!signUpForm.formState.errors.confirmPassword}
+              />
+              {signUpForm.formState.errors.confirmPassword && (
+                <ErrorMessage>
+                  {signUpForm.formState.errors.confirmPassword.message}
+                </ErrorMessage>
+              )}
+            </Field>
+
+            <Field>
+              <Label>이름</Label>
+              <Input
+                {...signUpForm.register('name')}
+                type="text"
+                name="name"
+                placeholder="홍길동"
+                aria-required="true"
+                invalid={!!signUpForm.formState.errors.name}
+              />
+              {signUpForm.formState.errors.name && (
+                <ErrorMessage>
+                  {signUpForm.formState.errors.name.message}
+                </ErrorMessage>
+              )}
+            </Field>
+
+            <Field>
+              <Label>계정 ID</Label>
+              <Input
+                {...signUpForm.register('accountId')}
+                type="text"
+                name="accountId"
+                placeholder="user123"
+                aria-required="true"
+                invalid={!!signUpForm.formState.errors.accountId}
+              />
+              {signUpForm.formState.errors.accountId && (
+                <ErrorMessage>
+                  {signUpForm.formState.errors.accountId.message}
+                </ErrorMessage>
+              )}
+            </Field>
+          </>
+        )}
+
+        {/* Remember me & Forgot password (로그인 모드만) */}
+        {!isSignUp && (
+          <div className="flex items-center justify-between">
+            <CheckboxField>
+              <Checkbox name="remember" value="remember" />
+              <Label>로그인 상태 유지</Label>
+            </CheckboxField>
+            <Text>
+              <TextLink href="/forgot-password">
+                <Strong>비밀번호 찾기</Strong>
+              </TextLink>
+            </Text>
+          </div>
+        )}
+
+        {/* 제출 버튼 */}
+        <Button
+          type="submit"
+          disabled={submitting}
+          className="w-full"
+          aria-busy={submitting}
+        >
+          {submitting ? '처리 중...' : isSignUp ? '회원가입' : '로그인'}
+        </Button>
+
+        {/* 모드 전환 링크 */}
+        <Text>
+          {isSignUp ? '이미 계정이 있나요? ' : '계정이 없나요? '}
+          <button
+            type="button"
+            onClick={toggleMode}
+            className="text-zinc-950 underline decoration-zinc-950/50 hover:decoration-zinc-950 dark:text-white dark:decoration-white/50 dark:hover:decoration-white font-medium"
+          >
+            <Strong>{isSignUp ? '로그인' : '회원가입'}</Strong>
+          </button>
+        </Text>
+      </form>
+    </AuthLayout>
   );
 }

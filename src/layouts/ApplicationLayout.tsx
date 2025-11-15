@@ -79,6 +79,10 @@ function AccountDropdownMenu({
         <DropdownLabel>비밀번호 변경</DropdownLabel>
       </DropdownItem>
       <DropdownDivider />
+      <DropdownItem href="/licenses">
+        <Cog6ToothIcon />
+        <DropdownLabel>라이선스</DropdownLabel>
+      </DropdownItem>
       <DropdownItem onClick={handleSignOut}>
         <ArrowRightStartOnRectangleIcon />
         <DropdownLabel>로그아웃</DropdownLabel>
@@ -333,9 +337,9 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
             <SidebarSpacer />
 
             <SidebarSection>
-              <SidebarItem href="/licenses">
-                <Cog6ToothIcon />
-                <SidebarLabel>라이선스</SidebarLabel>
+              <SidebarItem href="/logout">
+                <ArrowRightStartOnRectangleIcon />
+                <SidebarLabel>로그아웃</SidebarLabel>
               </SidebarItem>
             </SidebarSection>
           </SidebarBody>
