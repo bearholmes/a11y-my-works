@@ -82,7 +82,7 @@ export function Profile() {
               <Text className="font-medium text-zinc-500 dark:text-zinc-400 mb-1">
                 상태
               </Text>
-              <Badge color={profile.is_active ? 'green' : 'zinc'}>
+              <Badge color={profile.is_active ? 'lime' : 'zinc'}>
                 {profile.is_active ? '활성' : '비활성'}
               </Badge>
             </div>

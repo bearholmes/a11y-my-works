@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Heading } from '../components/ui/heading';
+import { Spinner } from '../components/ui/spinner';
 import {
   Table,
   TableBody,
@@ -13,7 +14,6 @@ import {
   TableRow,
 } from '../components/ui/table';
 import { Text } from '../components/ui/text';
-import { Spinner } from '../components/ui/spinner';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
 import { roleAPI } from '../services/api';
@@ -78,7 +78,7 @@ export function RoleList() {
       </div>
 
       {/* 역할 목록 */}
-      <div className="bg-white dark:bg-zinc-900 rounded-lg overflow-hidden">
+      <div className="mt-8">
         {isLoading ? (
           <div className="p-8 text-center">
             <Spinner />

@@ -7,6 +7,7 @@ import { Field, Label } from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
+import { Spinner } from '../components/ui/spinner';
 import {
   Table,
   TableBody,
@@ -16,7 +17,6 @@ import {
   TableRow,
 } from '../components/ui/table';
 import { Text } from '../components/ui/text';
-import { Spinner } from '../components/ui/spinner';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
 import { costGroupAPI } from '../services/api';
@@ -95,7 +95,7 @@ export function CostGroupList() {
       </div>
 
       {/* 검색 */}
-      <div className="bg-white dark:bg-zinc-900 p-4 rounded-lg">
+      <div className="mt-8">
         <form onSubmit={handleSearch} className="space-y-4">
           <div className="flex gap-4">
             <Field className="flex-1">
@@ -142,7 +142,7 @@ export function CostGroupList() {
       </div>
 
       {/* 청구 그룹 목록 테이블 */}
-      <div className="bg-white dark:bg-zinc-900 rounded-lg overflow-hidden">
+      <div className="mt-8">
         {isLoading ? (
           <div className="p-8 text-center">
             <Spinner />

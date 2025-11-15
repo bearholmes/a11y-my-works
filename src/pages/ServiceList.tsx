@@ -7,6 +7,7 @@ import { Field, Label } from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
+import { Spinner } from '../components/ui/spinner';
 import {
   Table,
   TableBody,
@@ -16,7 +17,6 @@ import {
   TableRow,
 } from '../components/ui/table';
 import { Text } from '../components/ui/text';
-import { Spinner } from '../components/ui/spinner';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
 import { serviceAPI } from '../services/api';
@@ -113,7 +113,7 @@ export function ServiceList() {
       </div>
 
       {/* 검색 및 필터 */}
-      <div className="bg-white dark:bg-zinc-900 p-4 rounded-lg">
+      <div className="mt-8">
         <form onSubmit={handleSearch} className="flex gap-4">
           <Field className="flex-1">
             <Label htmlFor="service-search" className="sr-only">
@@ -178,7 +178,7 @@ export function ServiceList() {
       </div>
 
       {/* 서비스 목록 테이블 */}
-      <div className="bg-white dark:bg-zinc-900 rounded-lg overflow-hidden">
+      <div className="mt-8">
         {isLoading ? (
           <div className="p-8 text-center">
             <Spinner />
@@ -211,7 +211,7 @@ export function ServiceList() {
                       {service.name}
                     </TableCell>
                     <TableCell>
-                      <Badge color="purple">
+                      <Badge color="zinc">
                         {service.cost_groups?.name || '-'}
                       </Badge>
                     </TableCell>

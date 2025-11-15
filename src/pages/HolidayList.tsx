@@ -4,6 +4,7 @@ import { Button } from '../components/ui/button';
 import { Field, Label } from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
 import { Select } from '../components/ui/select';
+import { Spinner } from '../components/ui/spinner';
 import {
   Table,
   TableBody,
@@ -13,7 +14,6 @@ import {
   TableRow,
 } from '../components/ui/table';
 import { Text } from '../components/ui/text';
-import { Spinner } from '../components/ui/spinner';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
 import { holidayAPI } from '../services/api';
@@ -102,7 +102,7 @@ export function HolidayList() {
       </div>
 
       {/* 목록 */}
-      <div className="bg-white dark:bg-zinc-900 rounded-lg overflow-hidden">
+      <div className="mt-8">
         {holidays.length === 0 ? (
           <div className="px-6 py-8 text-center">
             <Text className="text-zinc-500 dark:text-zinc-400">

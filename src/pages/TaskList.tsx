@@ -140,8 +140,7 @@ export function TaskList() {
 
   return (
     <>
-      {/* 헤더 */}
-      <header className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-zinc-950/10 pb-6 dark:border-white/10">
+      <div className="flex items-end justify-between gap-4">
         <div>
           <Heading>업무 보고</Heading>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
@@ -151,7 +150,7 @@ export function TaskList() {
         </div>
         <div className="flex items-center gap-4">
           {/* 날짜 네비게이션 버튼 그룹 */}
-          <div className="relative flex items-center rounded-md bg-white dark:bg-white/10 shadow-sm ring-1 ring-zinc-300 dark:ring-white/10">
+          <div className="relative flex items-center rounded-md bg-white shadow-sm ring-1 ring-zinc-300 dark:bg-white/10 dark:ring-white/10">
             <button
               type="button"
               onClick={handlePreviousDay}
@@ -163,11 +162,11 @@ export function TaskList() {
             <button
               type="button"
               onClick={handleToday}
-              className="hidden px-3.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:relative md:block dark:text-white dark:hover:bg-white/10"
+              className="hidden px-3.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:relative dark:text-white dark:hover:bg-white/10 md:block"
             >
               오늘
             </button>
-            <span className="relative -mx-px h-5 w-px bg-zinc-300 md:hidden dark:bg-white/10" />
+            <span className="relative -mx-px h-5 w-px bg-zinc-300 dark:bg-white/10 md:hidden" />
             <button
               type="button"
               onClick={handleNextDay}
@@ -192,10 +191,10 @@ export function TaskList() {
           {/* 업무 등록 버튼 */}
           <Button href="/tasks/new">업무 등록</Button>
         </div>
-      </header>
+      </div>
 
       {/* 주 단위 캘린더 */}
-      <div className="bg-white dark:bg-zinc-900 rounded-lg p-4 mb-6 ring-1 ring-zinc-200 dark:ring-white/10">
+      <div className="mt-8 rounded-lg bg-white p-4 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-white/10">
         <div className="flex items-center gap-4">
           {/* 이전 주 버튼 */}
           <button
@@ -260,11 +259,11 @@ export function TaskList() {
 
       {/* 업무 목록 */}
       {isLoading ? (
-        <div className="p-8 text-center">
+        <div className="mt-8 p-8 text-center">
           <Spinner />
         </div>
       ) : data?.data.length === 0 ? (
-        <div className="text-center py-12">
+        <div className="mt-8 py-12 text-center">
           <Text className="text-zinc-600 dark:text-zinc-400">
             {format(selectedDate, 'yyyy년 M월 d일')}에 작성된 업무 보고가
             없습니다.
@@ -274,7 +273,7 @@ export function TaskList() {
           </Button>
         </div>
       ) : (
-        <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+        <Table className="mt-8 [--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
           <TableHead>
             <TableRow>
               <TableHeader>업무명</TableHeader>

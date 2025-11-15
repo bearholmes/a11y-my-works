@@ -13,6 +13,7 @@ import { Label } from '../components/ui/fieldset';
 import { Heading, Subheading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
+import { Spinner } from '../components/ui/spinner.tsx';
 import {
   Table,
   TableBody,
@@ -23,7 +24,6 @@ import {
 } from '../components/ui/table';
 import { Text } from '../components/ui/text';
 import { dashboardAPI } from '../services/api';
-import {Spinner} from "../components/ui/spinner.tsx";
 
 /**
  * 업무 작성 현황 페이지
@@ -256,7 +256,7 @@ export function AdminDashboard() {
             title="완전 작성 사용자"
             value={`${stats.fullyCompletedMembers}명`}
             description="100% 작성 완료한 팀원"
-            className="[&_.text-gray-900]:!text-green-600"
+            className="[&_.text-gray-900]:!text-lime-600"
           />
           <Stat
             title="미완료 사용자"
@@ -343,9 +343,9 @@ export function AdminDashboard() {
                       <Badge
                         color={
                           member.stats.completionRate === 100
-                            ? 'green'
+                            ? 'lime'
                             : member.stats.completionRate >= 80
-                              ? 'blue'
+                              ? 'zinc'
                               : member.stats.completionRate >= 50
                                 ? 'yellow'
                                 : 'red'
@@ -432,7 +432,7 @@ export function AdminDashboard() {
             <Text>주말/공휴일 - 작성 불필요</Text>
           </div>
           <div className="flex items-center gap-2">
-            <Badge color="green">100%</Badge>
+            <Badge color="lime">100%</Badge>
             <Text>완료율 - 근무일 대비 작성률</Text>
           </div>
         </div>

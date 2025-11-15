@@ -57,11 +57,8 @@ export function Dashboard() {
 
   return (
     <>
-      <div className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-zinc-950/10 pb-6 dark:border-white/10">
-        <Heading>업무 대시보드</Heading>
-      </div>
-
-      <div className="mt-8 flex w-full flex-wrap items-end justify-between gap-4 border-b border-zinc-950/10 pb-6 dark:border-white/10">
+      <Heading>업무 대시보드</Heading>
+      <div className="mt-8 flex items-end justify-between">
         <Subheading>주요 지표</Subheading>
         <div className="flex gap-3">
           <Field>
@@ -133,10 +130,10 @@ export function Dashboard() {
         </div>
       </dl>
 
-      {/* 차트 섹션 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+      <Subheading className="mt-14">차트</Subheading>
+      <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* 일별 업무 추이 */}
-        <div className="bg-white rounded-lg p-6 dark:bg-zinc-900">
+        <div className="rounded-lg bg-white p-6 dark:bg-zinc-900">
           <Subheading className="mb-4">일별 업무 추이</Subheading>
           {dailyStats && dailyStats.length > 0 ? (
             <div className="space-y-2">
@@ -178,7 +175,7 @@ export function Dashboard() {
         </div>
 
         {/* 프로젝트별 업무 분포 */}
-        <div className="bg-white rounded-lg p-6 dark:bg-zinc-900">
+        <div className="rounded-lg bg-white p-6 dark:bg-zinc-900">
           <Subheading className="mb-4">프로젝트별 업무 분포</Subheading>
           {projectStats && projectStats.length > 0 ? (
             <div className="space-y-3">
@@ -214,13 +211,16 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* 사용자별 통계 및 최근 업무 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+      <Subheading className="mt-14">통계</Subheading>
+      <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* 사용자별 작업 시간 */}
-        <div className="bg-white rounded-lg p-6 dark:bg-zinc-900">
+        <div className="rounded-lg bg-white p-6 dark:bg-zinc-900">
           <Subheading className="mb-4">사용자별 작업 시간</Subheading>
           {memberStats && memberStats.length > 0 ? (
-            <Table dense>
+            <Table
+              className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]"
+              dense
+            >
               <TableHead>
                 <TableRow>
                   <TableHeader>이름</TableHeader>
@@ -250,8 +250,8 @@ export function Dashboard() {
         </div>
 
         {/* 최근 업무 목록 */}
-        <div className="bg-white rounded-lg p-6 dark:bg-zinc-900">
-          <div className="flex items-center justify-between mb-4">
+        <div className="rounded-lg bg-white p-6 dark:bg-zinc-900">
+          <div className="mb-4 flex items-center justify-between">
             <Subheading>최근 업무</Subheading>
             <Link
               href="/tasks"
@@ -262,7 +262,10 @@ export function Dashboard() {
             </Link>
           </div>
           {recentTasks && recentTasks.length > 0 ? (
-            <Table dense>
+            <Table
+              className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]"
+              dense
+            >
               <TableHead>
                 <TableRow>
                   <TableHeader>업무명</TableHeader>

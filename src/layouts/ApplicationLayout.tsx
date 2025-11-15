@@ -19,7 +19,6 @@ import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Avatar } from '../components/ui/avatar';
-import { Spinner } from '../components/ui/spinner';
 import {
   Dropdown,
   DropdownButton,
@@ -46,6 +45,7 @@ import {
   SidebarSpacer,
 } from '../components/ui/sidebar';
 import { SidebarLayout } from '../components/ui/sidebar-layout';
+import { Spinner } from '../components/ui/spinner';
 import { usePermissions } from '../hooks/usePermissions';
 import { useAuthContext } from '../providers/AuthProvider';
 import { memberAPI } from '../services/api';
@@ -63,11 +63,6 @@ function AccountDropdownMenu({
 }: {
   anchor: 'top start' | 'bottom end';
 }) {
-  const { signOut } = useAuthContext();
-
-  const handleSignOut = async () => {
-    await signOut();
-  };
 
   return (
     <DropdownMenu className="min-w-64" anchor={anchor}>
@@ -83,10 +78,6 @@ function AccountDropdownMenu({
       <DropdownItem href="/licenses">
         <Cog6ToothIcon />
         <DropdownLabel>라이선스</DropdownLabel>
-      </DropdownItem>
-      <DropdownItem onClick={handleSignOut}>
-        <ArrowRightStartOnRectangleIcon />
-        <DropdownLabel>로그아웃</DropdownLabel>
       </DropdownItem>
     </DropdownMenu>
   );

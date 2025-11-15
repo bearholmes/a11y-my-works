@@ -172,7 +172,7 @@ export function TeamTaskList() {
       </div>
 
       {/* 필터 */}
-      <div className="mt-8 bg-white rounded-lg p-6 dark:bg-zinc-900">
+      <div className="mt-8">
         <Subheading className="mb-4">필터</Subheading>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <Field>
@@ -206,8 +206,8 @@ export function TeamTaskList() {
       </div>
 
       {/* 업무 목록 */}
-      <div className="mt-8 bg-white rounded-lg overflow-hidden dark:bg-zinc-900">
-        <div className="px-6 py-4 border-b border-zinc-950/10 dark:border-white/10">
+      <div className="mt-8">
+        <div className="mb-4">
           <Subheading>업무 목록</Subheading>
         </div>
 

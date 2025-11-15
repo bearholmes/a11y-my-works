@@ -232,7 +232,7 @@ export function MemberList() {
       </div>
 
       {/* 검색 및 필터 */}
-      <div className="bg-white dark:bg-zinc-900 p-4 rounded-lg">
+      <div className="mt-8">
         <form onSubmit={handleSearch} className="flex gap-4">
           <Field className="flex-1">
             <Label htmlFor="member-search" className="sr-only">
@@ -283,7 +283,7 @@ export function MemberList() {
       </div>
 
       {/* 사용자 목록 테이블 */}
-      <div className="bg-white dark:bg-zinc-900 rounded-lg overflow-hidden">
+      <div className="mt-8">
         {isLoading ? (
           <div className="p-8 text-center">
             <Spinner />
@@ -317,7 +317,7 @@ export function MemberList() {
                     <TableCell>{member.email}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Badge color={member.roles?.name ? 'blue' : 'zinc'}>
+                        <Badge color="zinc">
                           {member.roles?.name || '역할 없음'}
                         </Badge>
                         {isPendingUser(member) && (
@@ -540,7 +540,7 @@ export function MemberList() {
           <Button
             onClick={handleApprovalSubmit}
             disabled={!selectedRoleId || approveMutation.isPending}
-            color="green"
+            color="lime"
           >
             {approveMutation.isPending ? (
               <span className="flex items-center justify-center gap-2">
