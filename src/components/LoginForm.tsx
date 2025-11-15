@@ -265,7 +265,7 @@ export function LoginForm() {
         {!isSignUp && (
           <div className="flex items-center justify-between">
             <CheckboxField>
-              <Checkbox name="remember" />
+              <Checkbox name="remember" value="remember" />
               <Label>로그인 상태 유지</Label>
             </CheckboxField>
             <Text>
