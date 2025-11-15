@@ -8,7 +8,8 @@ import { useState } from 'react';
 import { Stat } from '../components/Stat';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
-import { Checkbox } from '../components/ui/checkbox';
+import { Checkbox, CheckboxField } from '../components/ui/checkbox';
+import { Label } from '../components/ui/fieldset';
 import { Heading, Subheading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
@@ -210,13 +211,13 @@ export function AdminDashboard() {
             </Select>
 
             {/* 미완료만 보기 토글 */}
-            <div className="flex items-center gap-2">
+            <CheckboxField>
               <Checkbox
                 checked={showIncompleteOnly}
                 onChange={(checked) => setShowIncompleteOnly(checked)}
               />
-              <Text>미완료만 보기</Text>
-            </div>
+              <Label>미완료만 보기</Label>
+            </CheckboxField>
 
             {/* 필터 초기화 */}
             {(searchQuery || selectedDate !== null || !showIncompleteOnly) && (
