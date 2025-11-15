@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '../components/ui/button';
 import { Heading } from '../components/ui/heading';
+import { Spinner } from '../components/ui/spinner';
 import { Text } from '../components/ui/text';
 
 /**
@@ -43,10 +44,7 @@ export function Licenses() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4" />
-          <p className="text-gray-600">라이센스 정보를 불러오는 중...</p>
-        </div>
+        <Spinner size="lg" label="라이센스 정보를 불러오는 중..." />
       </div>
     );
   }

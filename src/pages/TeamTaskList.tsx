@@ -12,6 +12,7 @@ import { Field, Label } from '../components/ui/fieldset';
 import { Heading, Subheading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
+import { Spinner } from '../components/ui/spinner';
 import {
   Table,
   TableBody,
@@ -212,7 +213,7 @@ export function TeamTaskList() {
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-500"></div>
+            <Spinner size="lg" />
           </div>
         ) : tasks.length === 0 ? (
           <div className="text-center py-12">

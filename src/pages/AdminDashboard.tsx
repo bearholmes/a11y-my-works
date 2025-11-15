@@ -23,6 +23,7 @@ import {
 } from '../components/ui/table';
 import { Text } from '../components/ui/text';
 import { dashboardAPI } from '../services/api';
+import {Spinner} from "../components/ui/spinner.tsx";
 
 /**
  * 업무 작성 현황 페이지
@@ -268,8 +269,8 @@ export function AdminDashboard() {
 
       {/* 로딩 상태 */}
       {isLoading && (
-        <div className="bg-white dark:bg-zinc-900 rounded-lg p-12 text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-t-blue-600" />
+        <div className="text-center py-12">
+          <Spinner size="lg" label="데이터를 불러오는 중..." />
           <p className="mt-4 text-zinc-600 dark:text-zinc-400">
             데이터를 불러오는 중...
           </p>

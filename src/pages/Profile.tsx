@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Heading, Subheading } from '../components/ui/heading';
+import { Spinner } from '../components/ui/spinner';
 import { Text } from '../components/ui/text';
 import { useAuthContext } from '../providers/AuthProvider';
 import { memberAPI } from '../services/api';
@@ -19,7 +20,7 @@ export function Profile() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <Spinner size="lg" />
       </div>
     );
   }
