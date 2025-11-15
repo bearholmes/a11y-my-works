@@ -223,9 +223,11 @@ export function MemberList() {
   return (
     <>
       {/* 헤더 */}
-      <div className="flex items-center justify-between">
+      <div className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-zinc-950/10 pb-6 dark:border-white/10">
         <Heading>사용자 관리</Heading>
-        <Button onClick={handleInvite}>사용자 초대</Button>
+        <div className="flex gap-4">
+          <Button onClick={handleInvite}>사용자 초대</Button>
+        </div>
       </div>
 
       {/* 검색 및 필터 */}

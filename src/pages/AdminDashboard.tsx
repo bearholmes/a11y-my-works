@@ -116,128 +116,122 @@ export function AdminDashboard() {
   return (
     <>
       {/* 헤더 */}
-      <div className="bg-white dark:bg-zinc-900 rounded-lg p-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-          <div>
-            <Heading>업무 작성 현황</Heading>
-            <Text className="mt-1">
-              팀원들의 월별 업무 일지 작성 현황을 확인하세요 (기준: 8시간)
-            </Text>
-          </div>
+      <div className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-zinc-950/10 pb-6 dark:border-white/10">
+        <div>
+          <Heading>업무 작성 현황</Heading>
+          <Text className="mt-1">
+            팀원들의 월별 업무 일지 작성 현황을 확인하세요 (기준: 8시간)
+          </Text>
+        </div>
 
-          {/* 검색 및 필터 */}
-          <div className="mt-4 md:mt-0 flex flex-col gap-3">
-            {/* 월 선택기 */}
-            <div className="flex items-center gap-3">
-              <Button
-                type="button"
-                onClick={handlePrevMonth}
-                outline
-                aria-label="이전 달"
-              >
-                ←
-              </Button>
-              <div className="flex gap-2">
-                <Select
-                  value={year}
-                  onChange={(e) => setYear(Number(e.target.value))}
-                  className="text-sm"
-                >
-                  {Array.from(
-                    { length: 5 },
-                    (_, i) => now.getFullYear() - 2 + i
-                  ).map((y) => (
-                    <option key={y} value={y}>
-                      {y}년
-                    </option>
-                  ))}
-                </Select>
-                <Select
-                  value={month}
-                  onChange={(e) => setMonth(Number(e.target.value))}
-                  className="text-sm"
-                >
-                  {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                    <option key={m} value={m}>
-                      {m}월
-                    </option>
-                  ))}
-                </Select>
-              </div>
-              <Button
-                type="button"
-                onClick={handleNextMonth}
-                outline
-                aria-label="다음 달"
-              >
-                →
-              </Button>
-            </div>
-
-            {/* 필터 컨트롤 */}
-            <div className="flex flex-wrap items-center gap-3">
-              {/* 사용자 검색 */}
-              <div className="relative">
-                <Input
-                  type="text"
-                  placeholder="사용자 이름 또는 ID 검색..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-8 w-64"
-                />
-                <MagnifyingGlassIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-400" />
-              </div>
-
-              {/* 날짜 필터 */}
+        {/* 검색 및 필터 */}
+        <div className="flex flex-col gap-3">
+          {/* 월 선택기 */}
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              onClick={handlePrevMonth}
+              outline
+              aria-label="이전 달"
+            >
+              ←
+            </Button>
+            <div className="flex gap-2">
               <Select
-                value={selectedDate ?? ''}
-                onChange={(e) =>
-                  setSelectedDate(
-                    e.target.value ? Number(e.target.value) : null
-                  )
-                }
+                value={year}
+                onChange={(e) => setYear(Number(e.target.value))}
                 className="text-sm"
               >
-                <option value="">전체 날짜</option>
-                {days
-                  .filter((day) => {
-                    // 주말은 제외
-                    const dayOfWeek = getDayOfWeek(day);
-                    return dayOfWeek !== 0 && dayOfWeek !== 6;
-                  })
-                  .map((day) => (
-                    <option key={day} value={day}>
-                      {month}월 {day}일 미작성자
-                    </option>
-                  ))}
+                {Array.from(
+                  { length: 5 },
+                  (_, i) => now.getFullYear() - 2 + i
+                ).map((y) => (
+                  <option key={y} value={y}>
+                    {y}년
+                  </option>
+                ))}
               </Select>
-
-              {/* 미완료만 보기 토글 */}
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  checked={showIncompleteOnly}
-                  onChange={(checked) => setShowIncompleteOnly(checked)}
-                />
-                <Text>미완료만 보기</Text>
-              </div>
-
-              {/* 필터 초기화 */}
-              {(searchQuery ||
-                selectedDate !== null ||
-                !showIncompleteOnly) && (
-                <Button
-                  type="button"
-                  plain
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedDate(null);
-                    setShowIncompleteOnly(true);
-                  }}
-                >
-                  필터 초기화
-                </Button>
-              )}
+              <Select
+                value={month}
+                onChange={(e) => setMonth(Number(e.target.value))}
+                className="text-sm"
+              >
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                  <option key={m} value={m}>
+                    {m}월
+                  </option>
+                ))}
+              </Select>
             </div>
+            <Button
+              type="button"
+              onClick={handleNextMonth}
+              outline
+              aria-label="다음 달"
+            >
+              →
+            </Button>
+          </div>
+
+          {/* 필터 컨트롤 */}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* 사용자 검색 */}
+            <div className="relative">
+              <Input
+                type="text"
+                placeholder="사용자 이름 또는 ID 검색..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-8 w-64"
+              />
+              <MagnifyingGlassIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-400" />
+            </div>
+
+            {/* 날짜 필터 */}
+            <Select
+              value={selectedDate ?? ''}
+              onChange={(e) =>
+                setSelectedDate(e.target.value ? Number(e.target.value) : null)
+              }
+              className="text-sm"
+            >
+              <option value="">전체 날짜</option>
+              {days
+                .filter((day) => {
+                  // 주말은 제외
+                  const dayOfWeek = getDayOfWeek(day);
+                  return dayOfWeek !== 0 && dayOfWeek !== 6;
+                })
+                .map((day) => (
+                  <option key={day} value={day}>
+                    {month}월 {day}일 미작성자
+                  </option>
+                ))}
+            </Select>
+
+            {/* 미완료만 보기 토글 */}
+            <div className="flex items-center gap-2">
+              <Checkbox
+                checked={showIncompleteOnly}
+                onChange={(checked) => setShowIncompleteOnly(checked)}
+              />
+              <Text>미완료만 보기</Text>
+            </div>
+
+            {/* 필터 초기화 */}
+            {(searchQuery || selectedDate !== null || !showIncompleteOnly) && (
+              <Button
+                type="button"
+                plain
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedDate(null);
+                  setShowIncompleteOnly(true);
+                }}
+              >
+                필터 초기화
+              </Button>
+            )}
           </div>
         </div>
       </div>
