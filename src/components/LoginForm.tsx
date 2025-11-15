@@ -126,7 +126,7 @@ export function LoginForm() {
         aria-label={isSignUp ? '회원가입 폼' : '로그인 폼'}
       >
         {/* 헤딩 */}
-        <Heading level={1}>A11yWork</Heading>
+        <Heading level={1}>A11yWorks</Heading>
         <Heading level={2}>
           {isSignUp ? '계정 만들기' : '계정에 로그인'}
         </Heading>

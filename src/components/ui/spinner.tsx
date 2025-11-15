@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import type React from 'react';
 
 /**
  * 스피너 컴포넌트의 Props 인터페이스

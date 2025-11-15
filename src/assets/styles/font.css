@@ -1,0 +1,27 @@
+/* KoddiUD 온고딕 */
+@font-face {
+  font-family: 'KoddiUDOnGothic';
+  font-style: normal;
+  font-weight: 700;
+  src: url(../fonts/KoddiUDOnGothic-ExtraBold.woff2) format('woff2'),
+  url(../fonts/KoddiUDOnGothic-ExtraBold.woff) format('woff'),
+  url(../fonts/KoddiUDOnGothic-ExtraBold.otf) format('opentype');
+}
+
+@font-face {
+  font-family: 'KoddiUDOnGothic';
+  font-style: normal;
+  font-weight: 500;
+  src: url(../fonts/KoddiUDOnGothic-Bold.woff2) format('woff2'),
+  url(../fonts/KoddiUDOnGothic-Bold.woff) format('woff'),
+  url(../fonts/KoddiUDOnGothic-Bold.otf) format('opentype');
+}
+
+@font-face {
+  font-family: 'KoddiUDOnGothic';
+  font-style: normal;
+  font-weight: 400;
+  src: url(../fonts/KoddiUDOnGothic-Regular.woff2) format('woff2'),
+  url(../fonts/KoddiUDOnGothic-Regular.woff) format('woff'),
+  url(../fonts/KoddiUDOnGothic-Regular.otf) format('opentype');
+}

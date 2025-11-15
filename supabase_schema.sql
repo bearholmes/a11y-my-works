@@ -1,4 +1,4 @@
--- A11Y My Wooks 업무 보고 시스템 데이터베이스 스키마
+-- A11yWorks 업무 보고 시스템 데이터베이스 스키마
 -- 이 SQL을 Supabase SQL Editor에서 실행하세요
 
 -- 1. 역할(Roles) 테이블

@@ -50,6 +50,7 @@ import { usePermissions } from '../hooks/usePermissions';
 import { useAuthContext } from '../providers/AuthProvider';
 import { memberAPI } from '../services/api';
 import type { MenuItem } from '../types/permission';
+import clsx from "clsx";
 
 interface ApplicationLayoutProps {
   children: ReactNode;
@@ -289,11 +290,11 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
 
           <SidebarBody>
             <SidebarSection>
-              {accessibleMenus.map((item) => {
+              {accessibleMenus.map((item, index) => {
                 // 하위 메뉴가 있는 경우
                 if (item.children && item.children.length > 0) {
                   return (
-                    <div key={item.href}>
+                    <div key={item.href} className={clsx({'mt-4': index > 0})}>
                       <SidebarHeading>{item.name}</SidebarHeading>
                       {item.children.map((child) => (
                         <SidebarItem
