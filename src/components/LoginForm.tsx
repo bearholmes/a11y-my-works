@@ -55,7 +55,7 @@ export function LoginForm() {
       <AuthLayout>
         <div className="text-center" role="status" aria-live="polite">
           <div
-            className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"
+            className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mx-auto"
             aria-label="로딩 중"
           />
           <Text className="mt-4">로딩 중...</Text>
@@ -129,7 +129,8 @@ export function LoginForm() {
         aria-label={isSignUp ? '회원가입 폼' : '로그인 폼'}
       >
         {/* 헤딩 */}
-        <Heading>{isSignUp ? '계정 만들기' : '계정에 로그인'}</Heading>
+        <Heading level={1}>A11yWork</Heading>
+        <Heading level={2}>{isSignUp ? '계정 만들기' : '계정에 로그인'}</Heading>
 
         {/* 에러 메시지 */}
         {error && (
