@@ -120,7 +120,7 @@ export function LoginForm() {
   return (
     <AuthLayout>
       <form
-        className="grid w-full max-w-sm grid-cols-1 gap-6"
+        className="grid w-full max-w-sm grid-cols-1 gap-8"
         onSubmit={
           isSignUp
             ? signUpForm.handleSubmit(onSubmit)
@@ -280,14 +280,13 @@ export function LoginForm() {
           type="submit"
           disabled={submitting}
           className="w-full"
-          color="blue"
           aria-busy={submitting}
         >
           {submitting ? '처리 중...' : isSignUp ? '회원가입' : '로그인'}
         </Button>
 
         {/* 모드 전환 링크 */}
-        <Text className="text-center">
+        <Text>
           {isSignUp ? '이미 계정이 있나요? ' : '계정이 없나요? '}
           <button
             type="button"

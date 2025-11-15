@@ -52,7 +52,7 @@ export function ForgotPassword() {
   if (success) {
     return (
       <AuthLayout>
-        <div className="grid w-full max-w-sm grid-cols-1 gap-6 text-center">
+        <div className="grid w-full max-w-sm grid-cols-1 gap-8 text-center">
           <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-950">
             <svg
               className="h-6 w-6 text-green-600"
@@ -84,7 +84,7 @@ export function ForgotPassword() {
   return (
     <AuthLayout>
       <form
-        className="grid w-full max-w-sm grid-cols-1 gap-6"
+        className="grid w-full max-w-sm grid-cols-1 gap-8"
         onSubmit={handleSubmit(onSubmit)}
       >
         {/* 헤딩 */}
@@ -120,14 +120,13 @@ export function ForgotPassword() {
           type="submit"
           disabled={submitting}
           className="w-full"
-          color="blue"
           aria-busy={submitting}
         >
           {submitting ? '발송 중...' : '재설정 링크 보내기'}
         </Button>
 
         {/* 로그인 링크 */}
-        <Text className="text-center">
+        <Text>
           비밀번호가 기억나셨나요?{' '}
           <TextLink href="/login">
             <Strong>로그인</Strong>
