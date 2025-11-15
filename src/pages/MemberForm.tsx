@@ -15,6 +15,7 @@ import {
 import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
+import { Spinner } from '../components/ui/spinner';
 import { Text } from '../components/ui/text';
 import { useNotification } from '../hooks/useNotification';
 import { memberAPI, roleAPI } from '../services/api';
@@ -109,10 +110,7 @@ export function MemberForm() {
   if (isEditMode && memberLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <Text className="mt-4">로딩 중...</Text>
-        </div>
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -263,11 +261,16 @@ export function MemberForm() {
             aria-label={isEditMode ? '사용자 정보 수정 저장' : '사용자 등록'}
             aria-busy={updateMutation.isPending}
           >
-            {updateMutation.isPending
-              ? '처리 중...'
-              : isEditMode
-                ? '수정'
-                : '등록'}
+            {updateMutation.isPending ? (
+              <span className="flex items-center justify-center gap-2">
+                <Spinner size="sm" className="text-white" />
+                처리 중...
+              </span>
+            ) : isEditMode ? (
+              '수정'
+            ) : (
+              '등록'
+            )}
           </Button>
           <Button
             type="button"

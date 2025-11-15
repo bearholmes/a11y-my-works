@@ -14,6 +14,7 @@ import { Field, Label } from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
+import { Spinner } from '../components/ui/spinner';
 import {
   Table,
   TableBody,
@@ -285,10 +286,7 @@ export function MemberList() {
       <div className="bg-white dark:bg-zinc-900 rounded-lg overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
-            <Text className="mt-2 text-zinc-600 dark:text-zinc-400">
-              로딩 중...
-            </Text>
+            <Spinner />
           </div>
         ) : data?.data.length === 0 ? (
           <div className="p-8 text-center">
@@ -544,7 +542,14 @@ export function MemberList() {
             disabled={!selectedRoleId || approveMutation.isPending}
             color="green"
           >
-            {approveMutation.isPending ? '처리 중...' : '승인'}
+            {approveMutation.isPending ? (
+              <span className="flex items-center justify-center gap-2">
+                <Spinner size="sm" className="text-white" />
+                처리 중...
+              </span>
+            ) : (
+              '승인'
+            )}
           </Button>
         </DialogActions>
       </Dialog>

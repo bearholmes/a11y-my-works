@@ -8,6 +8,7 @@ import { Button } from '../components/ui/button';
 import { ErrorMessage, Field, Label } from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
+import { Spinner } from '../components/ui/spinner';
 import { Text } from '../components/ui/text';
 import { Textarea } from '../components/ui/textarea';
 import { useNotification } from '../hooks/useNotification';
@@ -99,10 +100,7 @@ export function HolidayForm() {
   if (isEditMode && holidayLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <Text className="mt-4">로딩 중...</Text>
-        </div>
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -171,11 +169,16 @@ export function HolidayForm() {
             type="submit"
             disabled={createMutation.isPending || updateMutation.isPending}
           >
-            {createMutation.isPending || updateMutation.isPending
-              ? '처리 중...'
-              : isEditMode
-                ? '수정'
-                : '등록'}
+            {createMutation.isPending || updateMutation.isPending ? (
+              <span className="flex items-center justify-center gap-2">
+                <Spinner size="sm" className="text-white" />
+                처리 중...
+              </span>
+            ) : isEditMode ? (
+              '수정'
+            ) : (
+              '등록'
+            )}
           </Button>
           <Button type="button" plain onClick={() => navigate('/holidays')}>
             취소

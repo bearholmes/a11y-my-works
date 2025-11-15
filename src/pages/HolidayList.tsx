@@ -13,6 +13,7 @@ import {
   TableRow,
 } from '../components/ui/table';
 import { Text } from '../components/ui/text';
+import { Spinner } from '../components/ui/spinner';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
 import { holidayAPI } from '../services/api';
@@ -60,12 +61,7 @@ export function HolidayList() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
-          <Text className="mt-4 text-zinc-600 dark:text-zinc-400">
-            로딩 중...
-          </Text>
-        </div>
+        <Spinner size="lg" />
       </div>
     );
   }

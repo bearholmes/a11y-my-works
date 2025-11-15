@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { Stat } from '../components/Stat';
 import { Heading, Subheading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
+import { Spinner } from '../components/ui/spinner';
 import { Text } from '../components/ui/text';
 import { taskAPI } from '../services/api';
 import type { Task } from '../types/database';
@@ -249,15 +250,8 @@ export function ResourceStats() {
       </div>
 
       {isLoading ? (
-        <div
-          className="flex items-center justify-center py-12"
-          role="status"
-          aria-live="polite"
-        >
-          <div
-            className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
-            aria-label="로딩 중"
-          />
+        <div className="flex items-center justify-center py-12">
+          <Spinner size="lg" />
         </div>
       ) : (
         <>
