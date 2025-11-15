@@ -333,9 +333,9 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
             <SidebarSpacer />
 
             <SidebarSection>
-              <SidebarItem href="/licenses">
-                <Cog6ToothIcon />
-                <SidebarLabel>라이선스</SidebarLabel>
+              <SidebarItem href="/logout">
+                <ArrowRightStartOnRectangleIcon />
+                <SidebarLabel>로그아웃</SidebarLabel>
               </SidebarItem>
             </SidebarSection>
           </SidebarBody>
