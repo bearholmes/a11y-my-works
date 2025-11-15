@@ -103,7 +103,7 @@ export function TeamTaskList() {
   return (
     <>
       {/* 헤더 */}
-      <div className="flex items-center justify-between">
+      <div className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-zinc-950/10 pb-6 dark:border-white/10">
         <Heading>팀 업무 조회</Heading>
       </div>
 

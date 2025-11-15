@@ -3,6 +3,13 @@ import { format } from 'date-fns';
 import { useState } from 'react';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
+import {
+  Dialog,
+  DialogActions,
+  DialogBody,
+  DialogDescription,
+  DialogTitle,
+} from '../components/ui/dialog';
 import { Field, Label } from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
@@ -216,9 +223,11 @@ export function MemberList() {
   return (
     <>
       {/* 헤더 */}
-      <div className="flex items-center justify-between">
+      <div className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-zinc-950/10 pb-6 dark:border-white/10">
         <Heading>사용자 관리</Heading>
-        <Button onClick={handleInvite}>사용자 초대</Button>
+        <div className="flex gap-4">
+          <Button onClick={handleInvite}>사용자 초대</Button>
+        </div>
       </div>
 
       {/* 검색 및 필터 */}
@@ -473,13 +482,20 @@ export function MemberList() {
       </div>
 
       {/* 승인 모달 */}
-      {showApprovalModal && selectedMember && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-zinc-900 rounded-lg-xl p-6 max-w-md w-full mx-4">
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
-              사용자 승인
-            </h2>
-
+      <Dialog
+        open={showApprovalModal && !!selectedMember}
+        onClose={() => {
+          setShowApprovalModal(false);
+          setSelectedMember(null);
+          setSelectedRoleId(null);
+        }}
+      >
+        <DialogTitle>사용자 승인</DialogTitle>
+        <DialogDescription>
+          사용자에게 역할을 할당하여 시스템 접근 권한을 부여합니다.
+        </DialogDescription>
+        {selectedMember && (
+          <DialogBody>
             <div className="mb-4 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
               <Text className="text-sm text-zinc-500 dark:text-zinc-400 mb-1">
                 이름
@@ -495,10 +511,8 @@ export function MemberList() {
               </Text>
             </div>
 
-            <Field className="mb-6">
-              <Label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                역할 선택 *
-              </Label>
+            <Field>
+              <Label>역할 선택 *</Label>
               <Select
                 value={selectedRoleId || ''}
                 onChange={(e) => setSelectedRoleId(Number(e.target.value))}
@@ -510,146 +524,118 @@ export function MemberList() {
                   </option>
                 ))}
               </Select>
-              <Text className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                승인 후 이 역할의 권한으로 시스템을 이용할 수 있습니다.
-              </Text>
             </Field>
-
-            <div className="flex gap-3">
-              <button
-                onClick={handleApprovalSubmit}
-                disabled={!selectedRoleId || approveMutation.isPending}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {approveMutation.isPending ? '처리 중...' : '승인'}
-              </button>
-              <button
-                onClick={() => {
-                  setShowApprovalModal(false);
-                  setSelectedMember(null);
-                  setSelectedRoleId(null);
-                }}
-                disabled={approveMutation.isPending}
-                className="flex-1 px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-md hover:bg-zinc-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-zinc-500"
-              >
-                취소
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          </DialogBody>
+        )}
+        <DialogActions>
+          <Button
+            plain
+            onClick={() => {
+              setShowApprovalModal(false);
+              setSelectedMember(null);
+              setSelectedRoleId(null);
+            }}
+            disabled={approveMutation.isPending}
+          >
+            취소
+          </Button>
+          <Button
+            onClick={handleApprovalSubmit}
+            disabled={!selectedRoleId || approveMutation.isPending}
+            color="green"
+          >
+            {approveMutation.isPending ? '처리 중...' : '승인'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* 초대 모달 (Supabase Auth 사용) */}
-      {showInvitationModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-zinc-900 rounded-lg-xl p-6 max-w-md w-full mx-4">
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
-              사용자 초대
-            </h2>
+      <Dialog open={showInvitationModal} onClose={handleCloseInvitationModal}>
+        <DialogTitle>사용자 초대</DialogTitle>
+        {!invitationSuccess ? (
+          <>
+            <DialogDescription>
+              새로운 사용자를 초대하고 역할을 할당하세요. 초대 이메일이
+              발송됩니다.
+            </DialogDescription>
+            <DialogBody>
+              <Field>
+                <Label>이메일 *</Label>
+                <Input
+                  type="email"
+                  value={invitationEmail}
+                  onChange={(e) => setInvitationEmail(e.target.value)}
+                  placeholder="user@example.com"
+                />
+              </Field>
 
-            {!invitationSuccess ? (
-              <>
-                <Field className="mb-4">
-                  <Label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                    이메일 *
-                  </Label>
-                  <Input
-                    type="email"
-                    value={invitationEmail}
-                    onChange={(e) => setInvitationEmail(e.target.value)}
-                    placeholder="user@example.com"
-                  />
-                  <Text className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                    초대할 사용자의 이메일 주소를 입력하세요.
-                  </Text>
-                </Field>
+              <Field className="mt-4">
+                <Label>이름</Label>
+                <Input
+                  type="text"
+                  value={invitationName}
+                  onChange={(e) => setInvitationName(e.target.value)}
+                  placeholder="홍길동"
+                />
+              </Field>
 
-                <Field className="mb-4">
-                  <Label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                    이름
-                  </Label>
-                  <Input
-                    type="text"
-                    value={invitationName}
-                    onChange={(e) => setInvitationName(e.target.value)}
-                    placeholder="홍길동"
-                  />
-                  <Text className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                    사용자 이름 (선택사항)
-                  </Text>
-                </Field>
-
-                <Field className="mb-6">
-                  <Label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                    역할 선택 *
-                  </Label>
-                  <Select
-                    value={invitationRoleId || ''}
-                    onChange={(e) =>
-                      setInvitationRoleId(Number(e.target.value))
-                    }
-                  >
-                    <option value="">역할을 선택하세요</option>
-                    {rolesData?.data.map((role: any) => (
-                      <option key={role.role_id} value={role.role_id}>
-                        {role.name}
-                      </option>
-                    ))}
-                  </Select>
-                  <Text className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                    초대받은 사용자에게 할당될 역할입니다.
-                  </Text>
-                </Field>
-
-                <div className="flex gap-3">
-                  <button
-                    onClick={handleInvitationSubmit}
-                    disabled={
-                      !invitationEmail ||
-                      !invitationRoleId ||
-                      inviteUserMutation.isPending
-                    }
-                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {inviteUserMutation.isPending
-                      ? '초대 중...'
-                      : '초대 보내기'}
-                  </button>
-                  <button
-                    onClick={handleCloseInvitationModal}
-                    disabled={inviteUserMutation.isPending}
-                    className="flex-1 px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-md hover:bg-zinc-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-zinc-500"
-                  >
-                    취소
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="mb-6 p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
-                  <Text className="text-green-800 dark:text-green-200 font-medium mb-2">
-                    초대 이메일이 발송되었습니다!
-                  </Text>
-                  <Text className="text-sm text-green-700 dark:text-green-300 mb-2">
-                    {invitationEmail}님에게 초대 이메일이 발송되었습니다.
-                  </Text>
-                  <Text className="text-sm text-green-700 dark:text-green-300">
-                    사용자가 이메일의 링크를 클릭하면 가입 절차를 진행할 수
-                    있습니다.
-                  </Text>
-                </div>
-
-                <button
-                  onClick={handleCloseInvitationModal}
-                  className="w-full px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-md hover:bg-zinc-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+              <Field className="mt-4">
+                <Label>역할 선택 *</Label>
+                <Select
+                  value={invitationRoleId || ''}
+                  onChange={(e) => setInvitationRoleId(Number(e.target.value))}
                 >
-                  닫기
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+                  <option value="">역할을 선택하세요</option>
+                  {rolesData?.data.map((role: any) => (
+                    <option key={role.role_id} value={role.role_id}>
+                      {role.name}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+            </DialogBody>
+            <DialogActions>
+              <Button
+                plain
+                onClick={handleCloseInvitationModal}
+                disabled={inviteUserMutation.isPending}
+              >
+                취소
+              </Button>
+              <Button
+                onClick={handleInvitationSubmit}
+                disabled={
+                  !invitationEmail ||
+                  !invitationRoleId ||
+                  inviteUserMutation.isPending
+                }
+              >
+                {inviteUserMutation.isPending ? '초대 중...' : '초대 보내기'}
+              </Button>
+            </DialogActions>
+          </>
+        ) : (
+          <>
+            <DialogDescription>
+              <div className="p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
+                <Text className="text-green-800 dark:text-green-200 font-medium mb-2">
+                  초대 이메일이 발송되었습니다!
+                </Text>
+                <Text className="text-sm text-green-700 dark:text-green-300 mb-2">
+                  {invitationEmail}님에게 초대 이메일이 발송되었습니다.
+                </Text>
+                <Text className="text-sm text-green-700 dark:text-green-300">
+                  사용자가 이메일의 링크를 클릭하면 가입 절차를 진행할 수
+                  있습니다.
+                </Text>
+              </div>
+            </DialogDescription>
+            <DialogActions>
+              <Button onClick={handleCloseInvitationModal}>닫기</Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
     </>
   );
 }

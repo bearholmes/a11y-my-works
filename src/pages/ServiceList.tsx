@@ -104,9 +104,11 @@ export function ServiceList() {
   return (
     <>
       {/* 헤더 */}
-      <div className="flex items-center justify-between">
+      <div className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-zinc-950/10 pb-6 dark:border-white/10">
         <Heading>서비스 관리</Heading>
-        <Button href="/services/new">+ 새 서비스</Button>
+        <div className="flex gap-4">
+          <Button href="/services/new">+ 새 서비스</Button>
+        </div>
       </div>
 
       {/* 검색 및 필터 */}

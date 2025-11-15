@@ -57,9 +57,11 @@ export function Dashboard() {
 
   return (
     <>
-      <Heading>업무 대시보드</Heading>
+      <div className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-zinc-950/10 pb-6 dark:border-white/10">
+        <Heading>업무 대시보드</Heading>
+      </div>
 
-      <div className="mt-8 flex items-end justify-between">
+      <div className="mt-8 flex w-full flex-wrap items-end justify-between gap-4 border-b border-zinc-950/10 pb-6 dark:border-white/10">
         <Subheading>주요 지표</Subheading>
         <div className="flex gap-3">
           <Field>

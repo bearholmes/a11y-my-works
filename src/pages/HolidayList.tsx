@@ -72,9 +72,11 @@ export function HolidayList() {
 
   return (
     <>
-      <div className="mb-6 flex justify-between items-center">
+      <div className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-zinc-950/10 pb-6 dark:border-white/10">
         <Heading>공휴일 관리</Heading>
-        <Button href="/holidays/new">공휴일 등록</Button>
+        <div className="flex gap-4">
+          <Button href="/holidays/new">공휴일 등록</Button>
+        </div>
       </div>
 
       {/* 필터 */}

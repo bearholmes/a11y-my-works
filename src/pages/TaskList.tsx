@@ -108,7 +108,7 @@ export function TaskList() {
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDate = new Date(e.target.value);
-    if (!isNaN(newDate.getTime())) {
+    if (!Number.isNaN(newDate.getTime())) {
       setSelectedDate(newDate);
     }
   };
@@ -140,7 +140,7 @@ export function TaskList() {
   return (
     <>
       {/* 헤더 */}
-      <header className="flex flex-none items-center justify-between mb-6">
+      <header className="flex w-full flex-wrap items-end justify-between gap-4 border-b border-zinc-950/10 pb-6 dark:border-white/10">
         <div>
           <Heading>업무 보고</Heading>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
