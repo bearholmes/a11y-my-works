@@ -11,6 +11,7 @@ import { Checkbox, CheckboxField } from './ui/checkbox';
 import { ErrorMessage, Field, Label } from './ui/fieldset';
 import { Heading } from './ui/heading';
 import { Input } from './ui/input';
+import { Spinner } from './ui/spinner';
 import { Strong, Text, TextLink } from './ui/text';
 
 const loginSchema = z.object({
@@ -53,12 +54,8 @@ export function LoginForm() {
   if (loading) {
     return (
       <AuthLayout>
-        <div className="text-center" role="status" aria-live="polite">
-          <div
-            className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mx-auto"
-            aria-label="로딩 중"
-          />
-          <Text className="mt-4">로딩 중...</Text>
+        <div className="flex flex-col items-center gap-4">
+          <Spinner size="lg" />
         </div>
       </AuthLayout>
     );
@@ -283,7 +280,16 @@ export function LoginForm() {
           className="w-full"
           aria-busy={submitting}
         >
-          {submitting ? '처리 중...' : isSignUp ? '회원가입' : '로그인'}
+          {submitting ? (
+            <span className="flex items-center justify-center gap-2">
+              <Spinner size="sm" className="text-white" />
+              처리 중...
+            </span>
+          ) : isSignUp ? (
+            '회원가입'
+          ) : (
+            '로그인'
+          )}
         </Button>
 
         {/* 모드 전환 링크 */}

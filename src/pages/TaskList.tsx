@@ -29,6 +29,7 @@ import {
 import { Field, Label } from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
+import { Spinner } from '../components/ui/spinner';
 import {
   Table,
   TableBody,
@@ -260,8 +261,7 @@ export function TaskList() {
       {/* 업무 목록 */}
       {isLoading ? (
         <div className="p-8 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto dark:border-blue-500"></div>
-          <Text className="mt-2">로딩 중...</Text>
+          <Spinner />
         </div>
       ) : data?.data.length === 0 ? (
         <div className="text-center py-12">

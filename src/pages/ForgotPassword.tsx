@@ -7,6 +7,7 @@ import { Button } from '../components/ui/button';
 import { ErrorMessage, Field, Label } from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
+import { Spinner } from '../components/ui/spinner';
 import { Strong, Text, TextLink } from '../components/ui/text';
 import { useAuth } from '../hooks/useAuth';
 
@@ -122,7 +123,14 @@ export function ForgotPassword() {
           className="w-full"
           aria-busy={submitting}
         >
-          {submitting ? '발송 중...' : '재설정 링크 보내기'}
+          {submitting ? (
+            <span className="flex items-center justify-center gap-2">
+              <Spinner size="sm" className="text-white" />
+              발송 중...
+            </span>
+          ) : (
+            '재설정 링크 보내기'
+          )}
         </Button>
 
         {/* 로그인 링크 */}

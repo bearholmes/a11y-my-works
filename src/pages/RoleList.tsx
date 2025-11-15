@@ -13,6 +13,7 @@ import {
   TableRow,
 } from '../components/ui/table';
 import { Text } from '../components/ui/text';
+import { Spinner } from '../components/ui/spinner';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
 import { roleAPI } from '../services/api';
@@ -80,10 +81,7 @@ export function RoleList() {
       <div className="bg-white dark:bg-zinc-900 rounded-lg overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
-            <Text className="mt-2 text-zinc-600 dark:text-zinc-400">
-              로딩 중...
-            </Text>
+            <Spinner />
           </div>
         ) : data?.data.length === 0 ? (
           <div className="p-8 text-center">

@@ -7,6 +7,7 @@ import { Button } from '../components/ui/button';
 import { Fieldset, Label } from '../components/ui/fieldset';
 import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
+import { Spinner } from '../components/ui/spinner';
 import { Text } from '../components/ui/text';
 import { useAuth } from '../hooks/useAuth';
 import { useNotification } from '../hooks/useNotification';
@@ -107,7 +108,14 @@ export function ResetPassword() {
           </Fieldset>
 
           <Button type="submit" disabled={submitting} className="w-full">
-            {submitting ? '변경 중...' : '비밀번호 변경'}
+            {submitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <Spinner size="sm" className="text-white" />
+                변경 중...
+              </span>
+            ) : (
+              '비밀번호 변경'
+            )}
           </Button>
         </form>
       </div>
