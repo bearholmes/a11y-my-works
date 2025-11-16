@@ -80,8 +80,8 @@ export function Dashboard() {
         </div>
       </div>
 
-      <dl className="mt-4 grid grid-cols-1 gap-px bg-zinc-900/5 sm:grid-cols-2 xl:grid-cols-4 dark:bg-white/10">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8 dark:bg-zinc-900">
+      <dl className="mt-4 grid grid-cols-1 gap-px bg-zinc-900/5 dark:bg-white/10">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 dark:bg-zinc-900">
           <dt className="text-sm/6 font-medium text-zinc-500 dark:text-zinc-400">
             총 업무 수
           </dt>
@@ -93,7 +93,7 @@ export function Dashboard() {
           </dd>
         </div>
 
-        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8 dark:bg-zinc-900">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 dark:bg-zinc-900">
           <dt className="text-sm/6 font-medium text-zinc-500 dark:text-zinc-400">
             총 작업 시간
           </dt>
@@ -105,7 +105,7 @@ export function Dashboard() {
           </dd>
         </div>
 
-        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8 dark:bg-zinc-900">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 dark:bg-zinc-900">
           <dt className="text-sm/6 font-medium text-zinc-500 dark:text-zinc-400">
             활성 사용자
           </dt>
@@ -117,7 +117,7 @@ export function Dashboard() {
           </dd>
         </div>
 
-        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8 dark:bg-zinc-900">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 dark:bg-zinc-900">
           <dt className="text-sm/6 font-medium text-zinc-500 dark:text-zinc-400">
             진행 중 프로젝트
           </dt>
@@ -131,7 +131,7 @@ export function Dashboard() {
       </dl>
 
       <Subheading className="mt-14">차트</Subheading>
-      <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-6">
         {/* 일별 업무 추이 */}
         <div className="rounded-lg bg-white p-6 dark:bg-zinc-900">
           <Subheading className="mb-4">일별 업무 추이</Subheading>
@@ -212,13 +212,13 @@ export function Dashboard() {
       </div>
 
       <Subheading className="mt-14">통계</Subheading>
-      <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-6">
         {/* 사용자별 작업 시간 */}
         <div className="rounded-lg bg-white p-6 dark:bg-zinc-900">
           <Subheading className="mb-4">사용자별 작업 시간</Subheading>
           {memberStats && memberStats.length > 0 ? (
             <Table
-              className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]"
+              className="[--gutter:--spacing(6)]"
               dense
             >
               <TableHead>
@@ -263,7 +263,7 @@ export function Dashboard() {
           </div>
           {recentTasks && recentTasks.length > 0 ? (
             <Table
-              className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]"
+              className="[--gutter:--spacing(6)]"
               dense
             >
               <TableHead>

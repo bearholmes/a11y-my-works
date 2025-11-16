@@ -9,7 +9,7 @@ import { AuthLayout } from './ui/auth-layout';
 import { Button } from './ui/button';
 import { Checkbox, CheckboxField } from './ui/checkbox';
 import { ErrorMessage, Field, Label } from './ui/fieldset';
-import { Heading } from './ui/heading';
+import {Heading, Subheading} from './ui/heading';
 import { Input } from './ui/input';
 import { Spinner } from './ui/spinner';
 import { Strong, Text, TextLink } from './ui/text';
@@ -127,9 +127,9 @@ export function LoginForm() {
       >
         {/* 헤딩 */}
         <Heading level={1}>A11yWorks</Heading>
-        <Heading level={2}>
-          {isSignUp ? '계정 만들기' : '계정에 로그인'}
-        </Heading>
+        <Subheading level={2}>
+          {isSignUp ? '계정 만들기' : '계정 로그인'}
+        </Subheading>
 
         {/* 에러 메시지 */}
         {error && (

@@ -56,7 +56,7 @@ export function Combobox<T>({
           // Background color is moved to control and shadow is removed in dark mode so hide `before` pseudo
           'dark:before:hidden',
           // Focus ring
-          'after:pointer-events-none after:absolute after:inset-0 after:rounded-lg after:ring-transparent after:ring-inset sm:focus-within:after:ring-2 sm:focus-within:after:ring-blue-500',
+          'after:pointer-events-none after:absolute after:inset-0 after:rounded-lg after:ring-transparent after:ring-inset',
           // Disabled state
           'has-data-disabled:opacity-50 has-data-disabled:before:bg-zinc-950/5 has-data-disabled:before:shadow-none',
           // Invalid state
@@ -73,11 +73,11 @@ export function Combobox<T>({
           className={clsx([
             className,
             // Basic layout
-            'relative block w-full appearance-none rounded-lg py-[calc(--spacing(2.5)-1px)] sm:py-[calc(--spacing(1.5)-1px)]',
+            'relative block w-full appearance-none rounded-lg py-[calc(--spacing(2.5)-1px)]',
             // Horizontal padding
-            'pr-[calc(--spacing(10)-1px)] pl-[calc(--spacing(3.5)-1px)] sm:pr-[calc(--spacing(9)-1px)] sm:pl-[calc(--spacing(3)-1px)]',
+            'pr-[calc(--spacing(10)-1px)] pl-[calc(--spacing(3.5)-1px)]',
             // Typography
-            'text-base/6 text-zinc-950 placeholder:text-zinc-500 sm:text-sm/6 dark:text-white',
+            'text-base/6 text-zinc-950 placeholder:text-zinc-500 dark:text-white',
             // Border
             'border border-zinc-950/10 data-hover:border-zinc-950/20 dark:border-white/10 dark:data-hover:border-white/20',
             // Background color
@@ -94,7 +94,7 @@ export function Combobox<T>({
         />
         <Headless.ComboboxButton className="group absolute inset-y-0 right-0 flex items-center px-2">
           <svg
-            className="size-5 stroke-zinc-500 group-data-disabled:stroke-zinc-600 group-data-hover:stroke-zinc-700 sm:size-4 dark:stroke-zinc-400 dark:group-data-hover:stroke-zinc-300 forced-colors:stroke-[CanvasText]"
+            className="size-5 stroke-zinc-500 group-data-disabled:stroke-zinc-600 group-data-hover:stroke-zinc-700 dark:stroke-zinc-400 dark:group-data-hover:stroke-zinc-300 forced-colors:stroke-[CanvasText]"
             viewBox="0 0 16 16"
             aria-hidden="true"
             fill="none"
@@ -119,7 +119,7 @@ export function Combobox<T>({
         anchor={anchor}
         className={clsx(
           // Anchor positioning
-          '[--anchor-gap:--spacing(2)] [--anchor-padding:--spacing(4)] sm:data-[anchor~=start]:[--anchor-offset:-4px]',
+          '[--anchor-gap:--spacing(2)] [--anchor-padding:--spacing(4)]',
           // Base styles,
           'isolate min-w-[calc(var(--input-width)+8px)] scroll-py-1 rounded-xl p-1 select-none empty:invisible',
           // Invisible border that is only visible in `forced-colors` mode for accessibility purposes
@@ -152,11 +152,11 @@ export function ComboboxOption<T>({
     // Base
     'flex min-w-0 items-center',
     // Icons
-    '*:data-[slot=icon]:size-5 *:data-[slot=icon]:shrink-0 sm:*:data-[slot=icon]:size-4',
+    '*:data-[slot=icon]:size-5 *:data-[slot=icon]:shrink-0',
     '*:data-[slot=icon]:text-zinc-500 group-data-focus/option:*:data-[slot=icon]:text-white dark:*:data-[slot=icon]:text-zinc-400',
     'forced-colors:*:data-[slot=icon]:text-[CanvasText] forced-colors:group-data-focus/option:*:data-[slot=icon]:text-[Canvas]',
     // Avatars
-    '*:data-[slot=avatar]:-mx-0.5 *:data-[slot=avatar]:size-6 sm:*:data-[slot=avatar]:size-5'
+    '*:data-[slot=avatar]:-mx-0.5 *:data-[slot=avatar]:size-6'
   );
 
   return (
@@ -164,9 +164,9 @@ export function ComboboxOption<T>({
       {...props}
       className={clsx(
         // Basic layout
-        'group/option grid w-full cursor-default grid-cols-[1fr_--spacing(5)] items-baseline gap-x-2 rounded-lg py-2.5 pr-2 pl-3.5 sm:grid-cols-[1fr_--spacing(4)] sm:py-1.5 sm:pr-2 sm:pl-3',
+        'group/option grid w-full cursor-default grid-cols-[1fr_--spacing(5)] items-baseline gap-x-2 rounded-lg py-2.5 pr-2 pl-3.5',
         // Typography
-        'text-base/6 text-zinc-950 sm:text-sm/6 dark:text-white forced-colors:text-[CanvasText]',
+        'text-base/6 text-zinc-950 dark:text-white forced-colors:text-[CanvasText]',
         // Focus
         'outline-hidden data-focus:bg-blue-500 data-focus:text-white',
         // Forced colors mode
@@ -177,7 +177,7 @@ export function ComboboxOption<T>({
     >
       <span className={clsx(className, sharedClasses)}>{children}</span>
       <svg
-        className="relative col-start-2 hidden size-5 self-center stroke-current group-data-selected/option:inline sm:size-4"
+        className="relative col-start-2 hidden size-5 self-center stroke-current group-data-selected/option:inline"
         viewBox="0 0 16 16"
         fill="none"
         aria-hidden="true"
@@ -202,7 +202,7 @@ export function ComboboxLabel({
       {...props}
       className={clsx(
         className,
-        'ml-2.5 truncate first:ml-0 sm:ml-2 sm:first:ml-0'
+        'ml-2.5 truncate first:ml-0'
       )}
     />
   );

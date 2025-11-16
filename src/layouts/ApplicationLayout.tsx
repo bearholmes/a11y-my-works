@@ -47,7 +47,6 @@ import {
 import { SidebarLayout } from '../components/ui/sidebar-layout';
 import { Spinner } from '../components/ui/spinner';
 import { usePermissions } from '../hooks/usePermissions';
-import { useAuthContext } from '../providers/AuthProvider';
 import { memberAPI } from '../services/api';
 import type { MenuItem } from '../types/permission';
 import clsx from "clsx";
@@ -225,7 +224,6 @@ function getMenuIcon(href: string, icon?: string) {
  */
 export function ApplicationLayout({ children }: ApplicationLayoutProps) {
   const location = useLocation();
-  const { user } = useAuthContext();
   const { filterAccessibleMenus, isLoading } = usePermissions();
 
   // 현재 로그인한 사용자의 멤버 정보 조회
@@ -269,7 +267,7 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
             <Dropdown>
               <DropdownButton as={NavbarItem}>
                 <Avatar
-                  initials={user?.email?.charAt(0).toUpperCase() || 'U'}
+                  initials={currentMember?.account_id?.charAt(0) || '-'}
                   className="size-8"
                 />
               </DropdownButton>
@@ -334,25 +332,21 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
             </SidebarSection>
           </SidebarBody>
 
-          <SidebarFooter className="max-lg:hidden">
+          <SidebarFooter>
             <Dropdown>
               <DropdownButton as={SidebarItem}>
                 <span className="flex min-w-0 items-center gap-3">
                   <Avatar
-                    initials={
-                      currentMember?.name?.charAt(0) ||
-                      user?.email?.charAt(0).toUpperCase() ||
-                      'U'
-                    }
+                    initials={currentMember?.account_id?.charAt(0) || '-'}
                     className="size-10"
                     square
                   />
                   <span className="min-w-0">
                     <span className="block truncate text-sm/5 font-medium text-zinc-950 dark:text-white">
-                      {currentMember?.name || user?.email}
+                      {currentMember?.account_id} ({currentMember?.name})
                     </span>
                     <span className="block truncate text-xs/5 font-normal text-zinc-500 dark:text-zinc-400">
-                      {currentMember?.role?.name || '사용자'}
+                      {currentMember?.roles?.name}
                     </span>
                   </span>
                 </span>

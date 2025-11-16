@@ -154,7 +154,7 @@ export function TaskList() {
             <button
               type="button"
               onClick={handlePreviousDay}
-              className="flex h-9 w-12 items-center justify-center rounded-l-md text-zinc-500 hover:text-zinc-700 focus:relative dark:text-zinc-400 dark:hover:text-white md:w-9 md:hover:bg-zinc-50 dark:md:hover:bg-white/10"
+              className="flex h-9 w-12 items-center justify-center rounded-l-md text-zinc-500 hover:text-zinc-700 focus:relative dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/10"
               aria-label="이전 날짜"
             >
               <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
@@ -162,15 +162,15 @@ export function TaskList() {
             <button
               type="button"
               onClick={handleToday}
-              className="hidden px-3.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:relative dark:text-white dark:hover:bg-white/10 md:block"
+              className="hidden px-3.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:relative dark:text-white dark:hover:bg-white/10"
             >
               오늘
             </button>
-            <span className="relative -mx-px h-5 w-px bg-zinc-300 dark:bg-white/10 md:hidden" />
+            <span className="relative -mx-px h-5 w-px bg-zinc-300 dark:bg-white/10" />
             <button
               type="button"
               onClick={handleNextDay}
-              className="flex h-9 w-12 items-center justify-center rounded-r-md text-zinc-500 hover:text-zinc-700 focus:relative dark:text-zinc-400 dark:hover:text-white md:w-9 md:hover:bg-zinc-50 dark:md:hover:bg-white/10"
+              className="flex h-9 w-12 items-center justify-center rounded-r-md text-zinc-500 hover:text-zinc-700 focus:relative dark:text-zinc-400 dark:hover:text-white dark:hover:bg-white/10"
               aria-label="다음 날짜"
             >
               <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
@@ -273,7 +273,7 @@ export function TaskList() {
           </Button>
         </div>
       ) : (
-        <Table className="mt-8 [--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+        <Table className="mt-8 [--gutter:--spacing(6)]">
           <TableHead>
             <TableRow>
               <TableHeader>업무명</TableHeader>

@@ -50,7 +50,7 @@ export function Table({
           <div
             className={clsx(
               'inline-block min-w-full align-middle',
-              !bleed && 'sm:px-[--gutter]'
+              !bleed && 'px-[--gutter]'
             )}
           >
             <table className="min-w-full text-left text-sm/6 text-zinc-950 dark:text-white">
@@ -139,7 +139,7 @@ export function TableHeader({
         'border-b border-b-zinc-950/10 px-[--gutter] py-2 font-medium first:pl-[--gutter] last:pr-[--gutter] dark:border-b-white/10',
         grid &&
           'border-l border-l-zinc-950/5 first:border-l-0 dark:border-l-white/5',
-        !bleed && 'sm:first:pl-1 sm:last:pr-1'
+        !bleed && 'first:pl-1'
       )}
     />
   );
@@ -165,7 +165,7 @@ export function TableCell({
         grid &&
           'border-l border-l-zinc-950/5 first:border-l-0 dark:border-l-white/5',
         dense ? 'py-2.5' : 'py-4',
-        !bleed && 'sm:first:pl-1 sm:last:pr-1'
+        !bleed && 'first:pl-1'
       )}
     >
       {href && (

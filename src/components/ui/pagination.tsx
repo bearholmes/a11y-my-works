@@ -109,7 +109,7 @@ export function PaginationList({
   return (
     <span
       {...props}
-      className={clsx(className, 'hidden items-baseline gap-x-2 sm:flex')}
+      className={clsx(className, 'hidden items-baseline gap-x-2')}
     />
   );
 }

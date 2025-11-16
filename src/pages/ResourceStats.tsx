@@ -228,7 +228,7 @@ export function ResourceStats() {
       </div>
 
       {/* 전체 통계 카드 */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5">
         <Stat
           title="총 투입 시간"
           value={stats.totalHours.toFixed(1)}

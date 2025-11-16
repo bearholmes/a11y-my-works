@@ -148,7 +148,7 @@ export function TaskForm() {
           className="space-y-6"
           aria-label={isEdit ? '업무 보고 수정 폼' : '업무 보고 등록 폼'}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             <Field>
               <Label>
                 날짜{' '}
@@ -225,7 +225,7 @@ export function TaskForm() {
             )}
           </Field>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             <Field>
               <Label>시작 시간</Label>
               <Input
@@ -247,7 +247,7 @@ export function TaskForm() {
             </Field>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             <Field>
               <Label>청구 그룹</Label>
               <Select
@@ -282,7 +282,7 @@ export function TaskForm() {
           </div>
 
           <div
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            className="grid grid-cols-1 gap-6"
             role="group"
             aria-labelledby="project-selection-label"
           >

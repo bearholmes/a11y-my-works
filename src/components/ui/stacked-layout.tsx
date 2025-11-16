@@ -27,7 +27,7 @@ function MobileSidebar({
   children,
 }: React.PropsWithChildren<{ open: boolean; close: () => void }>) {
   return (
-    <Headless.Dialog open={open} onClose={close} className="lg:hidden">
+    <Headless.Dialog open={open} onClose={close} className="hidden">
       <Headless.DialogBackdrop
         transition
         className="fixed inset-0 bg-black/30 transition data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
@@ -60,7 +60,7 @@ export function StackedLayout({
   const [showSidebar, setShowSidebar] = useState(false);
 
   return (
-    <div className="relative isolate flex min-h-svh w-full flex-col bg-white lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950">
+    <div className="relative isolate flex min-h-svh w-full flex-col bg-white dark:bg-zinc-900 dark:bg-zinc-950">
       {/* Sidebar on mobile */}
       <MobileSidebar open={showSidebar} close={() => setShowSidebar(false)}>
         {sidebar}
@@ -68,7 +68,7 @@ export function StackedLayout({
 
       {/* Navbar */}
       <header className="flex items-center px-4">
-        <div className="py-2.5 lg:hidden">
+        <div className="py-2.5">
           <NavbarItem
             onClick={() => setShowSidebar(true)}
             aria-label="Open navigation"
@@ -80,8 +80,8 @@ export function StackedLayout({
       </header>
 
       {/* Content */}
-      <main className="flex flex-1 flex-col pb-2 lg:px-2">
-        <div className="grow p-6 lg:rounded-lg lg:bg-white lg:p-10 lg:shadow-xs lg:ring-1 lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
+      <main className="flex flex-1 flex-col min-w-6xl pb-2">
+        <div className="grow p-6 dark:bg-zinc-900 dark:ring-white/10">
           <div className="mx-auto max-w-6xl">{children}</div>
         </div>
       </main>

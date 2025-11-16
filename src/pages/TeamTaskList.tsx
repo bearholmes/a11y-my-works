@@ -109,7 +109,7 @@ export function TeamTaskList() {
       </div>
 
       {/* 통계 카드 */}
-      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
+      <div className="mt-8 grid grid-cols-1 gap-5">
         <div className="bg-white overflow-hidden rounded-lg dark:bg-zinc-900">
           <div className="p-5">
             <div className="flex items-center">
@@ -174,7 +174,7 @@ export function TeamTaskList() {
       {/* 필터 */}
       <div className="mt-8">
         <Subheading className="mb-4">필터</Subheading>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6">
           <Field>
             <Label>날짜</Label>
             <Input
@@ -221,7 +221,7 @@ export function TeamTaskList() {
             <Text className="mt-2">선택한 날짜에 업무 보고가 없습니다</Text>
           </div>
         ) : (
-          <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+          <Table className="[--gutter:--spacing(6)]">
             <TableHead>
               <TableRow>
                 <TableHeader>팀원</TableHeader>

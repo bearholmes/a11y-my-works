@@ -240,7 +240,7 @@ export function AdminDashboard() {
 
       {/* 통계 카드 */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6">
           <Stat
             title="활성 사용자"
             value={`${stats.totalActiveMembers}명`}
@@ -418,7 +418,7 @@ export function AdminDashboard() {
       {/* 범례 */}
       <div className="bg-white dark:bg-zinc-900 rounded-lg p-6">
         <Subheading className="mb-3">범례</Subheading>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3">
           <div className="flex items-center gap-2">
             <CheckCircleIcon className="h-5 w-5 text-green-600" />
             <Text>완료 - 해당 날짜에 8시간(480분) 이상 업무 작성</Text>

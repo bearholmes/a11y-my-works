@@ -110,7 +110,7 @@ export function HolidayList() {
             </Text>
           </div>
         ) : (
-          <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+          <Table className="[--gutter:--spacing(6)]">
             <TableHead>
               <TableRow>
                 <TableHeader>날짜</TableHeader>

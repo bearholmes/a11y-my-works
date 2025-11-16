@@ -9,15 +9,15 @@ import { Button } from '../components/ui/button';
  */
 export function ServerError() {
   return (
-    <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8 dark:bg-zinc-950">
+    <main className="grid min-h-full min-w-3xl place-items-center bg-white px-6 py-24 dark:bg-zinc-950">
       <div className="text-center">
         <p className="text-base font-semibold text-red-600 dark:text-red-400">
           500
         </p>
-        <h1 className="mt-4 text-5xl font-semibold tracking-tight text-balance text-zinc-900 sm:text-7xl dark:text-white">
+        <h1 className="mt-4 text-5xl font-semibold tracking-tight text-balance text-zinc-900 dark:text-white">
           서버 오류가 발생했습니다
         </h1>
-        <p className="mt-6 text-lg font-medium text-pretty text-zinc-500 sm:text-xl/8 dark:text-zinc-400">
+        <p className="mt-6 text-lg font-medium text-pretty text-zinc-500 dark:text-zinc-400">
           일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.
         </p>
         <div className="mt-10 flex items-center justify-center gap-x-6">

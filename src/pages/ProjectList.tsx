@@ -144,7 +144,7 @@ export function ProjectList() {
           </div>
         ) : (
           <>
-            <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+            <Table className="[--gutter:--spacing(6)]">
               <TableHead>
                 <TableRow>
                   <TableHeader>프로젝트명</TableHeader>
@@ -208,8 +208,8 @@ export function ProjectList() {
 
             {/* 페이지네이션 */}
             {data && data.pagination.pageCount > 1 && (
-              <div className="bg-white dark:bg-zinc-900 px-4 py-3 flex items-center justify-between border-t sm:px-6">
-                <div className="flex-1 flex justify-between sm:hidden">
+              <div className="bg-white dark:bg-zinc-900 px-4 py-3 flex items-center justify-between border-t">
+                <div className="flex-1 flex justify-between">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
@@ -227,7 +227,7 @@ export function ProjectList() {
                     다음
                   </button>
                 </div>
-                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div className="hidden">
                   <div>
                     <Text className="text-sm text-zinc-700 dark:text-zinc-300">
                       전체{' '}

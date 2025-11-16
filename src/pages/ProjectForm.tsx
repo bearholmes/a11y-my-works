@@ -15,7 +15,6 @@ import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { Spinner } from '../components/ui/spinner';
-import { Text } from '../components/ui/text';
 import { Textarea } from '../components/ui/textarea';
 import { useNotification } from '../hooks/useNotification';
 import { projectAPI } from '../services/api';

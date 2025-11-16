@@ -34,9 +34,9 @@ export function RadioField({
       className={clsx(
         className,
         // Base layout
-        'grid grid-cols-[1.125rem_1fr] gap-x-4 gap-y-1 sm:grid-cols-[1rem_1fr]',
+        'grid grid-cols-[1.125rem_1fr] gap-x-4 gap-y-1',
         // Control layout
-        '*:data-[slot=control]:col-start-1 *:data-[slot=control]:row-start-1 *:data-[slot=control]:mt-0.75 sm:*:data-[slot=control]:mt-1',
+        '*:data-[slot=control]:col-start-1 *:data-[slot=control]:row-start-1 *:data-[slot=control]:mt-0.75',
         // Label layout
         '*:data-[slot=label]:col-start-2 *:data-[slot=label]:row-start-1',
         // Description layout
@@ -50,7 +50,7 @@ export function RadioField({
 
 const base = [
   // Basic layout
-  'relative isolate flex size-4.75 shrink-0 rounded-full sm:size-4.25',
+  'relative isolate flex size-4.75 shrink-0 rounded-full',
   // Background color + shadow applied to inset pseudo element, so shadow blends with border in light mode
   'before:absolute before:inset-0 before:-z-10 before:rounded-full before:bg-white before:shadow-sm',
   // Background color when checked
