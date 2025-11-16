@@ -26,7 +26,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 });
 
 // 세션 타임아웃 체크 (30분)
-const SESSION_TIMEOUT = 30 * 60 * 1000; // 30분
+const SESSION_TIMEOUT = 120 * 60 * 1000; // 120분
 let lastActivityTime = Date.now();
 
 // 사용자 활동 감지

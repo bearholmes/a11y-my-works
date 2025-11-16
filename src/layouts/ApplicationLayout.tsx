@@ -1,20 +1,18 @@
 import {
   ArrowRightStartOnRectangleIcon,
-  Cog8ToothIcon,
-  KeyIcon,
-  UserCircleIcon,
-} from '@heroicons/react/16/solid';
-import {
   CalendarDaysIcon,
   ChartBarIcon,
   ClipboardDocumentListIcon,
   Cog6ToothIcon,
+  Cog8ToothIcon,
   CreditCardIcon,
   HomeIcon,
+  KeyIcon,
+  UserCircleIcon,
   UserGroupIcon,
   UsersIcon,
   WrenchScrewdriverIcon,
-} from '@heroicons/react/20/solid';
+} from '@heroicons/react/24/outline';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
@@ -69,17 +67,12 @@ function AccountDropdownMenu({
   return (
     <DropdownMenu className="min-w-64" anchor={anchor}>
       <DropdownItem href="/profile">
-        <UserCircleIcon />
+        <UserCircleIcon data-slot="icon" />
         <DropdownLabel>내 프로필</DropdownLabel>
-      </DropdownItem>
-      <DropdownItem href="/change-password">
-        <KeyIcon />
-        <DropdownLabel>비밀번호 변경</DropdownLabel>
       </DropdownItem>
       <DropdownDivider />
       <DropdownItem href="/licenses">
-        <Cog6ToothIcon />
-        <DropdownLabel>라이선스</DropdownLabel>
+        <DropdownLabel className="text-sm text-zinc-600 dark:text-zinc-300">오픈 라이센스</DropdownLabel>
       </DropdownItem>
     </DropdownMenu>
   );
@@ -215,7 +208,7 @@ function getMenuIcon(href: string, icon?: string) {
 
   const IconComponent = iconMap[href];
   return IconComponent ? (
-    <IconComponent />
+    <IconComponent data-slot="icon" />
   ) : (
     <span aria-hidden="true">{icon}</span>
   );
@@ -344,7 +337,7 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
 
             <SidebarSection>
               <SidebarItem href="/logout">
-                <ArrowRightStartOnRectangleIcon />
+                <ArrowRightStartOnRectangleIcon data-slot="icon" />
                 <SidebarLabel>로그아웃</SidebarLabel>
               </SidebarItem>
             </SidebarSection>
@@ -375,7 +368,7 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
                     </span>
                   </span>
                 </span>
-                <Cog8ToothIcon />
+                <Cog8ToothIcon data-slot="icon" />
               </DropdownButton>
               <AccountDropdownMenu anchor="top start" />
             </Dropdown>

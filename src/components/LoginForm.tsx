@@ -182,7 +182,7 @@ export function LoginForm() {
               : loginForm.register('password'))}
             type="password"
             name="password"
-            placeholder="••••••••"
+            placeholder="Password"
             aria-required="true"
             invalid={
               !!(isSignUp
