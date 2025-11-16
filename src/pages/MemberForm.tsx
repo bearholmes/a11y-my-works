@@ -124,7 +124,9 @@ export function MemberForm() {
 
     if (
       await confirm({
+        title: '비밀번호 초기화',
         message: `${member.name}님의 비밀번호를 초기화하시겠습니까?\n비밀번호 재설정 이메일이 발송됩니다.`,
+        confirmText: '발송'
       })
     ) {
       resetPasswordMutation.mutate(member.email);
