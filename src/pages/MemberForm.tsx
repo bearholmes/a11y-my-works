@@ -18,7 +18,7 @@ import { Select } from '../components/ui/select';
 import { Spinner } from '../components/ui/spinner';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
-import { memberAPI, roleAPI } from '../services/api';
+import { departmentAPI, memberAPI, roleAPI } from '../services/api';
 
 const memberSchema = z.object({
   name: z.string().min(1, '이름을 입력해주세요'),
@@ -26,6 +26,7 @@ const memberSchema = z.object({
   email: z.string().email('올바른 이메일을 입력해주세요'),
   mobile: z.string().optional(),
   role_id: z.number().min(1, '역할을 선택해주세요'),
+  department_id: z.number().nullable().optional(),
   is_active: z.boolean(),
   requires_daily_report: z.boolean(),
 });
@@ -60,6 +61,17 @@ export function MemberForm() {
     queryFn: () => roleAPI.getRoles({ isActive: true }),
   });
 
+  // 부서 목록 조회
+  const { data: departmentsData } = useQuery({
+    queryKey: ['departments', { includeInactive: false }],
+    queryFn: () =>
+      departmentAPI.getDepartments({
+        page: 1,
+        pageSize: 100,
+        includeInactive: false,
+      }),
+  });
+
   // 수정 모드일 때 사용자 정보 조회
   const { data: member, isLoading: memberLoading } = useQuery({
     queryKey: ['member', id],
@@ -76,6 +88,7 @@ export function MemberForm() {
         email: member.email,
         mobile: member.mobile || '',
         role_id: member.role_id || 0,
+        department_id: member.department_id || null,
         is_active: member.is_active,
         requires_daily_report: member.requires_daily_report,
       });
@@ -250,6 +263,35 @@ export function MemberForm() {
             <ErrorMessage>{errors.role_id.message}</ErrorMessage>
           )}
         </Field>
+
+        <Controller
+          name="department_id"
+          control={control}
+          render={({ field }) => (
+            <Field>
+              <Label>부서</Label>
+              <Select
+                id="department_id"
+                value={field.value ?? ''}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  field.onChange(value ? Number(value) : null);
+                }}
+                aria-label="부서 선택"
+              >
+                <option value="">부서 미배정</option>
+                {departmentsData?.data.map((dept: any) => (
+                  <option key={dept.department_id} value={dept.department_id}>
+                    {'  '.repeat(dept.depth)}{dept.name} ({dept.code})
+                  </option>
+                ))}
+              </Select>
+              {errors.department_id && (
+                <ErrorMessage>{errors.department_id.message}</ErrorMessage>
+              )}
+            </Field>
+          )}
+        />
 
         <Controller
           name="is_active"

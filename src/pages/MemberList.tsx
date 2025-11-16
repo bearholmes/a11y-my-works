@@ -26,7 +26,7 @@ import {
 import { Text } from '../components/ui/text';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
-import { invitationAPI, memberAPI, roleAPI } from '../services/api';
+import { departmentAPI, invitationAPI, memberAPI, roleAPI } from '../services/api';
 
 export function MemberList() {
   const queryClient = useQueryClient();
@@ -34,6 +34,9 @@ export function MemberList() {
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [isActiveFilter, setIsActiveFilter] = useState<boolean | undefined>(
+    undefined
+  );
+  const [departmentFilter, setDepartmentFilter] = useState<number | undefined>(
     undefined
   );
   const [showApprovalModal, setShowApprovalModal] = useState(false);
@@ -51,13 +54,14 @@ export function MemberList() {
 
   // 사용자 목록 조회
   const { data, isLoading, error } = useQuery({
-    queryKey: ['members', { page, search, isActive: isActiveFilter }],
+    queryKey: ['members', { page, search, isActive: isActiveFilter, departmentId: departmentFilter }],
     queryFn: () =>
       memberAPI.getMembers({
         page,
         pageSize: 20,
         search,
         isActive: isActiveFilter,
+        departmentId: departmentFilter,
       }),
   });
 
@@ -65,6 +69,17 @@ export function MemberList() {
   const { data: rolesData } = useQuery({
     queryKey: ['roles'],
     queryFn: () => roleAPI.getRoles({ isActive: true }),
+  });
+
+  // 부서 목록 조회 (필터용)
+  const { data: departmentsData } = useQuery({
+    queryKey: ['departments', { includeInactive: false }],
+    queryFn: () =>
+      departmentAPI.getDepartments({
+        page: 1,
+        pageSize: 100,
+        includeInactive: false,
+      }),
   });
 
 
@@ -182,8 +197,8 @@ export function MemberList() {
 
       {/* 검색 및 필터 */}
       <div className="mt-8">
-        <form onSubmit={handleSearch} className="flex gap-4">
-          <Field className="flex-1">
+        <form onSubmit={handleSearch} className="flex gap-4 flex-wrap">
+          <Field className="flex-1 min-w-[200px]">
             <Label htmlFor="member-search" className="sr-only">
               이름, 이메일, 계정 ID로 검색
             </Label>
@@ -195,6 +210,27 @@ export function MemberList() {
               placeholder="이름, 이메일, 계정 ID로 검색"
               aria-label="이름, 이메일, 계정 ID로 검색"
             />
+          </Field>
+          <Field>
+            <Label htmlFor="department-filter" className="sr-only">
+              부서 필터
+            </Label>
+            <Select
+              id="department-filter"
+              value={departmentFilter ?? ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                setDepartmentFilter(value ? Number(value) : undefined);
+                setPage(1);
+              }}
+            >
+              <option value="">전체 부서</option>
+              {departmentsData?.data.map((dept: any) => (
+                <option key={dept.department_id} value={dept.department_id}>
+                  {'  '.repeat(dept.depth)}{dept.name}
+                </option>
+              ))}
+            </Select>
           </Field>
           <Field>
             <Label htmlFor="status-filter" className="sr-only">
@@ -222,13 +258,13 @@ export function MemberList() {
               <option value="inactive">비활성</option>
             </Select>
           </Field>
-          {isActiveFilter === false && (
-            <div className="px-3 py-2 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-md text-sm text-yellow-800 dark:text-yellow-200">
-              승인 대기 중인 사용자만 표시됩니다
-            </div>
-          )}
           <Button type="submit" className="self-end">검색</Button>
         </form>
+        {isActiveFilter === false && (
+          <div className="mt-4 px-3 py-2 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-md text-sm text-yellow-800 dark:text-yellow-200">
+            승인 대기 중인 사용자만 표시됩니다
+          </div>
+        )}
       </div>
 
       {/* 사용자 목록 테이블 */}
@@ -251,6 +287,7 @@ export function MemberList() {
                   <TableHeader>이름</TableHeader>
                   <TableHeader>계정 ID</TableHeader>
                   <TableHeader>이메일</TableHeader>
+                  <TableHeader>부서</TableHeader>
                   <TableHeader>역할</TableHeader>
                   <TableHeader>상태</TableHeader>
                   <TableHeader>업무보고</TableHeader>
@@ -264,6 +301,13 @@ export function MemberList() {
                     <TableCell className="font-medium">{member.name}</TableCell>
                     <TableCell>{member.account_id}</TableCell>
                     <TableCell>{member.email}</TableCell>
+                    <TableCell>
+                      {member.departments?.name ? (
+                        <Badge color="purple">{member.departments.name}</Badge>
+                      ) : (
+                        <span className="text-zinc-400 text-sm">미배정</span>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Badge color="zinc">
