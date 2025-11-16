@@ -17,11 +17,6 @@ import { departmentAPI } from '../services/api';
 
 const departmentSchema = z.object({
   name: z.string().min(1, '부서명을 입력해주세요'),
-  code: z
-    .string()
-    .min(2, '부서 코드는 최소 2자 이상이어야 합니다')
-    .max(50, '부서 코드는 최대 50자까지 가능합니다')
-    .regex(/^[A-Z_]+$/, '부서 코드는 영문 대문자와 언더스코어만 사용 가능합니다'),
   description: z.string().optional(),
   parent_department_id: z.number().nullable().optional(),
   is_active: z.boolean().optional().default(true),
@@ -79,7 +74,6 @@ export function DepartmentForm() {
     if (department) {
       reset({
         name: department.name,
-        code: department.code,
         description: department.description || '',
         parent_department_id: department.parent_department_id || null,
         is_active: department.is_active,
@@ -94,7 +88,6 @@ export function DepartmentForm() {
       // depth와 path는 API에서 자동 계산
       return departmentAPI.createDepartment({
         name: data.name,
-        code: data.code,
         description: data.description || null,
         parent_department_id: data.parent_department_id || null,
         is_active: data.is_active ?? true,
@@ -122,7 +115,7 @@ export function DepartmentForm() {
       departmentId: number;
       data: DepartmentFormData;
     }) => {
-      // code와 parent_department_id는 수정 불가
+      // parent_department_id는 수정 불가
       return departmentAPI.updateDepartment(departmentId, {
         name: data.name,
         description: data.description || null,
@@ -192,30 +185,6 @@ export function DepartmentForm() {
         </Field>
 
         <Field>
-          <Label>
-            부서 코드{' '}
-            <span className="text-red-600" aria-label="필수 항목">
-              *
-            </span>
-          </Label>
-          <Input
-            id="code"
-            {...register('code')}
-            type="text"
-            disabled={isEditMode} // 수정 모드에서는 코드 변경 불가
-            aria-required="true"
-            aria-invalid={!!errors.code}
-            placeholder="예: DEV, FE, BE (영문 대문자와 언더스코어만)"
-          />
-          {errors.code && <ErrorMessage>{errors.code.message}</ErrorMessage>}
-          {isEditMode && (
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-              부서 코드는 생성 후 수정할 수 없습니다.
-            </p>
-          )}
-        </Field>
-
-        <Field>
           <Label>설명</Label>
           <Textarea
             id="description"
@@ -249,7 +218,7 @@ export function DepartmentForm() {
             {availableDepartments?.map((dept: any) => (
               <option key={dept.department_id} value={dept.department_id}>
                 {'  '.repeat(dept.depth)}
-                {dept.name} ({dept.code})
+                {dept.name}
               </option>
             ))}
           </Select>

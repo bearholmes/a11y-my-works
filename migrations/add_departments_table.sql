@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS public.departments (
   -- 기본 정보
   department_id SERIAL PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
-  code VARCHAR(50) UNIQUE NOT NULL,
   description TEXT,
 
   -- 계층 구조 (Self-Referencing FK)
@@ -25,22 +24,18 @@ CREATE TABLE IF NOT EXISTS public.departments (
 
   -- 제약조건
   CONSTRAINT check_depth CHECK (depth >= 0),
-  CONSTRAINT check_name_not_empty CHECK (LENGTH(TRIM(name)) > 0),
-  CONSTRAINT check_code_format CHECK (code ~ '^[A-Z_]+$'),
-  CONSTRAINT check_code_length CHECK (LENGTH(code) >= 2 AND LENGTH(code) <= 50)
+  CONSTRAINT check_name_not_empty CHECK (LENGTH(TRIM(name)) > 0)
 );
 
 -- 2. 인덱스 생성
 CREATE INDEX IF NOT EXISTS idx_departments_parent ON public.departments(parent_department_id);
 CREATE INDEX IF NOT EXISTS idx_departments_is_active ON public.departments(is_active);
-CREATE INDEX IF NOT EXISTS idx_departments_code ON public.departments(code);
 CREATE INDEX IF NOT EXISTS idx_departments_path ON public.departments(path);
 
 -- 3. 테이블 및 컬럼 주석
 COMMENT ON TABLE public.departments IS '부서 마스터 테이블 - 계층 구조 지원 (Materialized Path 패턴)';
 COMMENT ON COLUMN public.departments.department_id IS '부서 고유 식별자';
 COMMENT ON COLUMN public.departments.name IS '부서명';
-COMMENT ON COLUMN public.departments.code IS '부서 코드 (고유, 영문 대문자 및 언더스코어)';
 COMMENT ON COLUMN public.departments.description IS '부서 설명';
 COMMENT ON COLUMN public.departments.parent_department_id IS '상위 부서 ID (NULL = 최상위 부서)';
 COMMENT ON COLUMN public.departments.depth IS '계층 깊이 (0 = 최상위)';
@@ -122,12 +117,12 @@ CREATE POLICY "부서 관리 권한"
   );
 
 -- 9. 샘플 부서 데이터 삽입 (선택적)
-INSERT INTO public.departments (name, code, description, parent_department_id, depth, path, is_active, sort_order)
+INSERT INTO public.departments (name, description, parent_department_id, depth, path, is_active, sort_order)
 VALUES
-  ('개발팀', 'DEV', '소프트웨어 개발 부서', NULL, 0, '/1', true, 1),
-  ('기획팀', 'PM', '기획 및 프로젝트 관리', NULL, 0, '/2', true, 2),
-  ('디자인팀', 'DESIGN', 'UI/UX 디자인', NULL, 0, '/3', true, 3)
-ON CONFLICT (code) DO NOTHING;
+  ('개발팀', '소프트웨어 개발 부서', NULL, 0, '/1', true, 1),
+  ('기획팀', '기획 및 프로젝트 관리', NULL, 0, '/2', true, 2),
+  ('디자인팀', 'UI/UX 디자인', NULL, 0, '/3', true, 3)
+ON CONFLICT DO NOTHING;
 
 -- 10. 샘플 하위 부서 데이터 삽입 (선택적)
 -- 개발팀 하위
@@ -135,14 +130,14 @@ DO $$
 DECLARE
   dev_dept_id INTEGER;
 BEGIN
-  SELECT department_id INTO dev_dept_id FROM public.departments WHERE code = 'DEV';
+  SELECT department_id INTO dev_dept_id FROM public.departments WHERE name = '개발팀';
 
   IF dev_dept_id IS NOT NULL THEN
-    INSERT INTO public.departments (name, code, description, parent_department_id, depth, path, is_active, sort_order)
+    INSERT INTO public.departments (name, description, parent_department_id, depth, path, is_active, sort_order)
     VALUES
-      ('프론트엔드팀', 'FE', '프론트엔드 개발', dev_dept_id, 1, '/' || dev_dept_id || '/' || (SELECT COALESCE(MAX(department_id), 0) + 1 FROM public.departments), true, 1),
-      ('백엔드팀', 'BE', '백엔드 개발', dev_dept_id, 1, '/' || dev_dept_id || '/' || (SELECT COALESCE(MAX(department_id), 0) + 2 FROM public.departments), true, 2)
-    ON CONFLICT (code) DO NOTHING;
+      ('프론트엔드팀', '프론트엔드 개발', dev_dept_id, 1, '/' || dev_dept_id || '/' || (SELECT COALESCE(MAX(department_id), 0) + 1 FROM public.departments), true, 1),
+      ('백엔드팀', '백엔드 개발', dev_dept_id, 1, '/' || dev_dept_id || '/' || (SELECT COALESCE(MAX(department_id), 0) + 2 FROM public.departments), true, 2)
+    ON CONFLICT DO NOTHING;
   END IF;
 END $$;
 

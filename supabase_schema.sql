@@ -97,7 +97,6 @@ CREATE TABLE project_urls (
 CREATE TABLE departments (
     department_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    code VARCHAR(50) UNIQUE NOT NULL,
     description TEXT,
     parent_department_id INTEGER REFERENCES departments(department_id) ON DELETE SET NULL,
     depth INTEGER DEFAULT 0 NOT NULL,
@@ -107,22 +106,18 @@ CREATE TABLE departments (
     created_at TIMESTAMP DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMP DEFAULT NOW() NOT NULL,
     CONSTRAINT check_depth CHECK (depth >= 0),
-    CONSTRAINT check_name_not_empty CHECK (LENGTH(TRIM(name)) > 0),
-    CONSTRAINT check_code_format CHECK (code ~ '^[A-Z_]+$'),
-    CONSTRAINT check_code_length CHECK (LENGTH(code) >= 2 AND LENGTH(code) <= 50)
+    CONSTRAINT check_name_not_empty CHECK (LENGTH(TRIM(name)) > 0)
 );
 
 -- departments 테이블 인덱스
 CREATE INDEX idx_departments_parent ON departments(parent_department_id);
 CREATE INDEX idx_departments_is_active ON departments(is_active);
-CREATE INDEX idx_departments_code ON departments(code);
 CREATE INDEX idx_departments_path ON departments(path);
 
 -- departments 테이블 설명
 COMMENT ON TABLE departments IS '부서 마스터 테이블 - 계층 구조 지원 (Materialized Path 패턴)';
 COMMENT ON COLUMN departments.department_id IS '부서 고유 식별자';
 COMMENT ON COLUMN departments.name IS '부서명';
-COMMENT ON COLUMN departments.code IS '부서 코드 (고유, 영문 대문자 및 언더스코어)';
 COMMENT ON COLUMN departments.description IS '부서 설명';
 COMMENT ON COLUMN departments.parent_department_id IS '상위 부서 ID (NULL = 최상위 부서)';
 COMMENT ON COLUMN departments.depth IS '계층 깊이 (0 = 최상위)';

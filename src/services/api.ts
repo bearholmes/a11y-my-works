@@ -400,7 +400,7 @@ export const departmentAPI = {
       .select(
         `
         *,
-        parent:departments!parent_department_id(department_id, name, code)
+        parent:departments!parent_department_id(department_id, name)
       `,
         { count: 'exact' }
       )
@@ -408,7 +408,7 @@ export const departmentAPI = {
       .order('name');
 
     if (search) {
-      query = query.or(`name.ilike.%${search}%,code.ilike.%${search}%`);
+      query = query.ilike('name', `%${search}%`);
     }
 
     // includeInactive가 false이면 활성 부서만 조회
@@ -479,7 +479,7 @@ export const departmentAPI = {
       .select(
         `
         *,
-        parent:departments!parent_department_id(department_id, name, code)
+        parent:departments!parent_department_id(department_id, name)
       `
       )
       .eq('department_id', departmentId)
@@ -490,7 +490,7 @@ export const departmentAPI = {
     // 하위 부서 조회
     const { data: children } = await supabase
       .from('departments')
-      .select('department_id, name, code')
+      .select('department_id, name')
       .eq('parent_department_id', departmentId)
       .order('sort_order')
       .order('name');
@@ -608,17 +608,6 @@ export const departmentAPI = {
   async createDepartment(
     department: Database['public']['Tables']['departments']['Insert']
   ) {
-    // 부서 코드 중복 확인
-    const { data: existing } = await supabase
-      .from('departments')
-      .select('department_id')
-      .eq('code', department.code)
-      .maybeSingle();
-
-    if (existing) {
-      throw new Error('이미 사용 중인 부서 코드입니다.');
-    }
-
     // 상위 부서가 지정된 경우 존재 여부 확인
     if (department.parent_department_id) {
       const { data: parent, error: parentError } = await supabase

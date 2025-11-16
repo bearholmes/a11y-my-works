@@ -176,7 +176,6 @@ export interface Holiday {
 export interface Department {
   department_id: number;
   name: string;
-  code: string;
   description?: string;
   parent_department_id?: number;
   depth: number;
