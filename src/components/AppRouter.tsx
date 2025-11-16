@@ -110,6 +110,14 @@ const RoleForm = lazy(() =>
   import('../pages/RoleForm').then((m) => ({ default: m.RoleForm }))
 );
 
+// 부서 관리
+const DepartmentList = lazy(() =>
+  import('../pages/DepartmentList').then((m) => ({ default: m.DepartmentList }))
+);
+const DepartmentForm = lazy(() =>
+  import('../pages/DepartmentForm').then((m) => ({ default: m.DepartmentForm }))
+);
+
 // 팀 관리
 const TeamTaskList = lazy(() =>
   import('../pages/TeamTaskList').then((m) => ({ default: m.TeamTaskList }))
@@ -484,6 +492,38 @@ export function AppRouter() {
             <ProtectedRoute>
               <PermissionGuard permission="member.write" requireWrite>
                 <RoleForm />
+              </PermissionGuard>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 부서 관리 */}
+        <Route
+          path="/departments"
+          element={
+            <ProtectedRoute>
+              <PermissionGuard permission="member.read">
+                <DepartmentList />
+              </PermissionGuard>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/departments/new"
+          element={
+            <ProtectedRoute>
+              <PermissionGuard permission="member.write" requireWrite>
+                <DepartmentForm />
+              </PermissionGuard>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/departments/edit/:id"
+          element={
+            <ProtectedRoute>
+              <PermissionGuard permission="member.write" requireWrite>
+                <DepartmentForm />
               </PermissionGuard>
             </ProtectedRoute>
           }

@@ -1,5 +1,6 @@
 import {
   ArrowRightStartOnRectangleIcon,
+  BuildingOfficeIcon,
   CalendarDaysIcon,
   ChartBarIcon,
   ClipboardDocumentListIcon,
@@ -178,6 +179,13 @@ const MENU_ITEMS: MenuItem[] = [
         requireReadOnly: true,
       },
       {
+        name: '부서 관리',
+        href: '/departments',
+        icon: '🏢',
+        requiredPermission: 'member.read',
+        requireReadOnly: true,
+      },
+      {
         name: '역할 관리',
         href: '/roles',
         icon: '🔐',
@@ -203,6 +211,7 @@ function getMenuIcon(href: string, icon?: string) {
     '/projects': HomeIcon,
     '/holidays': CalendarDaysIcon,
     '/members': UsersIcon,
+    '/departments': BuildingOfficeIcon,
     '/roles': Cog6ToothIcon,
   };
 
