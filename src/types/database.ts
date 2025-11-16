@@ -57,8 +57,21 @@ export interface Database {
       };
       departments: {
         Row: Department;
-        Insert: Omit<Department, 'department_id' | 'created_at' | 'updated_at' | 'depth' | 'path'>;
-        Update: Partial<Omit<Department, 'department_id' | 'created_at' | 'code' | 'parent_department_id' | 'depth' | 'path'>>;
+        Insert: Omit<
+          Department,
+          'department_id' | 'created_at' | 'updated_at' | 'depth' | 'path'
+        >;
+        Update: Partial<
+          Omit<
+            Department,
+            | 'department_id'
+            | 'created_at'
+            | 'code'
+            | 'parent_department_id'
+            | 'depth'
+            | 'path'
+          >
+        >;
       };
     };
   };

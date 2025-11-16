@@ -1,5 +1,9 @@
-import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  ChevronDownIcon,
+  ChevronRightIcon,
+  PlusIcon,
+} from '@heroicons/react/24/outline';
+import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,8 +12,6 @@ import { Button } from '../components/ui/button';
 import { Heading } from '../components/ui/heading';
 import { Spinner } from '../components/ui/spinner';
 import { Text } from '../components/ui/text';
-import { useConfirm } from '../hooks/useConfirm';
-import { useNotification } from '../hooks/useNotification';
 import { departmentAPI } from '../services/api';
 import type { DepartmentTreeNode } from '../types/database';
 
@@ -20,12 +22,12 @@ function TreeNode({
   node,
   level = 0,
   onEdit,
-  onDelete,
+  onAddChild,
 }: {
   node: DepartmentTreeNode;
   level?: number;
   onEdit: (id: number) => void;
-  onDelete: (id: number, name: string) => void;
+  onAddChild: (parentId: number, parentName: string) => void;
 }) {
   const [isExpanded, setIsExpanded] = useState(true);
   const hasChildren = node.children && node.children.length > 0;
@@ -34,7 +36,7 @@ function TreeNode({
     <div className="select-none">
       {/* 현재 노드 */}
       <div
-        className={`group flex items-center gap-2 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 border-b border-zinc-950/5 dark:border-white/5 transition-colors ${
+        className={`group flex items-center gap-2 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 border-b border-zinc-950/10 dark:border-white/10 transition-colors ${
           level > 0 ? 'bg-zinc-50/30 dark:bg-zinc-900/30' : ''
         }`}
         style={{ paddingLeft: `${level * 24 + 16}px` }}
@@ -55,7 +57,9 @@ function TreeNode({
               )}
             </button>
           ) : (
-            <div className="w-4 h-4" />
+            <div className="w-4 h-4 ml-0.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-600" />
+            </div>
           )}
         </div>
 
@@ -66,7 +70,10 @@ function TreeNode({
               <span className="font-medium text-zinc-900 dark:text-zinc-100">
                 {node.name}
               </span>
-              <Badge color={node.is_active ? 'lime' : 'zinc'} className="text-xs">
+              <Badge
+                color={node.is_active ? 'lime' : 'zinc'}
+                className="text-xs"
+              >
                 {node.is_active ? '활성' : '비활성'}
               </Badge>
               {level === 0 && (
@@ -106,6 +113,19 @@ function TreeNode({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                onAddChild(node.department_id, node.name);
+              }}
+              className="text-sm flex items-center gap-1"
+              aria-label={`${node.name}의 하위 부서 추가`}
+            >
+              <PlusIcon className="w-3.5 h-3.5" />
+              추가
+            </Button>
+            <Button
+              plain
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 onEdit(node.department_id);
               }}
               className="text-sm"
@@ -113,32 +133,20 @@ function TreeNode({
             >
               수정
             </Button>
-            <Button
-              plain
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onDelete(node.department_id, node.name);
-              }}
-              className="text-sm text-red-600 dark:text-red-400"
-              aria-label={`${node.name} 삭제`}
-            >
-              삭제
-            </Button>
           </div>
         </div>
       </div>
 
       {/* 하위 노드 (재귀) */}
       {hasChildren && isExpanded && (
-        <div>
+        <div className="border-l-2 border-zinc-200 dark:border-zinc-700 ml-6">
           {node.children.map((child) => (
             <TreeNode
               key={child.department_id}
               node={child}
               level={level + 1}
               onEdit={onEdit}
-              onDelete={onDelete}
+              onAddChild={onAddChild}
             />
           ))}
         </div>
@@ -152,38 +160,23 @@ function TreeNode({
  */
 export function DepartmentList() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const { confirmDelete } = useConfirm();
-  const { showSuccess, showError } = useNotification();
 
   // 트리 형태로 부서 목록 조회
-  const { data: tree, isLoading, error } = useQuery({
+  const {
+    data: tree,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['departments', 'tree'],
     queryFn: () => departmentAPI.getDepartmentTree({ includeInactive: true }),
-  });
-
-  // 부서 삭제 mutation
-  const deleteMutation = useMutation({
-    mutationFn: (departmentId: number) =>
-      departmentAPI.deleteDepartment(departmentId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['departments'] });
-      showSuccess('부서가 삭제되었습니다.');
-    },
-    onError: (error) => {
-      showError(`삭제 실패: ${(error as Error).message}`);
-    },
   });
 
   const handleEdit = (departmentId: number) => {
     navigate(`/departments/edit/${departmentId}`);
   };
 
-  const handleDelete = async (departmentId: number, departmentName: string) => {
-    const confirmed = await confirmDelete('부서를 삭제하시겠습니까?', departmentName);
-    if (confirmed) {
-      deleteMutation.mutate(departmentId);
-    }
+  const handleAddChild = (parentId: number, _parentName: string) => {
+    navigate(`/departments/new?parent=${parentId}`);
   };
 
   if (error) {
@@ -206,11 +199,12 @@ export function DepartmentList() {
         <div>
           <Heading>부서 관리</Heading>
           <Text className="mt-2 text-zinc-500 dark:text-zinc-400">
-            계층 구조로 부서를 관리합니다. 클릭하여 접기/펼치기가 가능합니다.
+            계층 구조로 부서를 관리합니다. 상단 버튼으로 최상위 부서를, 트리의
+            추가 버튼으로 하위 부서를 추가할 수 있습니다.
           </Text>
         </div>
         <div className="flex gap-4">
-          <Button href="/departments/new">+ 새 부서</Button>
+          <Button href="/departments/new">+ 부서 추가</Button>
         </div>
       </div>
 
@@ -237,7 +231,7 @@ export function DepartmentList() {
                 node={node}
                 level={0}
                 onEdit={handleEdit}
-                onDelete={handleDelete}
+                onAddChild={handleAddChild}
               />
             ))}
           </div>
@@ -265,8 +259,12 @@ export function DepartmentList() {
               <strong>부서 관리 안내</strong>
             </Text>
             <ul className="mt-2 text-sm text-blue-700 dark:text-blue-300 space-y-1 list-disc list-inside">
-              <li>하위 부서가 있는 부서는 접기/펼치기 아이콘이 표시됩니다</li>
-              <li>부서를 삭제하려면 먼저 하위 부서와 소속 사용자를 제거해야 합니다</li>
+              <li>
+                각 부서에서 '추가' 버튼을 클릭하여 하위 부서를 추가할 수
+                있습니다
+              </li>
+              <li>부서 삭제는 수정 페이지에서 가능합니다</li>
+              <li>하위 부서가 있는 부서는 삭제할 수 없습니다</li>
               <li>상위 부서는 생성 후 변경할 수 없습니다</li>
             </ul>
           </div>

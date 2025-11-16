@@ -272,9 +272,7 @@ export const memberAPI = {
           const { data: deptIds, error: deptIdsError } = await supabase
             .from('departments')
             .select('department_id')
-            .or(
-              `department_id.eq.${departmentId},path.like.${dept.path}/%`
-            );
+            .or(`department_id.eq.${departmentId},path.like.${dept.path}/%`);
 
           if (deptIdsError) throw deptIdsError;
 
@@ -446,10 +444,13 @@ export const departmentAPI = {
         .select('department_id')
         .in('department_id', departmentIds);
 
-      memberCounts = (memberData || []).reduce((acc, m) => {
-        acc[m.department_id] = (acc[m.department_id] || 0) + 1;
-        return acc;
-      }, {} as Record<number, number>);
+      memberCounts = (memberData || []).reduce(
+        (acc, m) => {
+          acc[m.department_id] = (acc[m.department_id] || 0) + 1;
+          return acc;
+        },
+        {} as Record<number, number>
+      );
     }
 
     // 결과 데이터 조합
@@ -565,12 +566,15 @@ export const departmentAPI = {
       .from('members')
       .select('department_id');
 
-    const memberCounts = (memberData || []).reduce((acc, m) => {
-      if (m.department_id) {
-        acc[m.department_id] = (acc[m.department_id] || 0) + 1;
-      }
-      return acc;
-    }, {} as Record<number, number>);
+    const memberCounts = (memberData || []).reduce(
+      (acc, m) => {
+        if (m.department_id) {
+          acc[m.department_id] = (acc[m.department_id] || 0) + 1;
+        }
+        return acc;
+      },
+      {} as Record<number, number>
+    );
 
     // 트리 구조 생성
     const departments = (data || []).map((dept) => ({
@@ -779,17 +783,13 @@ export const departmentAPI = {
       .in('department_id', targetDepartmentIds);
 
     const memberCount = members?.length || 0;
-    const activeMemberCount =
-      members?.filter((m) => m.is_active).length || 0;
+    const activeMemberCount = members?.filter((m) => m.is_active).length || 0;
 
     // 업무 통계
     let taskQuery = supabase
       .from('tasks')
       .select('task_id, work_time, member_id')
-      .in(
-        'member_id',
-        members?.map((m) => m.member_id) || []
-      );
+      .in('member_id', members?.map((m) => m.member_id) || []);
 
     if (startDate) taskQuery = taskQuery.gte('task_date', startDate);
     if (endDate) taskQuery = taskQuery.lte('task_date', endDate);

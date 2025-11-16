@@ -26,7 +26,12 @@ import {
 import { Text } from '../components/ui/text';
 import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
-import { departmentAPI, invitationAPI, memberAPI, roleAPI } from '../services/api';
+import {
+  departmentAPI,
+  invitationAPI,
+  memberAPI,
+  roleAPI,
+} from '../services/api';
 
 export function MemberList() {
   const queryClient = useQueryClient();
@@ -54,7 +59,15 @@ export function MemberList() {
 
   // 사용자 목록 조회
   const { data, isLoading, error } = useQuery({
-    queryKey: ['members', { page, search, isActive: isActiveFilter, departmentId: departmentFilter }],
+    queryKey: [
+      'members',
+      {
+        page,
+        search,
+        isActive: isActiveFilter,
+        departmentId: departmentFilter,
+      },
+    ],
     queryFn: () =>
       memberAPI.getMembers({
         page,
@@ -82,7 +95,6 @@ export function MemberList() {
       }),
   });
 
-
   // 사용자 승인 mutation
   const approveMutation = useMutation({
     mutationFn: ({ memberId, roleId }: { memberId: number; roleId: number }) =>
@@ -106,7 +118,6 @@ export function MemberList() {
       showError(error.message);
     },
   });
-
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -227,7 +238,8 @@ export function MemberList() {
               <option value="">전체 부서</option>
               {departmentsData?.data.map((dept: any) => (
                 <option key={dept.department_id} value={dept.department_id}>
-                  {'  '.repeat(dept.depth)}{dept.name}
+                  {'  '.repeat(dept.depth)}
+                  {dept.name}
                 </option>
               ))}
             </Select>
@@ -258,7 +270,9 @@ export function MemberList() {
               <option value="inactive">비활성</option>
             </Select>
           </Field>
-          <Button type="submit" className="self-end">검색</Button>
+          <Button type="submit" className="self-end">
+            검색
+          </Button>
         </form>
         {isActiveFilter === false && (
           <div className="mt-4 px-3 py-2 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-md text-sm text-yellow-800 dark:text-yellow-200">

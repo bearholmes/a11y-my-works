@@ -190,10 +190,7 @@ export function ListboxLabel({
   return (
     <span
       {...props}
-      className={clsx(
-        className,
-        'ml-2.5 truncate first:ml-0'
-      )}
+      className={clsx(className, 'ml-2.5 truncate first:ml-0')}
     />
   );
 }

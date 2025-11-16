@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import { Button } from '../components/ui/button';
 import { Checkbox, CheckboxField } from '../components/ui/checkbox';
@@ -12,15 +12,16 @@ import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { Spinner } from '../components/ui/spinner';
 import { Textarea } from '../components/ui/textarea';
+import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
 import { departmentAPI } from '../services/api';
 
 const departmentSchema = z.object({
   name: z.string().min(1, '부서명을 입력해주세요'),
   description: z.string().optional(),
-  parent_department_id: z.number().nullable().optional(),
-  is_active: z.boolean().optional().default(true),
-  sort_order: z.number().optional().default(0),
+  parent_department_id: z.number().optional(),
+  is_active: z.boolean(),
+  sort_order: z.number(),
 });
 
 type DepartmentFormData = z.infer<typeof departmentSchema>;
@@ -30,10 +31,15 @@ type DepartmentFormData = z.infer<typeof departmentSchema>;
  */
 export function DepartmentForm() {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isEditMode = !!id;
   const { showSuccess, showError } = useNotification();
+  const { confirm } = useConfirm();
+
+  // URL 파라미터에서 상위 부서 ID 가져오기
+  const parentDepartmentId = searchParams.get('parent');
 
   const {
     register,
@@ -47,7 +53,9 @@ export function DepartmentForm() {
     defaultValues: {
       is_active: true,
       sort_order: 0,
-      parent_department_id: null,
+      parent_department_id: parentDepartmentId
+        ? Number(parentDepartmentId)
+        : undefined,
     },
   });
 
@@ -74,8 +82,8 @@ export function DepartmentForm() {
     if (department) {
       reset({
         name: department.name,
-        description: department.description || '',
-        parent_department_id: department.parent_department_id || null,
+        description: department.description || undefined,
+        parent_department_id: department.parent_department_id || undefined,
         is_active: department.is_active,
         sort_order: department.sort_order,
       });
@@ -88,12 +96,10 @@ export function DepartmentForm() {
       // depth와 path는 API에서 자동 계산
       return departmentAPI.createDepartment({
         name: data.name,
-        description: data.description || null,
-        parent_department_id: data.parent_department_id || null,
-        is_active: data.is_active ?? true,
-        sort_order: data.sort_order ?? 0,
-        depth: 0, // API에서 재계산됨
-        path: '/temp', // API에서 재계산됨
+        description: data.description,
+        parent_department_id: data.parent_department_id,
+        is_active: data.is_active,
+        sort_order: data.sort_order,
       });
     },
     onSuccess: () => {
@@ -118,9 +124,9 @@ export function DepartmentForm() {
       // parent_department_id는 수정 불가
       return departmentAPI.updateDepartment(departmentId, {
         name: data.name,
-        description: data.description || null,
-        is_active: data.is_active ?? true,
-        sort_order: data.sort_order ?? 0,
+        description: data.description,
+        is_active: data.is_active,
+        sort_order: data.sort_order,
       });
     },
     onSuccess: () => {
@@ -134,11 +140,59 @@ export function DepartmentForm() {
     },
   });
 
+  // 부서 삭제 mutation
+  const deleteMutation = useMutation({
+    mutationFn: (departmentId: number) =>
+      departmentAPI.deleteDepartment(departmentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['departments'] });
+      showSuccess('부서가 삭제되었습니다.');
+      navigate('/departments');
+    },
+    onError: (error) => {
+      showError(`삭제 실패: ${(error as Error).message}`);
+    },
+  });
+
   const onSubmit = async (data: DepartmentFormData) => {
     if (isEditMode && id) {
       updateMutation.mutate({ departmentId: Number(id), data });
     } else {
       createMutation.mutate(data);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!department || !id) return;
+
+    // 하위 부서 존재 여부 확인
+    if (
+      department.child_departments &&
+      department.child_departments.length > 0
+    ) {
+      showError(
+        '하위 부서가 있는 부서는 삭제할 수 없습니다. 먼저 하위 부서를 삭제하거나 다른 부서로 이동해주세요.'
+      );
+      return;
+    }
+
+    // 소속 사용자 확인
+    if (department.member_count && department.member_count > 0) {
+      showError(
+        '소속 사용자가 있는 부서는 삭제할 수 없습니다. 먼저 사용자를 다른 부서로 이동하거나 제거해주세요.'
+      );
+      return;
+    }
+
+    // 삭제 확인
+    if (
+      await confirm({
+        title: '부서 삭제',
+        message: `"${department.name}" 부서를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`,
+        confirmText: '삭제',
+      })
+    ) {
+      deleteMutation.mutate(Number(id));
     }
   };
 
@@ -208,7 +262,7 @@ export function DepartmentForm() {
               const value = e.target.value;
               setValue(
                 'parent_department_id',
-                value ? Number(value) : null
+                value ? Number(value) : undefined
               );
             }}
             disabled={isEditMode} // 수정 모드에서는 상위 부서 변경 불가
@@ -258,32 +312,48 @@ export function DepartmentForm() {
           <Label>활성 상태</Label>
         </CheckboxField>
 
-        <div className="flex gap-3 pt-4">
-          <Button
-            type="submit"
-            disabled={createMutation.isPending || updateMutation.isPending}
-            aria-label={isEditMode ? '부서 수정 저장' : '부서 등록'}
-            aria-busy={createMutation.isPending || updateMutation.isPending}
-          >
-            {createMutation.isPending || updateMutation.isPending ? (
-              <span className="flex items-center justify-center gap-2">
-                <Spinner size="sm" className="text-white" />
-                처리 중...
-              </span>
-            ) : isEditMode ? (
-              '수정'
-            ) : (
-              '등록'
-            )}
-          </Button>
-          <Button
-            type="button"
-            plain
-            onClick={() => navigate('/departments')}
-            aria-label="부서 등록 취소하고 목록으로 돌아가기"
-          >
-            취소
-          </Button>
+        <div className="flex justify-between items-center pt-4">
+          <div className="flex gap-3">
+            <Button
+              type="submit"
+              disabled={createMutation.isPending || updateMutation.isPending}
+              aria-label={isEditMode ? '부서 수정 저장' : '부서 등록'}
+              aria-busy={createMutation.isPending || updateMutation.isPending}
+            >
+              {createMutation.isPending || updateMutation.isPending ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Spinner size="sm" className="text-white" />
+                  처리 중...
+                </span>
+              ) : isEditMode ? (
+                '수정'
+              ) : (
+                '등록'
+              )}
+            </Button>
+            <Button
+              type="button"
+              plain
+              onClick={() => navigate('/departments')}
+              aria-label="부서 등록 취소하고 목록으로 돌아가기"
+            >
+              취소
+            </Button>
+          </div>
+
+          {isEditMode && department && (
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                color="red"
+                onClick={handleDelete}
+                disabled={deleteMutation.isPending}
+                aria-label={`${department.name} 부서 삭제`}
+              >
+                {deleteMutation.isPending ? '처리 중...' : '부서 삭제'}
+              </Button>
+            </div>
+          )}
         </div>
       </form>
     </>

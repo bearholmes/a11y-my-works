@@ -15,11 +15,11 @@ import {
   WrenchScrewdriverIcon,
 } from '@heroicons/react/24/outline';
 import { useQuery } from '@tanstack/react-query';
+import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Avatar } from '../components/ui/avatar';
-import { getAvatarColors } from '../utils/avatarColor';
 import {
   Dropdown,
   DropdownButton,
@@ -50,7 +50,7 @@ import { Spinner } from '../components/ui/spinner';
 import { usePermissions } from '../hooks/usePermissions';
 import { memberAPI } from '../services/api';
 import type { MenuItem } from '../types/permission';
-import clsx from "clsx";
+import { getAvatarColors } from '../utils/avatarColor';
 
 interface ApplicationLayoutProps {
   children: ReactNode;
@@ -64,7 +64,6 @@ function AccountDropdownMenu({
 }: {
   anchor: 'top start' | 'bottom end';
 }) {
-
   return (
     <DropdownMenu className="min-w-64" anchor={anchor}>
       <DropdownItem href="/profile">
@@ -73,7 +72,9 @@ function AccountDropdownMenu({
       </DropdownItem>
       <DropdownDivider />
       <DropdownItem href="/licenses">
-        <DropdownLabel className="text-sm text-zinc-600 dark:text-zinc-300">오픈 라이센스</DropdownLabel>
+        <DropdownLabel className="text-sm text-zinc-600 dark:text-zinc-300">
+          오픈 라이센스
+        </DropdownLabel>
       </DropdownItem>
     </DropdownMenu>
   );
@@ -312,7 +313,10 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
                 // 하위 메뉴가 있는 경우
                 if (item.children && item.children.length > 0) {
                   return (
-                    <div key={item.href} className={clsx({'mt-4': index > 0})}>
+                    <div
+                      key={item.href}
+                      className={clsx({ 'mt-4': index > 0 })}
+                    >
                       <SidebarHeading>{item.name}</SidebarHeading>
                       {item.children.map((child) => (
                         <SidebarItem

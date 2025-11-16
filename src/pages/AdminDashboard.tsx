@@ -212,14 +212,17 @@ export function AdminDashboard() {
             <Select
               value={departmentFilter ?? ''}
               onChange={(e) =>
-                setDepartmentFilter(e.target.value ? Number(e.target.value) : null)
+                setDepartmentFilter(
+                  e.target.value ? Number(e.target.value) : null
+                )
               }
               className="text-sm"
             >
               <option value="">전체 부서</option>
               {departmentsData?.data.map((dept: any) => (
                 <option key={dept.department_id} value={dept.department_id}>
-                  {'  '.repeat(dept.depth)}{dept.name}
+                  {'  '.repeat(dept.depth)}
+                  {dept.name}
                 </option>
               ))}
             </Select>
@@ -256,7 +259,10 @@ export function AdminDashboard() {
             </CheckboxField>
 
             {/* 필터 초기화 */}
-            {(searchQuery || selectedDate !== null || departmentFilter !== null || !showIncompleteOnly) && (
+            {(searchQuery ||
+              selectedDate !== null ||
+              departmentFilter !== null ||
+              !showIncompleteOnly) && (
               <Button
                 type="button"
                 plain

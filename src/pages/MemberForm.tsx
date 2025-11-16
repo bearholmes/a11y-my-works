@@ -139,7 +139,7 @@ export function MemberForm() {
       await confirm({
         title: '비밀번호 초기화',
         message: `${member.name}님의 비밀번호를 초기화하시겠습니까?\n비밀번호 재설정 이메일이 발송됩니다.`,
-        confirmText: '발송'
+        confirmText: '발송',
       })
     ) {
       resetPasswordMutation.mutate(member.email);
@@ -282,7 +282,8 @@ export function MemberForm() {
                 <option value="">부서 미배정</option>
                 {departmentsData?.data.map((dept: any) => (
                   <option key={dept.department_id} value={dept.department_id}>
-                    {'  '.repeat(dept.depth)}{dept.name}
+                    {'  '.repeat(dept.depth)}
+                    {dept.name}
                   </option>
                 ))}
               </Select>
@@ -360,7 +361,9 @@ export function MemberForm() {
                 disabled={resetPasswordMutation.isPending}
                 aria-label={`${member.name} 사용자 비밀번호 초기화`}
               >
-                {resetPasswordMutation.isPending ? '처리 중...' : '비밀번호 초기화'}
+                {resetPasswordMutation.isPending
+                  ? '처리 중...'
+                  : '비밀번호 초기화'}
               </Button>
             </div>
           )}
