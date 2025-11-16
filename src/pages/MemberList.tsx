@@ -40,7 +40,7 @@ export function MemberList() {
   const [selectedMember, setSelectedMember] = useState<any>(null);
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
   const { confirm } = useConfirm();
-  const { showSuccess, showError, showWarning } = useNotification();
+  const { showError, showWarning } = useNotification();
 
   // 초대 관련 상태
   const [showInvitationModal, setShowInvitationModal] = useState(false);
@@ -67,20 +67,6 @@ export function MemberList() {
     queryFn: () => roleAPI.getRoles({ isActive: true }),
   });
 
-  // 사용자 활성화/비활성화 mutation
-  const activateMutation = useMutation({
-    mutationFn: (memberId: number) => memberAPI.activateMember(memberId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['members'] });
-    },
-  });
-
-  const deactivateMutation = useMutation({
-    mutationFn: (memberId: number) => memberAPI.deactivateMember(memberId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['members'] });
-    },
-  });
 
   // 사용자 승인 mutation
   const approveMutation = useMutation({
@@ -106,38 +92,11 @@ export function MemberList() {
     },
   });
 
-  // 비밀번호 초기화 mutation
-  const resetPasswordMutation = useMutation({
-    mutationFn: (email: string) => memberAPI.resetUserPassword(email),
-    onSuccess: () => {
-      showSuccess('비밀번호 재설정 이메일을 발송했습니다.');
-    },
-    onError: (error: Error) => {
-      showError(`비밀번호 초기화 실패: ${error.message}`);
-    },
-  });
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setSearch(searchInput);
     setPage(1);
-  };
-
-  const handleToggleActive = async (
-    memberId: number,
-    currentStatus: boolean
-  ) => {
-    if (
-      await confirm({
-        message: `이 사용자를 ${currentStatus ? '비활성화' : '활성화'}하시겠습니까?`,
-      })
-    ) {
-      if (currentStatus) {
-        deactivateMutation.mutate(memberId);
-      } else {
-        activateMutation.mutate(memberId);
-      }
-    }
   };
 
   const handleApprove = (member: any) => {
@@ -196,16 +155,6 @@ export function MemberList() {
     setInvitationName('');
     setInvitationRoleId(null);
     setInvitationSuccess(false);
-  };
-
-  const handleResetPassword = async (member: any) => {
-    if (
-      await confirm({
-        message: `${member.name}님의 비밀번호를 초기화하시겠습니까?\n비밀번호 재설정 이메일이 발송됩니다.`,
-      })
-    ) {
-      resetPasswordMutation.mutate(member.email);
-    }
   };
 
   if (error) {
@@ -354,39 +303,13 @@ export function MemberList() {
                             승인
                           </Button>
                         ) : (
-                          <>
-                            <Button
-                              plain
-                              href={`/members/edit/${member.member_id}`}
-                              aria-label={`${member.name} 사용자 수정`}
-                            >
-                              수정
-                            </Button>
-                            <Button
-                              plain
-                              onClick={() => handleResetPassword(member)}
-                              aria-label={`${member.name} 사용자 비밀번호 초기화`}
-                              disabled={resetPasswordMutation.isPending}
-                            >
-                              비밀번호 초기화
-                            </Button>
-                            <Button
-                              plain
-                              onClick={() =>
-                                handleToggleActive(
-                                  member.member_id,
-                                  member.is_active
-                                )
-                              }
-                              aria-label={`${member.name} 사용자 ${member.is_active ? '비활성화' : '활성화'}`}
-                              disabled={
-                                activateMutation.isPending ||
-                                deactivateMutation.isPending
-                              }
-                            >
-                              {member.is_active ? '비활성화' : '활성화'}
-                            </Button>
-                          </>
+                          <Button
+                            plain
+                            href={`/members/edit/${member.member_id}`}
+                            aria-label={`${member.name} 사용자 수정`}
+                          >
+                            수정
+                          </Button>
                         )}
                       </div>
                     </TableCell>
@@ -397,8 +320,8 @@ export function MemberList() {
 
             {/* 페이지네이션 */}
             {data && data.pagination.pageCount > 1 && (
-              <div className="bg-white dark:bg-zinc-900 px-4 py-3 flex items-center justify-between border-t">
-                <div className="flex-1 flex justify-between">
+              <div className="bg-white dark:bg-zinc-900 px-4 py-3 flex items-center justify-end border-t">
+                <div className="flex gap-3">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
@@ -411,7 +334,7 @@ export function MemberList() {
                       setPage((p) => Math.min(data.pagination.pageCount, p + 1))
                     }
                     disabled={page === data.pagination.pageCount}
-                    className="ml-3 relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
+                    className="relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50"
                   >
                     다음
                   </button>

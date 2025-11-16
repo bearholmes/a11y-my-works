@@ -16,6 +16,7 @@ import { Heading } from '../components/ui/heading';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { Spinner } from '../components/ui/spinner';
+import { useConfirm } from '../hooks/useConfirm';
 import { useNotification } from '../hooks/useNotification';
 import { memberAPI, roleAPI } from '../services/api';
 
@@ -37,6 +38,7 @@ export function MemberForm() {
   const queryClient = useQueryClient();
   const isEditMode = !!id;
   const { showSuccess, showError } = useNotification();
+  const { confirm } = useConfirm();
 
   const {
     register,
@@ -100,9 +102,32 @@ export function MemberForm() {
     },
   });
 
+  // 비밀번호 초기화 mutation
+  const resetPasswordMutation = useMutation({
+    mutationFn: (email: string) => memberAPI.resetUserPassword(email),
+    onSuccess: () => {
+      showSuccess('비밀번호 재설정 이메일을 발송했습니다.');
+    },
+    onError: (error: Error) => {
+      showError(`비밀번호 초기화 실패: ${error.message}`);
+    },
+  });
+
   const onSubmit = async (data: MemberFormData) => {
     if (isEditMode && id) {
       updateMutation.mutate({ memberId: Number(id), data });
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!member?.email) return;
+
+    if (
+      await confirm({
+        message: `${member.name}님의 비밀번호를 초기화하시겠습니까?\n비밀번호 재설정 이메일이 발송됩니다.`,
+      })
+    ) {
+      resetPasswordMutation.mutate(member.email);
     }
   };
 
@@ -253,32 +278,48 @@ export function MemberForm() {
           )}
         />
 
-        <div className="flex gap-3 pt-4">
-          <Button
-            type="submit"
-            disabled={updateMutation.isPending}
-            aria-label={isEditMode ? '사용자 정보 수정 저장' : '사용자 등록'}
-            aria-busy={updateMutation.isPending}
-          >
-            {updateMutation.isPending ? (
-              <span className="flex items-center justify-center gap-2">
-                <Spinner size="sm" className="text-white" />
-                처리 중...
-              </span>
-            ) : isEditMode ? (
-              '수정'
-            ) : (
-              '등록'
-            )}
-          </Button>
-          <Button
-            type="button"
-            plain
-            onClick={() => navigate('/members')}
-            aria-label="사용자 등록 취소하고 목록으로 돌아가기"
-          >
-            취소
-          </Button>
+        <div className="flex justify-between items-center pt-4">
+          <div className="flex gap-3">
+            <Button
+              type="submit"
+              disabled={updateMutation.isPending}
+              aria-label={isEditMode ? '사용자 정보 수정 저장' : '사용자 등록'}
+              aria-busy={updateMutation.isPending}
+            >
+              {updateMutation.isPending ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Spinner size="sm" className="text-white" />
+                  처리 중...
+                </span>
+              ) : isEditMode ? (
+                '수정'
+              ) : (
+                '등록'
+              )}
+            </Button>
+            <Button
+              type="button"
+              plain
+              onClick={() => navigate('/members')}
+              aria-label="사용자 등록 취소하고 목록으로 돌아가기"
+            >
+              취소
+            </Button>
+          </div>
+
+          {isEditMode && member && (
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                color="red"
+                onClick={handleResetPassword}
+                disabled={resetPasswordMutation.isPending}
+                aria-label={`${member.name} 사용자 비밀번호 초기화`}
+              >
+                {resetPasswordMutation.isPending ? '처리 중...' : '비밀번호 초기화'}
+              </Button>
+            </div>
+          )}
         </div>
       </form>
     </>

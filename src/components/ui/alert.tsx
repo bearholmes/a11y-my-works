@@ -101,7 +101,7 @@ export function AlertActions({
       {...props}
       className={clsx(
         className,
-        'mt-6 flex flex-col-reverse items-center justify-end gap-3 *:w-full'
+        'mt-6 flex items-center flex-row-reverse justify-self-start gap-3'
       )}
     />
   );
