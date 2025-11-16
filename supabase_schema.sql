@@ -93,7 +93,44 @@ CREATE TABLE project_urls (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
--- 10. 사용자(Members) 테이블 - Supabase Auth와 연동
+-- 10. 부서(Departments) 테이블
+CREATE TABLE departments (
+    department_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    code VARCHAR(50) UNIQUE NOT NULL,
+    description TEXT,
+    parent_department_id INTEGER REFERENCES departments(department_id) ON DELETE SET NULL,
+    depth INTEGER DEFAULT 0 NOT NULL,
+    path TEXT NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE NOT NULL,
+    sort_order INTEGER DEFAULT 0 NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMP DEFAULT NOW() NOT NULL,
+    CONSTRAINT check_depth CHECK (depth >= 0),
+    CONSTRAINT check_name_not_empty CHECK (LENGTH(TRIM(name)) > 0),
+    CONSTRAINT check_code_format CHECK (code ~ '^[A-Z_]+$'),
+    CONSTRAINT check_code_length CHECK (LENGTH(code) >= 2 AND LENGTH(code) <= 50)
+);
+
+-- departments 테이블 인덱스
+CREATE INDEX idx_departments_parent ON departments(parent_department_id);
+CREATE INDEX idx_departments_is_active ON departments(is_active);
+CREATE INDEX idx_departments_code ON departments(code);
+CREATE INDEX idx_departments_path ON departments(path);
+
+-- departments 테이블 설명
+COMMENT ON TABLE departments IS '부서 마스터 테이블 - 계층 구조 지원 (Materialized Path 패턴)';
+COMMENT ON COLUMN departments.department_id IS '부서 고유 식별자';
+COMMENT ON COLUMN departments.name IS '부서명';
+COMMENT ON COLUMN departments.code IS '부서 코드 (고유, 영문 대문자 및 언더스코어)';
+COMMENT ON COLUMN departments.description IS '부서 설명';
+COMMENT ON COLUMN departments.parent_department_id IS '상위 부서 ID (NULL = 최상위 부서)';
+COMMENT ON COLUMN departments.depth IS '계층 깊이 (0 = 최상위)';
+COMMENT ON COLUMN departments.path IS '계층 경로 (Materialized Path, 예: /1/2/5)';
+COMMENT ON COLUMN departments.is_active IS '활성 상태';
+COMMENT ON COLUMN departments.sort_order IS '표시 순서';
+
+-- 11. 사용자(Members) 테이블 - Supabase Auth와 연동
 CREATE TABLE members (
     member_id SERIAL PRIMARY KEY,
     auth_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -102,6 +139,7 @@ CREATE TABLE members (
     email VARCHAR(255) UNIQUE NOT NULL,
     mobile VARCHAR(20),
     role_id INTEGER REFERENCES roles(role_id),
+    department_id INTEGER REFERENCES departments(department_id) ON DELETE SET NULL,
     is_active BOOLEAN DEFAULT TRUE,
     requires_daily_report BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT NOW(),
@@ -110,13 +148,16 @@ CREATE TABLE members (
 
 -- members 테이블 컬럼 설명
 COMMENT ON COLUMN members.requires_daily_report IS '일일 업무보고 작성 의무 여부. TRUE=작성 필수(기본값), FALSE=작성 불필요';
+COMMENT ON COLUMN members.department_id IS '소속 부서 ID';
 
 -- members 테이블 인덱스
 CREATE INDEX idx_members_requires_daily_report
 ON members(requires_daily_report)
 WHERE is_active = TRUE;
 
--- 11. 업무 보고(Tasks) 테이블
+CREATE INDEX idx_members_department ON members(department_id);
+
+-- 12. 업무 보고(Tasks) 테이블
 CREATE TABLE tasks (
     task_id SERIAL PRIMARY KEY,
     member_id INTEGER REFERENCES members(member_id),
@@ -136,7 +177,7 @@ CREATE TABLE tasks (
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- 12. 공휴일(Holidays) 테이블
+-- 13. 공휴일(Holidays) 테이블
 CREATE TABLE holidays (
     holiday_id SERIAL PRIMARY KEY,
     holiday_date DATE UNIQUE NOT NULL,
@@ -145,7 +186,7 @@ CREATE TABLE holidays (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
--- 13. 시스템 로그(Logs) 테이블
+-- 14. 시스템 로그(Logs) 테이블
 CREATE TABLE logs (
     log_id SERIAL PRIMARY KEY,
     member_id INTEGER REFERENCES members(member_id),
@@ -215,6 +256,12 @@ INSERT INTO codes (code_group_id, name, key, value, sort_order) VALUES
 (3, '매니징 버퍼', '매니징 버퍼', '매니징 버퍼', 5),
 (3, '휴가', '휴가', '휴가', 6);
 
+-- 부서 샘플 데이터
+INSERT INTO departments (name, code, description, parent_department_id, depth, path, is_active, sort_order) VALUES
+('개발팀', 'DEV', '소프트웨어 개발 부서', NULL, 0, '/1', TRUE, 1),
+('기획팀', 'PM', '기획 및 프로젝트 관리', NULL, 0, '/2', TRUE, 2),
+('디자인팀', 'DESIGN', 'UI/UX 디자인', NULL, 0, '/3', TRUE, 3);
+
 -- RLS (Row Level Security) 설정
 ALTER TABLE roles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE permissions ENABLE ROW LEVEL SECURITY;
@@ -225,6 +272,7 @@ ALTER TABLE code_groups ENABLE ROW LEVEL SECURITY;
 ALTER TABLE codes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE project_urls ENABLE ROW LEVEL SECURITY;
+ALTER TABLE departments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE holidays ENABLE ROW LEVEL SECURITY;
@@ -309,6 +357,9 @@ CREATE POLICY "인증된 사용자는 프로젝트URL 정보 조회 가능" ON p
 FOR SELECT USING (auth.role() = 'authenticated');
 
 CREATE POLICY "인증된 사용자는 공휴일 정보 조회 가능" ON holidays
+FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "인증된 사용자는 부서 정보 조회 가능" ON departments
 FOR SELECT USING (auth.role() = 'authenticated');
 
 -- 2. 사용자별 데이터 접근 제어 (순환 참조 없는 안전한 정책)
@@ -719,6 +770,74 @@ USING (true);
 CREATE POLICY "codes_select_all" ON codes
 FOR SELECT TO authenticated
 USING (true);
+
+-- departments 테이블 관리 정책
+CREATE POLICY "departments_select_all" ON departments
+FOR SELECT TO authenticated
+USING (true);
+
+-- 관리자/매니저만 부서 생성/수정/삭제 가능
+CREATE POLICY "departments_insert_admin" ON departments
+FOR INSERT TO authenticated
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+);
+
+CREATE POLICY "departments_update_admin" ON departments
+FOR UPDATE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+)
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+);
+
+CREATE POLICY "departments_delete_admin" ON departments
+FOR DELETE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM members m
+    JOIN roles r ON m.role_id = r.role_id
+    WHERE m.auth_id = auth.uid()
+      AND r.name IN ('관리자', '매니저')
+      AND m.is_active = true
+  )
+);
+
+-- ============================================
+-- 트리거 함수: departments updated_at 자동 갱신
+-- ============================================
+
+CREATE OR REPLACE FUNCTION public.update_departments_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_departments_updated_at
+  BEFORE UPDATE ON departments
+  FOR EACH ROW
+  EXECUTE FUNCTION public.update_departments_updated_at();
 
 -- ============================================
 -- Auth 트리거: 사용자 생성 시 members 자동 생성
