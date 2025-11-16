@@ -1,10 +1,12 @@
 import {
   ChevronDownIcon,
   ChevronRightIcon,
+  FolderIcon,
+  FolderOpenIcon,
+  PencilIcon,
   PlusIcon,
 } from '@heroicons/react/24/outline';
 import { useQuery } from '@tanstack/react-query';
-import { format } from 'date-fns';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/badge';
@@ -16,7 +18,7 @@ import { departmentAPI } from '../services/api';
 import type { DepartmentTreeNode } from '../types/database';
 
 /**
- * 트리 노드 컴포넌트 - 재귀적으로 계층 구조를 렌더링
+ * 트리 노드 컴포넌트 - 파일 탐색기 스타일
  */
 function TreeNode({
   node,
@@ -33,113 +35,106 @@ function TreeNode({
   const hasChildren = node.children && node.children.length > 0;
 
   return (
-    <div className="select-none">
+    <div>
       {/* 현재 노드 */}
       <div
-        className={`group flex items-center gap-2 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 border-b border-zinc-950/10 dark:border-white/10 transition-colors ${
-          level > 0 ? 'bg-zinc-50/30 dark:bg-zinc-900/30' : ''
-        }`}
-        style={{ paddingLeft: `${level * 24 + 16}px` }}
+        className="group relative flex items-center gap-1 px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950/30 cursor-pointer transition-colors select-none"
+        style={{ paddingLeft: `${level * 20 + 8}px` }}
       >
-        {/* 접기/펼치기 아이콘 */}
-        <div className="w-5 h-5 flex-shrink-0">
+        {/* 접기/펼치기 버튼 */}
+        <button
+          type="button"
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-4 h-4 flex items-center justify-center flex-shrink-0 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded transition-colors"
+          aria-label={isExpanded ? '접기' : '펼치기'}
+          aria-expanded={isExpanded}
+        >
           {hasChildren ? (
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="p-0.5 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded transition-colors"
-              aria-label={isExpanded ? '하위 부서 접기' : '하위 부서 펼치기'}
-              aria-expanded={isExpanded}
-            >
-              {isExpanded ? (
-                <ChevronDownIcon className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
-              ) : (
-                <ChevronRightIcon className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
-              )}
-            </button>
+            isExpanded ? (
+              <ChevronDownIcon className="w-3 h-3 text-zinc-600 dark:text-zinc-400" />
+            ) : (
+              <ChevronRightIcon className="w-3 h-3 text-zinc-600 dark:text-zinc-400" />
+            )
           ) : (
-            <div className="w-4 h-4 ml-0.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-600" />
-            </div>
+            <span className="w-3 h-3" />
+          )}
+        </button>
+
+        {/* 폴더 아이콘 */}
+        <div className="w-4 h-4 flex-shrink-0">
+          {hasChildren ? (
+            isExpanded ? (
+              <FolderOpenIcon className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+            ) : (
+              <FolderIcon className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+            )
+          ) : (
+            <FolderIcon className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
           )}
         </div>
 
-        {/* 부서 정보 */}
-        <div className="flex-1 min-w-0 flex items-center gap-4">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-zinc-900 dark:text-zinc-100">
-                {node.name}
-              </span>
-              <Badge
-                color={node.is_active ? 'lime' : 'zinc'}
-                className="text-xs"
-              >
-                {node.is_active ? '활성' : '비활성'}
+        {/* 부서명 및 정보 */}
+        <div className="flex-1 min-w-0 flex items-center gap-2">
+          <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
+            {node.name}
+          </span>
+
+          {/* 뱃지들 */}
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <Badge
+              color={node.is_active ? 'lime' : 'zinc'}
+              className="text-xs py-0 px-1.5"
+            >
+              {node.is_active ? '활성' : '비활성'}
+            </Badge>
+            {level === 0 && (
+              <Badge color="blue" className="text-xs py-0 px-1.5">
+                최상위
               </Badge>
-              {level === 0 && (
-                <Badge color="blue" className="text-xs">
-                  최상위
-                </Badge>
-              )}
-            </div>
-            {node.description && (
-              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5 truncate">
-                {node.description}
-              </p>
             )}
-          </div>
-
-          {/* 통계 정보 */}
-          <div className="flex items-center gap-4 text-sm">
-            <div className="flex items-center gap-1.5">
-              <span className="text-zinc-500 dark:text-zinc-400">소속:</span>
-              <Badge color="purple">{node.member_count || 0}명</Badge>
-            </div>
+            <span className="text-xs text-zinc-500 dark:text-zinc-400">
+              {node.member_count || 0}명
+            </span>
             {hasChildren && (
-              <div className="flex items-center gap-1.5">
-                <span className="text-zinc-500 dark:text-zinc-400">하위:</span>
-                <Badge color="sky">{node.children.length}개</Badge>
-              </div>
+              <span className="text-xs text-zinc-400 dark:text-zinc-500">
+                · {node.children.length}개
+              </span>
             )}
-            <div className="text-zinc-400 dark:text-zinc-500 text-xs">
-              {format(new Date(node.created_at), 'yyyy-MM-dd')}
-            </div>
           </div>
+        </div>
 
-          {/* 액션 버튼 */}
-          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button
-              plain
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onAddChild(node.department_id, node.name);
-              }}
-              className="text-sm flex items-center gap-1"
-              aria-label={`${node.name}의 하위 부서 추가`}
-            >
-              <PlusIcon className="w-3.5 h-3.5" />
-              추가
-            </Button>
-            <Button
-              plain
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onEdit(node.department_id);
-              }}
-              className="text-sm"
-              aria-label={`${node.name} 수정`}
-            >
-              수정
-            </Button>
-          </div>
+        {/* 액션 버튼 (호버 시 표시) */}
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddChild(node.department_id, node.name);
+            }}
+            className="p-1 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded transition-colors"
+            aria-label={`${node.name}의 하위 부서 추가`}
+            title="하위 부서 추가"
+          >
+            <PlusIcon className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(node.department_id);
+            }}
+            className="p-1 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded transition-colors"
+            aria-label={`${node.name} 수정`}
+            title="부서 수정"
+          >
+            <PencilIcon className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
+          </button>
         </div>
       </div>
 
       {/* 하위 노드 (재귀) */}
       {hasChildren && isExpanded && (
-        <div className="border-l-2 border-zinc-200 dark:border-zinc-700 ml-6">
+        <div>
           {node.children.map((child) => (
             <TreeNode
               key={child.department_id}
@@ -224,7 +219,7 @@ export function DepartmentList() {
             </Button>
           </div>
         ) : (
-          <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-950/10 dark:border-white/10 overflow-hidden">
+          <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
             {tree.map((node) => (
               <TreeNode
                 key={node.department_id}
@@ -260,12 +255,16 @@ export function DepartmentList() {
             </Text>
             <ul className="mt-2 text-sm text-blue-700 dark:text-blue-300 space-y-1 list-disc list-inside">
               <li>
-                각 부서에서 '추가' 버튼을 클릭하여 하위 부서를 추가할 수
+                각 부서에서 '+' 버튼을 클릭하여 하위 부서를 추가할 수 있습니다
+              </li>
+              <li>
+                부서 수정 페이지에서 상위 부서를 변경하여 부서를 이동할 수
                 있습니다
               </li>
               <li>부서 삭제는 수정 페이지에서 가능합니다</li>
-              <li>하위 부서가 있는 부서는 삭제할 수 없습니다</li>
-              <li>상위 부서는 생성 후 변경할 수 없습니다</li>
+              <li>
+                하위 부서가 있거나 소속 사용자가 있는 부서는 삭제할 수 없습니다
+              </li>
             </ul>
           </div>
         </div>

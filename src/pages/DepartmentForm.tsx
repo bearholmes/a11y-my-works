@@ -121,10 +121,10 @@ export function DepartmentForm() {
       departmentId: number;
       data: DepartmentFormData;
     }) => {
-      // parent_department_id는 수정 불가
       return departmentAPI.updateDepartment(departmentId, {
         name: data.name,
         description: data.description,
+        parent_department_id: data.parent_department_id,
         is_active: data.is_active,
         sort_order: data.sort_order,
       });
@@ -206,9 +206,27 @@ export function DepartmentForm() {
     );
   }
 
-  // 현재 수정 중인 부서는 상위 부서 선택에서 제외 (자기 자신을 상위 부서로 선택 방지)
+  // 순환 참조 방지: 현재 부서와 하위 부서들을 선택 불가능하게 만들기
+  const getDescendantIds = (deptId: number, allDepts: any[]): number[] => {
+    const children = allDepts.filter((d) => d.parent_department_id === deptId);
+    const childIds = children.map((c) => c.department_id);
+    const descendantIds = children.flatMap((c) =>
+      getDescendantIds(c.department_id, allDepts)
+    );
+    return [...childIds, ...descendantIds];
+  };
+
   const availableDepartments = isEditMode
-    ? departmentsData?.data.filter((d: any) => d.department_id !== Number(id))
+    ? departmentsData?.data.filter((d: any) => {
+        // 자기 자신 제외
+        if (d.department_id === Number(id)) return false;
+        // 자기 하위 부서들 제외
+        const descendantIds = getDescendantIds(
+          Number(id),
+          departmentsData?.data || []
+        );
+        return !descendantIds.includes(d.department_id);
+      })
     : departmentsData?.data;
 
   return (
@@ -265,7 +283,6 @@ export function DepartmentForm() {
                 value ? Number(value) : undefined
               );
             }}
-            disabled={isEditMode} // 수정 모드에서는 상위 부서 변경 불가
             aria-label="상위 부서 선택"
           >
             <option value="">최상위 부서</option>
@@ -278,7 +295,8 @@ export function DepartmentForm() {
           </Select>
           {isEditMode && (
             <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-              상위 부서는 생성 후 변경할 수 없습니다.
+              상위 부서를 변경하면 부서가 이동됩니다. 자기 자신과 하위 부서는
+              선택할 수 없습니다.
             </p>
           )}
         </Field>
