@@ -84,7 +84,7 @@ CREATE POLICY "부서 생성 권한"
       JOIN public.roles r ON m.role_id = r.role_id
       WHERE m.auth_id = auth.uid()
         AND (
-          r.name = 'ADMIN'
+          r.name = '관리자'
           OR EXISTS (
             SELECT 1
             FROM public.role_permissions rp
@@ -108,7 +108,7 @@ CREATE POLICY "부서 수정 권한"
       JOIN public.roles r ON m.role_id = r.role_id
       WHERE m.auth_id = auth.uid()
         AND (
-          r.name = 'ADMIN'
+          r.name = '관리자'
           OR EXISTS (
             SELECT 1
             FROM public.role_permissions rp
@@ -127,7 +127,7 @@ CREATE POLICY "부서 수정 권한"
       JOIN public.roles r ON m.role_id = r.role_id
       WHERE m.auth_id = auth.uid()
         AND (
-          r.name = 'ADMIN'
+          r.name = '관리자'
           OR EXISTS (
             SELECT 1
             FROM public.role_permissions rp
@@ -151,7 +151,7 @@ CREATE POLICY "부서 삭제 권한"
       JOIN public.roles r ON m.role_id = r.role_id
       WHERE m.auth_id = auth.uid()
         AND (
-          r.name = 'ADMIN'
+          r.name = '관리자'
           OR EXISTS (
             SELECT 1
             FROM public.role_permissions rp

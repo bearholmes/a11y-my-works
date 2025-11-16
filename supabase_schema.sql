@@ -781,7 +781,7 @@ WITH CHECK (
     JOIN public.roles r ON m.role_id = r.role_id
     WHERE m.auth_id = auth.uid()
       AND (
-        r.name = 'ADMIN'
+        r.name = '관리자'
         OR EXISTS (
           SELECT 1
           FROM public.role_permissions rp
@@ -804,7 +804,7 @@ USING (
     JOIN public.roles r ON m.role_id = r.role_id
     WHERE m.auth_id = auth.uid()
       AND (
-        r.name = 'ADMIN'
+        r.name = '관리자'
         OR EXISTS (
           SELECT 1
           FROM public.role_permissions rp
@@ -823,7 +823,7 @@ WITH CHECK (
     JOIN public.roles r ON m.role_id = r.role_id
     WHERE m.auth_id = auth.uid()
       AND (
-        r.name = 'ADMIN'
+        r.name = '관리자'
         OR EXISTS (
           SELECT 1
           FROM public.role_permissions rp
@@ -846,7 +846,7 @@ USING (
     JOIN public.roles r ON m.role_id = r.role_id
     WHERE m.auth_id = auth.uid()
       AND (
-        r.name = 'ADMIN'
+        r.name = '관리자'
         OR EXISTS (
           SELECT 1
           FROM public.role_permissions rp
