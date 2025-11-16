@@ -78,7 +78,7 @@ export function ChangePassword() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className=" mx-auto">
       <div className="bg-white dark:bg-zinc-900 rounded-lg">
         <div className="px-6 py-4 border-b">
           <Heading>비밀번호 변경</Heading>

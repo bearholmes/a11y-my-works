@@ -142,7 +142,7 @@ export function TaskForm() {
   return (
     <>
       <Heading>{isEdit ? '업무 보고 수정' : '업무 보고 등록'}</Heading>
-      <div className="mt-8 max-w-2xl bg-white dark:bg-zinc-900 rounded-lg p-6">
+      <div className="mt-8  bg-white dark:bg-zinc-900 rounded-lg p-6">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="space-y-6"

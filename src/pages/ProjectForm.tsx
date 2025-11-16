@@ -138,7 +138,7 @@ export function ProjectForm() {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mt-8 max-w-2xl bg-white dark:bg-zinc-900 rounded-lg p-6 space-y-6"
+        className="mt-8  bg-white dark:bg-zinc-900 rounded-lg p-6 space-y-6"
         aria-label={isEditMode ? '프로젝트 수정 폼' : '프로젝트 등록 폼'}
       >
         <Field>

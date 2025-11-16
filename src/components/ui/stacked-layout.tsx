@@ -82,7 +82,7 @@ export function StackedLayout({
       {/* Content */}
       <main className="flex flex-1 flex-col min-w-6xl pb-2">
         <div className="grow p-6 dark:bg-zinc-900 dark:ring-white/10">
-          <div className="mx-auto max-w-6xl">{children}</div>
+          <div className="mx-auto">{children}</div>
         </div>
       </main>
     </div>

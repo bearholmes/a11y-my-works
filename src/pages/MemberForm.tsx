@@ -120,7 +120,7 @@ export function MemberForm() {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mt-8 max-w-2xl bg-white dark:bg-zinc-900 rounded-lg p-6 space-y-6"
+        className="mt-8  bg-white dark:bg-zinc-900 rounded-lg p-6 space-y-6"
         aria-label={isEditMode ? '사용자 수정 폼' : '사용자 등록 폼'}
       >
         <Field>

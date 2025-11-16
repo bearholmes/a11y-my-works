@@ -17,8 +17,10 @@ import {
 } from '@heroicons/react/20/solid';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
+import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Avatar } from '../components/ui/avatar';
+import { getAvatarColors } from '../utils/avatarColor';
 import {
   Dropdown,
   DropdownButton,
@@ -233,6 +235,14 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
     staleTime: 5 * 60 * 1000, // 5분간 fresh 상태 유지
   });
 
+  // account_id 기반 아바타 색상 계산
+  const avatarColors = useMemo(() => {
+    if (currentMember?.account_id) {
+      return getAvatarColors(currentMember.account_id);
+    }
+    return null;
+  }, [currentMember?.account_id]);
+
   // 권한에 따라 필터링된 메뉴
   const accessibleMenus = filterAccessibleMenus(MENU_ITEMS);
 
@@ -269,6 +279,14 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
                 <Avatar
                   initials={currentMember?.account_id?.charAt(0) || '-'}
                   className="size-8"
+                  style={
+                    avatarColors
+                      ? {
+                          backgroundColor: avatarColors.backgroundColor,
+                          color: avatarColors.textColor,
+                        }
+                      : undefined
+                  }
                 />
               </DropdownButton>
               <AccountDropdownMenu anchor="bottom end" />
@@ -339,14 +357,21 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
                   <Avatar
                     initials={currentMember?.account_id?.charAt(0) || '-'}
                     className="size-10"
-                    square
+                    style={
+                      avatarColors
+                        ? {
+                            backgroundColor: avatarColors.backgroundColor,
+                            color: avatarColors.textColor,
+                          }
+                        : undefined
+                    }
                   />
                   <span className="min-w-0">
-                    <span className="block truncate text-sm/5 font-medium text-zinc-950 dark:text-white">
-                      {currentMember?.account_id} ({currentMember?.name})
+                    <span className="block truncate text-base/7 font-medium text-zinc-950 dark:text-white">
+                      {currentMember?.account_id}
                     </span>
-                    <span className="block truncate text-xs/5 font-normal text-zinc-500 dark:text-zinc-400">
-                      {currentMember?.roles?.name}
+                    <span className="block truncate text-sm/6 font-normal text-zinc-500 dark:text-zinc-400">
+                      {currentMember?.name} @{currentMember?.roles?.name}
                     </span>
                   </span>
                 </span>

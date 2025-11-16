@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Heading, Subheading } from '../components/ui/heading';
@@ -6,6 +7,7 @@ import { Spinner } from '../components/ui/spinner';
 import { Text } from '../components/ui/text';
 import { useAuthContext } from '../providers/AuthProvider';
 import { memberAPI } from '../services/api';
+import { getAvatarColors } from '../utils/avatarColor';
 
 export function Profile() {
   const { user } = useAuthContext();
@@ -16,6 +18,14 @@ export function Profile() {
     queryFn: () => memberAPI.getCurrentMember(),
     enabled: !!user?.id,
   });
+
+  // account_id 기반 아바타 색상 계산
+  const avatarColors = useMemo(() => {
+    if (profile?.account_id) {
+      return getAvatarColors(profile.account_id);
+    }
+    return null;
+  }, [profile?.account_id]);
 
   if (isLoading) {
     return (
@@ -41,14 +51,27 @@ export function Profile() {
         <Text className="mt-1">개인 정보를 확인할 수 있습니다.</Text>
       </div>
 
-      <div className="max-w-2xl">
+      <div className="">
         <div className="bg-white dark:bg-zinc-900 rounded-lg">
           {/* 프로필 헤더 */}
           <div className="p-6 border-b">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-zinc-200 dark:bg-zinc-900 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-2xl font-bold text-zinc-700 dark:text-zinc-400">
-                  {profile.name.charAt(0)}
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0"
+                style={
+                  avatarColors
+                    ? {
+                        backgroundColor: avatarColors.backgroundColor,
+                        color: avatarColors.textColor,
+                      }
+                    : {
+                        backgroundColor: '#e4e4e7',
+                        color: '#52525b',
+                      }
+                }
+              >
+                <span className="text-2xl font-bold uppercase">
+                  {profile.account_id.charAt(0)}
                 </span>
               </div>
               <div>
