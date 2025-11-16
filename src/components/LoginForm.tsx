@@ -1,10 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import { useNotification } from '../hooks/useNotification';
 import { useAuthContext } from '../providers/AuthProvider';
+import {
+  Alert,
+  AlertActions,
+  AlertDescription,
+  AlertTitle,
+} from './ui/alert';
 import { AuthLayout } from './ui/auth-layout';
 import { Button } from './ui/button';
 import { Checkbox, CheckboxField } from './ui/checkbox';
@@ -41,6 +47,8 @@ export function LoginForm() {
   const [error, setError] = useState<string>('');
   const [submitting, setSubmitting] = useState(false);
   const { showSuccess } = useNotification();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [showTimeoutAlert, setShowTimeoutAlert] = useState(false);
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -49,6 +57,21 @@ export function LoginForm() {
   const signUpForm = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
   });
+
+  // 세션 타임아웃 알림 처리
+  useEffect(() => {
+    const timeout = searchParams.get('timeout');
+    const sessionExpired = searchParams.get('session_expired');
+
+    if (timeout === 'true' || sessionExpired === 'true') {
+      setShowTimeoutAlert(true);
+
+      // URL에서 쿼리 파라미터 제거 (clean URL)
+      searchParams.delete('timeout');
+      searchParams.delete('session_expired');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // 로딩 중에는 아무것도 렌더링하지 않음
   if (loading) {
@@ -115,16 +138,30 @@ export function LoginForm() {
   };
 
   return (
-    <AuthLayout>
-      <form
-        className="grid w-full max-w-sm grid-cols-1 gap-8"
-        onSubmit={
-          isSignUp
-            ? signUpForm.handleSubmit(onSubmit)
-            : loginForm.handleSubmit(onSubmit)
-        }
-        aria-label={isSignUp ? '회원가입 폼' : '로그인 폼'}
-      >
+    <>
+      {/* 세션 타임아웃 알림 */}
+      <Alert open={showTimeoutAlert} onClose={() => setShowTimeoutAlert(false)}>
+        <AlertTitle>세션이 만료되었습니다</AlertTitle>
+        <AlertDescription>
+          일정 시간 동안 활동이 없어 자동으로 로그아웃되었습니다.
+          <br />
+          다시 로그인해주세요.
+        </AlertDescription>
+        <AlertActions>
+          <Button onClick={() => setShowTimeoutAlert(false)}>확인</Button>
+        </AlertActions>
+      </Alert>
+
+      <AuthLayout>
+        <form
+          className="grid w-full max-w-sm grid-cols-1 gap-8"
+          onSubmit={
+            isSignUp
+              ? signUpForm.handleSubmit(onSubmit)
+              : loginForm.handleSubmit(onSubmit)
+          }
+          aria-label={isSignUp ? '회원가입 폼' : '로그인 폼'}
+        >
         {/* 헤딩 */}
         <Heading level={1}>A11yWorks</Heading>
         <Subheading level={2}>
@@ -307,5 +344,6 @@ export function LoginForm() {
         </Text>
       </form>
     </AuthLayout>
+    </>
   );
 }

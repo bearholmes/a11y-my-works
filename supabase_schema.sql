@@ -159,8 +159,8 @@ CREATE TABLE logs (
 INSERT INTO roles (name, description) VALUES
 ('관리자', '시스템 전체 관리 권한'),
 ('매니저', '팀 관리 및 업무 승인 권한'),
-('직원', '업무 보고 작성 권한'),
-('Pending User', '승인 대기 중인 사용자');
+('일반', '업무 보고 작성 권한'),
+('승인대기', '승인 대기 중인 사용자');
 
 INSERT INTO permissions (key, name) VALUES
 ('task.read', '업무 보고 조회'),
