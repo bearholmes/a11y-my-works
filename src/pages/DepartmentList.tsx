@@ -70,6 +70,14 @@ function TreeNode({
           />
         </div>
 
+        {/* 활성 상태 뱃지 */}
+        <Badge
+          color={node.is_active ? 'lime' : 'zinc'}
+          className="text-xs py-0 px-1.5"
+        >
+          {node.is_active ? '활성' : '비활성'}
+        </Badge>
+
         {/* 부서명 */}
         <span className="text-base font-medium text-zinc-900 dark:text-zinc-100">
           {node.name}
@@ -103,19 +111,8 @@ function TreeNode({
           </button>
         </div>
 
-        {/* 뱃지들 (오른쪽으로 밀림) */}
+        {/* 통계 정보 (오른쪽으로 밀림) */}
         <div className="flex items-center gap-1.5 ml-auto flex-shrink-0">
-          <Badge
-            color={node.is_active ? 'lime' : 'zinc'}
-            className="text-xs py-0 px-1.5"
-          >
-            {node.is_active ? '활성' : '비활성'}
-          </Badge>
-          {level === 0 && (
-            <Badge color="blue" className="text-xs py-0 px-1.5">
-              최상위
-            </Badge>
-          )}
           <span className="text-sm text-zinc-500 dark:text-zinc-400">
             {node.member_count || 0}명
           </span>
