@@ -21,7 +21,6 @@ const departmentSchema = z.object({
   description: z.string().optional(),
   parent_department_id: z.number().optional(),
   is_active: z.boolean(),
-  sort_order: z.number(),
 });
 
 type DepartmentFormData = z.infer<typeof departmentSchema>;
@@ -52,7 +51,6 @@ export function DepartmentForm() {
     resolver: zodResolver(departmentSchema),
     defaultValues: {
       is_active: true,
-      sort_order: 0,
       parent_department_id: parentDepartmentId
         ? Number(parentDepartmentId)
         : undefined,
@@ -85,7 +83,6 @@ export function DepartmentForm() {
         description: department.description || undefined,
         parent_department_id: department.parent_department_id || undefined,
         is_active: department.is_active,
-        sort_order: department.sort_order,
       });
     }
   }, [department, reset]);
@@ -94,12 +91,13 @@ export function DepartmentForm() {
   const createMutation = useMutation({
     mutationFn: (data: DepartmentFormData) => {
       // depth와 path는 API에서 자동 계산
+      // sort_order는 드래그앤드롭으로 관리되므로 기본값 0
       return departmentAPI.createDepartment({
         name: data.name,
         description: data.description,
         parent_department_id: data.parent_department_id,
         is_active: data.is_active,
-        sort_order: data.sort_order,
+        sort_order: 0,
       });
     },
     onSuccess: () => {
@@ -121,12 +119,11 @@ export function DepartmentForm() {
       departmentId: number;
       data: DepartmentFormData;
     }) => {
+      // parent_department_id는 moveDepartment로 별도 처리하므로 제외
       return departmentAPI.updateDepartment(departmentId, {
         name: data.name,
         description: data.description,
-        parent_department_id: data.parent_department_id,
         is_active: data.is_active,
-        sort_order: data.sort_order,
       });
     },
     onSuccess: () => {
@@ -156,6 +153,19 @@ export function DepartmentForm() {
 
   const onSubmit = async (data: DepartmentFormData) => {
     if (isEditMode && id) {
+      // 부서 이동 여부 확인
+      const parentChanged =
+        department?.parent_department_id !== data.parent_department_id;
+
+      if (parentChanged) {
+        // 부서 이동 먼저 수행
+        await departmentAPI.moveDepartment(
+          Number(id),
+          data.parent_department_id
+        );
+      }
+
+      // 나머지 정보 업데이트
       updateMutation.mutate({ departmentId: Number(id), data });
     } else {
       createMutation.mutate(data);
@@ -317,25 +327,6 @@ export function DepartmentForm() {
               선택할 수 없습니다.
             </p>
           )}
-        </Field>
-
-        <Field>
-          <Label>표시 순서</Label>
-          <Input
-            id="sort_order"
-            {...register('sort_order', { valueAsNumber: true })}
-            type="number"
-            min="0"
-            aria-label="표시 순서 (숫자가 작을수록 먼저 표시)"
-            aria-invalid={!!errors.sort_order}
-            placeholder="0"
-          />
-          {errors.sort_order && (
-            <ErrorMessage>{errors.sort_order.message}</ErrorMessage>
-          )}
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-            숫자가 작을수록 먼저 표시됩니다
-          </p>
         </Field>
 
         <CheckboxField>

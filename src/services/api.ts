@@ -512,7 +512,7 @@ export const departmentAPI = {
       .order('name');
 
     // 소속 사용자 수 카운트
-    const { data: childrenWithCounts } = await Promise.all(
+    const childrenWithCounts = await Promise.all(
       (children || []).map(async (child) => {
         const { count } = await supabase
           .from('members')
@@ -530,7 +530,7 @@ export const departmentAPI = {
       ...data,
       parent_department_name: data.parent?.name || null,
       member_count: members?.length || 0,
-      child_departments: childrenWithCounts || [],
+      child_departments: childrenWithCounts,
       members: (members || []).map((m: any) => ({
         member_id: m.member_id,
         name: m.name,
@@ -612,6 +612,8 @@ export const departmentAPI = {
   async createDepartment(
     department: Database['public']['Tables']['departments']['Insert']
   ) {
+    const insertData: any = { ...department };
+
     // 상위 부서가 지정된 경우 존재 여부 확인
     if (department.parent_department_id) {
       const { data: parent, error: parentError } = await supabase
@@ -625,17 +627,17 @@ export const departmentAPI = {
       }
 
       // depth와 path 계산
-      department.depth = parent.depth + 1;
+      insertData.depth = parent.depth + 1;
       // path는 insert 후에 부서 ID를 알아야 완성할 수 있으므로 임시값
-      department.path = `${parent.path}/temp`;
+      insertData.path = `${parent.path}/temp`;
     } else {
-      department.depth = 0;
-      department.path = '/temp';
+      insertData.depth = 0;
+      insertData.path = '/temp';
     }
 
     const { data, error } = await supabase
       .from('departments')
-      .insert(department)
+      .insert(insertData)
       .select()
       .single();
 
@@ -643,7 +645,7 @@ export const departmentAPI = {
 
     // path 업데이트 (생성된 department_id를 사용)
     const correctPath = department.parent_department_id
-      ? `${department.path.replace('/temp', '')}/${data.department_id}`
+      ? `${insertData.path.replace('/temp', '')}/${data.department_id}`
       : `/${data.department_id}`;
 
     const { error: updateError } = await supabase
@@ -659,13 +661,14 @@ export const departmentAPI = {
   /**
    * 부서 정보를 수정합니다.
    * 참고: parent_department_id는 생성 후 수정 불가 (데이터 무결성 유지)
+   * 부서 이동은 moveDepartment를 사용하세요.
    */
   async updateDepartment(
     departmentId: number,
     updates: Database['public']['Tables']['departments']['Update']
   ) {
     // parent_department_id, depth, path 변경 방지
-    const safeUpdates = { ...updates };
+    const safeUpdates: any = { ...updates };
     delete safeUpdates.parent_department_id;
     delete safeUpdates.depth;
     delete safeUpdates.path;
@@ -679,6 +682,138 @@ export const departmentAPI = {
 
     if (error) throw error;
     return data;
+  },
+
+  /**
+   * 부서를 다른 부서로 이동합니다 (parent_department_id 변경).
+   * depth와 path를 자동으로 재계산합니다.
+   */
+  async moveDepartment(departmentId: number, newParentId: number | undefined) {
+    // 현재 부서 정보 조회
+    const { data: currentDept, error: currentError } = await supabase
+      .from('departments')
+      .select('*')
+      .eq('department_id', departmentId)
+      .single();
+
+    if (currentError || !currentDept) {
+      throw new Error('부서를 찾을 수 없습니다.');
+    }
+
+    // 새로운 상위 부서 정보 조회 및 검증
+    let newDepth = 0;
+    let newPathPrefix = '';
+
+    if (newParentId) {
+      const { data: newParent, error: parentError } = await supabase
+        .from('departments')
+        .select('department_id, depth, path')
+        .eq('department_id', newParentId)
+        .single();
+
+      if (parentError || !newParent) {
+        throw new Error('새로운 상위 부서를 찾을 수 없습니다.');
+      }
+
+      newDepth = newParent.depth + 1;
+      newPathPrefix = newParent.path;
+    }
+
+    // 새로운 path 계산
+    const newPath = newParentId
+      ? `${newPathPrefix}/${departmentId}`
+      : `/${departmentId}`;
+
+    // 부서 정보 업데이트
+    const { data, error } = await supabase
+      .from('departments')
+      .update({
+        parent_department_id: newParentId || null,
+        depth: newDepth,
+        path: newPath,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('department_id', departmentId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // 하위 부서들의 depth와 path도 재귀적으로 업데이트
+    const { data: children } = await supabase
+      .from('departments')
+      .select('*')
+      .eq('parent_department_id', departmentId);
+
+    if (children && children.length > 0) {
+      await Promise.all(
+        children.map((child) =>
+          this.updateChildDepartmentPaths(child, newDepth + 1, newPath)
+        )
+      );
+    }
+
+    return data;
+  },
+
+  /**
+   * 하위 부서들의 depth와 path를 재귀적으로 업데이트합니다 (내부 함수).
+   */
+  async updateChildDepartmentPaths(
+    department: Department,
+    newDepth: number,
+    parentPath: string
+  ) {
+    const newPath = `${parentPath}/${department.department_id}`;
+
+    await supabase
+      .from('departments')
+      .update({
+        depth: newDepth,
+        path: newPath,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('department_id', department.department_id);
+
+    // 하위 부서 처리
+    const { data: children } = await supabase
+      .from('departments')
+      .select('*')
+      .eq('parent_department_id', department.department_id);
+
+    if (children && children.length > 0) {
+      await Promise.all(
+        children.map((child) =>
+          this.updateChildDepartmentPaths(child, newDepth + 1, newPath)
+        )
+      );
+    }
+  },
+
+  /**
+   * 여러 부서의 순서를 한번에 업데이트합니다.
+   */
+  async reorderDepartments(
+    updates: Array<{ departmentId: number; sortOrder: number }>
+  ) {
+    const results = await Promise.all(
+      updates.map(async ({ departmentId, sortOrder }) => {
+        const { data, error } = await supabase
+          .from('departments')
+          .update({
+            sort_order: sortOrder,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('department_id', departmentId)
+          .select()
+          .single();
+
+        if (error) throw error;
+        return data;
+      })
+    );
+
+    return results;
   },
 
   /**
