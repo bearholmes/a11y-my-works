@@ -12,11 +12,14 @@ import { Spinner } from './ui/spinner';
 function PageLoader() {
   return (
     <div
-      className="flex items-center justify-center py-12"
+      className="min-h-screen bg-gray-50 dark:bg-zinc-950 flex items-center justify-center"
       role="status"
       aria-live="polite"
     >
-      <Spinner size="lg" label="페이지 로딩 중" />
+      <div className="text-center">
+        <Spinner size="lg" label="페이지 로딩 중" />
+        <p className="mt-4 text-gray-600 dark:text-gray-300">로딩 중...</p>
+      </div>
     </div>
   );
 }
