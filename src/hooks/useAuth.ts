@@ -2,6 +2,7 @@ import { useAtom } from 'jotai';
 import { useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { loadingAtom, sessionAtom, userAtom } from '../stores/authStore';
+import { getAuthErrorMessage } from '../utils/authErrorMessages';
 
 export function useAuth() {
   const [user, setUser] = useAtom(userAtom);
@@ -33,6 +34,18 @@ export function useAuth() {
       email,
       password,
     });
+
+    // 에러 메시지를 한글로 변환
+    if (error) {
+      return {
+        data,
+        error: {
+          ...error,
+          message: getAuthErrorMessage(error),
+        },
+      };
+    }
+
     return { data, error };
   };
 
@@ -54,8 +67,15 @@ export function useAuth() {
         },
       });
 
+      // 에러 메시지를 한글로 변환
       if (error) {
-        return { data, error };
+        return {
+          data,
+          error: {
+            ...error,
+            message: getAuthErrorMessage(error),
+          },
+        };
       }
 
       // 트리거가 자동으로 members 테이블에 생성하므로
@@ -63,7 +83,14 @@ export function useAuth() {
 
       return { data, error };
     } catch (err) {
-      return { data: null, error: err as Error };
+      const error = err as Error;
+      return {
+        data: null,
+        error: {
+          name: error.name,
+          message: getAuthErrorMessage(error),
+        } as Error,
+      };
     }
   };
 
@@ -76,6 +103,18 @@ export function useAuth() {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
+
+    // 에러 메시지를 한글로 변환
+    if (error) {
+      return {
+        data,
+        error: {
+          ...error,
+          message: getAuthErrorMessage(error),
+        },
+      };
+    }
+
     return { data, error };
   };
 
@@ -83,6 +122,18 @@ export function useAuth() {
     const { data, error } = await supabase.auth.updateUser({
       password: newPassword,
     });
+
+    // 에러 메시지를 한글로 변환
+    if (error) {
+      return {
+        data,
+        error: {
+          ...error,
+          message: getAuthErrorMessage(error),
+        },
+      };
+    }
+
     return { data, error };
   };
 
