@@ -661,11 +661,10 @@ export const departmentAPI = {
     updates: Database['public']['Tables']['departments']['Update']
   ) {
     // parent_department_id, depth, path 변경 방지
-    const safeUpdates = { ...updates } as any;
+    const safeUpdates = { ...updates };
     delete safeUpdates.parent_department_id;
     delete safeUpdates.depth;
     delete safeUpdates.path;
-    delete safeUpdates.code; // DB에 code 컬럼이 남아있을 수 있으므로 제거
 
     const { data, error } = await supabase
       .from('departments')
