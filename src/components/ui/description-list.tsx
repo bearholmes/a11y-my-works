@@ -7,10 +7,7 @@ export function DescriptionList({
   return (
     <dl
       {...props}
-      className={clsx(
-        className,
-        'grid grid-cols-1 text-base/6'
-      )}
+      className={clsx(className, 'grid grid-cols-1 text-base/6')}
     />
   );
 }

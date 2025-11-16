@@ -42,7 +42,11 @@ function hashToHSL(hash: number): { h: number; s: number; l: number } {
  * @param l - Lightness (0-100)
  * @returns RGB 객체 (0-255)
  */
-function hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: number } {
+function hslToRgb(
+  h: number,
+  s: number,
+  l: number
+): { r: number; g: number; b: number } {
   const sNorm = s / 100;
   const lNorm = l / 100;
 
@@ -108,7 +112,7 @@ function rgbToHex(r: number, g: number, b: number): string {
 function getRelativeLuminance(r: number, g: number, b: number): number {
   const [rs, gs, bs] = [r, g, b].map((c) => {
     const sRGB = c / 255;
-    return sRGB <= 0.03928 ? sRGB / 12.92 : Math.pow((sRGB + 0.055) / 1.055, 2.4);
+    return sRGB <= 0.03928 ? sRGB / 12.92 : ((sRGB + 0.055) / 1.055) ** 2.4;
   });
 
   return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;

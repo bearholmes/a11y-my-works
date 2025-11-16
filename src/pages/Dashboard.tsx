@@ -217,10 +217,7 @@ export function Dashboard() {
         <div className="rounded-lg bg-white p-6 dark:bg-zinc-900">
           <Subheading className="mb-4">사용자별 작업 시간</Subheading>
           {memberStats && memberStats.length > 0 ? (
-            <Table
-              className="[--gutter:--spacing(6)]"
-              dense
-            >
+            <Table className="[--gutter:--spacing(6)]" dense>
               <TableHead>
                 <TableRow>
                   <TableHeader>이름</TableHeader>
@@ -262,10 +259,7 @@ export function Dashboard() {
             </Link>
           </div>
           {recentTasks && recentTasks.length > 0 ? (
-            <Table
-              className="[--gutter:--spacing(6)]"
-              dense
-            >
+            <Table className="[--gutter:--spacing(6)]" dense>
               <TableHead>
                 <TableRow>
                   <TableHeader>업무명</TableHeader>

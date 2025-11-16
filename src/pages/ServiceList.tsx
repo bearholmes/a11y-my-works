@@ -173,7 +173,9 @@ export function ServiceList() {
               <option value="false">비활성</option>
             </Select>
           </Field>
-          <Button type="submit" className="self-end">검색</Button>
+          <Button type="submit" className="self-end">
+            검색
+          </Button>
         </form>
       </div>
 

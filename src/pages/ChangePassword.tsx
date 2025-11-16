@@ -81,7 +81,9 @@ export function ChangePassword() {
   return (
     <>
       <Heading>비밀번호 변경</Heading>
-      <Text className="mt-2">보안을 위해 정기적으로 비밀번호를 변경하세요.</Text>
+      <Text className="mt-2">
+        보안을 위해 정기적으로 비밀번호를 변경하세요.
+      </Text>
 
       <Divider className="my-10 mt-6" />
 

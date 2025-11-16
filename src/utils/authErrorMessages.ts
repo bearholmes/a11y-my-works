@@ -9,7 +9,8 @@ import type { AuthError } from '@supabase/supabase-js';
 const ERROR_MESSAGE_MAP: Record<string, string> = {
   // 로그인 관련 에러
   'Invalid login credentials': '이메일 또는 비밀번호가 올바르지 않습니다.',
-  'Email not confirmed': '이메일 인증이 완료되지 않았습니다. 이메일을 확인해주세요.',
+  'Email not confirmed':
+    '이메일 인증이 완료되지 않았습니다. 이메일을 확인해주세요.',
   'Invalid email or password': '이메일 또는 비밀번호가 올바르지 않습니다.',
 
   // 회원가입 관련 에러
@@ -42,7 +43,8 @@ const ERROR_MESSAGE_MAP: Record<string, string> = {
   // Rate limiting
   'Email rate limit exceeded':
     '이메일 발송 한도를 초과했습니다. 잠시 후 다시 시도해주세요.',
-  'Too many requests': '너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요.',
+  'Too many requests':
+    '너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요.',
 
   // 기타
   'Invalid token': '유효하지 않은 토큰입니다.',
@@ -163,7 +165,9 @@ export function getAuthErrorMessage(error: AuthError | Error | null): string {
  * }
  * ```
  */
-export function getAuthErrorSuggestion(error: AuthError | Error | null): string | null {
+export function getAuthErrorSuggestion(
+  error: AuthError | Error | null
+): string | null {
   if (!error) return null;
 
   const errorMessage = error.message?.toLowerCase() || '';
