@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
+import { Divider } from '../components/ui/divider';
 import { Heading, Subheading } from '../components/ui/heading';
 import { Spinner } from '../components/ui/spinner';
 import { Text } from '../components/ui/text';
@@ -44,79 +45,73 @@ export function Profile() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* 헤더 */}
-      <div>
-        <Heading>내 프로필</Heading>
-        <Text className="mt-1">개인 정보를 확인할 수 있습니다.</Text>
-      </div>
+    <>
+      <Heading>내 프로필</Heading>
+      <Text className="mt-2">개인 정보를 확인할 수 있습니다.</Text>
 
-      <div className="">
-        <div className="bg-white dark:bg-zinc-900 rounded-lg">
-          {/* 프로필 헤더 */}
-          <div className="p-6 border-b">
-            <div className="flex items-center gap-4">
-              <div
-                className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0"
-                style={
-                  avatarColors
-                    ? {
-                        backgroundColor: avatarColors.backgroundColor,
-                        color: avatarColors.textColor,
-                      }
-                    : {
-                        backgroundColor: '#e4e4e7',
-                        color: '#52525b',
-                      }
+      <Divider className="my-10 mt-6" />
+
+      <div className="flex items-center gap-4 mb-8">
+        <div
+          className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0"
+          style={
+            avatarColors
+              ? {
+                  backgroundColor: avatarColors.backgroundColor,
+                  color: avatarColors.textColor,
                 }
-              >
-                <span className="text-2xl font-bold uppercase">
-                  {profile.account_id.charAt(0)}
-                </span>
-              </div>
-              <div>
-                <Subheading>{profile.name}</Subheading>
-                <Text>@{profile.account_id}</Text>
-              </div>
-            </div>
-          </div>
-
-          {/* 프로필 정보 */}
-          <div className="p-6 space-y-4">
-            <div>
-              <Text className="font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                이메일
-              </Text>
-              <Text className="text-zinc-900 dark:text-zinc-100">
-                {profile.email}
-              </Text>
-            </div>
-
-            <div>
-              <Text className="font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                역할
-              </Text>
-              <Text className="text-zinc-900 dark:text-zinc-100">
-                {profile.roles?.name || '-'}
-              </Text>
-            </div>
-
-            <div>
-              <Text className="font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                상태
-              </Text>
-              <Badge color={profile.is_active ? 'lime' : 'zinc'}>
-                {profile.is_active ? '활성' : '비활성'}
-              </Badge>
-            </div>
-          </div>
-
-          {/* 액션 버튼 */}
-          <div className="p-6 border-t bg-zinc-50 dark:bg-zinc-950">
-            <Button href="/change-password">비밀번호 변경</Button>
-          </div>
+              : {
+                  backgroundColor: '#e4e4e7',
+                  color: '#52525b',
+                }
+          }
+        >
+          <span className="text-2xl font-bold uppercase">
+            {profile.account_id.charAt(0)}
+          </span>
+        </div>
+        <div>
+          <Subheading>{profile.name}</Subheading>
+          <Text>@{profile.account_id}</Text>
         </div>
       </div>
-    </div>
+
+      <dl className="space-y-6 max-w-2xl">
+        <div>
+          <dt className="text-sm/6 font-medium text-zinc-500 dark:text-zinc-400">
+            이메일
+          </dt>
+          <dd className="mt-1 text-sm/6 text-zinc-950 dark:text-white">
+            {profile.email}
+          </dd>
+        </div>
+
+        <div>
+          <dt className="text-sm/6 font-medium text-zinc-500 dark:text-zinc-400">
+            역할
+          </dt>
+          <dd className="mt-1 text-sm/6 text-zinc-950 dark:text-white">
+            {profile.roles?.name || '-'}
+          </dd>
+        </div>
+
+        <div>
+          <dt className="text-sm/6 font-medium text-zinc-500 dark:text-zinc-400">
+            상태
+          </dt>
+          <dd className="mt-1">
+            <Badge color={profile.is_active ? 'lime' : 'zinc'}>
+              {profile.is_active ? '활성' : '비활성'}
+            </Badge>
+          </dd>
+        </div>
+      </dl>
+
+      <Divider className="my-10" />
+
+      <div className="flex gap-3">
+        <Button href="/change-password">비밀번호 변경</Button>
+      </div>
+    </>
   );
 }

@@ -193,7 +193,7 @@ export function RoleForm() {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mt-8 max-w-4xl space-y-6"
+        className="mt-8 space-y-6"
         aria-label={isEditMode ? '역할 수정 폼' : '역할 생성 폼'}
       >
         {/* 기본 정보 */}
@@ -229,20 +229,22 @@ export function RoleForm() {
             />
           </Field>
 
-          <Controller
-            name="is_active"
-            control={control}
-            render={({ field }) => (
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  checked={field.value}
-                  onChange={field.onChange}
-                  aria-label="역할 활성 상태"
-                />
-                <Label>활성 상태</Label>
-              </div>
-            )}
-          />
+          <Field>
+            <Controller
+              name="is_active"
+              control={control}
+              render={({ field }) => (
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    checked={field.value}
+                    onChange={field.onChange}
+                    aria-label="역할 활성 상태"
+                  />
+                  <Label>활성 상태</Label>
+                </div>
+              )}
+            />
+          </Field>
         </div>
 
         {/* 권한 설정 */}

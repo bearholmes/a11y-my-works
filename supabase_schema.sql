@@ -242,6 +242,54 @@ FOR SELECT USING (auth.role() = 'authenticated');
 CREATE POLICY "인증된 사용자는 역할권한 정보 조회 가능" ON role_permissions
 FOR SELECT USING (auth.role() = 'authenticated');
 
+-- INSERT 정책: member.write 권한을 가진 사용자만 역할 권한 추가 가능
+CREATE POLICY "member.write 권한을 가진 사용자는 역할권한 추가 가능"
+ON role_permissions
+FOR INSERT
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM members m
+    INNER JOIN role_permissions rp ON m.role_id = rp.role_id
+    INNER JOIN permissions p ON rp.permission_id = p.permission_id
+    WHERE m.auth_id = auth.uid()
+    AND p.key = 'member.write'
+    AND rp.write_access = true
+    AND m.is_active = true
+  )
+);
+
+-- UPDATE 정책: member.write 권한을 가진 사용자만 역할 권한 수정 가능
+CREATE POLICY "member.write 권한을 가진 사용자는 역할권한 수정 가능"
+ON role_permissions
+FOR UPDATE
+USING (
+  EXISTS (
+    SELECT 1 FROM members m
+    INNER JOIN role_permissions rp ON m.role_id = rp.role_id
+    INNER JOIN permissions p ON rp.permission_id = p.permission_id
+    WHERE m.auth_id = auth.uid()
+    AND p.key = 'member.write'
+    AND rp.write_access = true
+    AND m.is_active = true
+  )
+);
+
+-- DELETE 정책: member.write 권한을 가진 사용자만 역할 권한 삭제 가능
+CREATE POLICY "member.write 권한을 가진 사용자는 역할권한 삭제 가능"
+ON role_permissions
+FOR DELETE
+USING (
+  EXISTS (
+    SELECT 1 FROM members m
+    INNER JOIN role_permissions rp ON m.role_id = rp.role_id
+    INNER JOIN permissions p ON rp.permission_id = p.permission_id
+    WHERE m.auth_id = auth.uid()
+    AND p.key = 'member.write'
+    AND rp.write_access = true
+    AND m.is_active = true
+  )
+);
+
 CREATE POLICY "인증된 사용자는 청구그룹 정보 조회 가능" ON cost_groups
 FOR SELECT USING (auth.role() = 'authenticated');
 
