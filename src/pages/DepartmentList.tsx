@@ -2,6 +2,7 @@ import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Heading } from '../components/ui/heading';
@@ -142,6 +143,7 @@ function TreeNode({
  * 부서 관리 페이지 - 트리 형태
  */
 export function DepartmentList() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { confirmDelete } = useConfirm();
   const { showSuccess, showError } = useNotification();
@@ -166,11 +168,12 @@ export function DepartmentList() {
   });
 
   const handleEdit = (departmentId: number) => {
-    window.location.href = `/departments/edit/${departmentId}`;
+    navigate(`/departments/edit/${departmentId}`);
   };
 
   const handleDelete = async (departmentId: number, departmentName: string) => {
-    if (await confirmDelete('부서를 삭제하시겠습니까?', departmentName)) {
+    const confirmed = await confirmDelete('부서를 삭제하시겠습니까?', departmentName);
+    if (confirmed) {
       deleteMutation.mutate(departmentId);
     }
   };
