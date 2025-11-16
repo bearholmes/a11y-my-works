@@ -37,65 +37,65 @@ function TreeNode({
     <div>
       {/* 현재 노드 */}
       <div
-        className="group relative flex items-center gap-1.5 px-3 py-2 hover:bg-blue-50 dark:hover:bg-blue-950/30 cursor-pointer transition-colors select-none"
-        style={{ paddingLeft: `${level * 24 + 12}px` }}
+        className="group relative flex items-center gap-2 px-2 py-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors select-none"
+        style={{ paddingLeft: `${level * 20 + 8}px` }}
       >
         {/* 접기/펼치기 버튼 */}
         <button
           type="button"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="w-5 h-5 flex items-center justify-center flex-shrink-0 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded transition-colors"
+          className="w-4 h-4 flex items-center justify-center flex-shrink-0 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded"
           aria-label={isExpanded ? '접기' : '펼치기'}
           aria-expanded={isExpanded}
         >
           {hasChildren ? (
             isExpanded ? (
-              <ChevronDownIcon className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
+              <ChevronDownIcon className="w-3.5 h-3.5 text-zinc-500" />
             ) : (
-              <ChevronRightIcon className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
+              <ChevronRightIcon className="w-3.5 h-3.5 text-zinc-500" />
             )
           ) : (
-            <span className="w-4 h-4" />
+            <span className="w-3.5 h-3.5" />
           )}
         </button>
 
         {/* 조직 아이콘 */}
-        <div className="w-5 h-5 flex-shrink-0">
-          <BuildingOfficeIcon
-            className={`w-5 h-5 ${
-              hasChildren
-                ? 'text-blue-500 dark:text-blue-400'
-                : 'text-zinc-400 dark:text-zinc-500'
-            }`}
-          />
-        </div>
-
-        {/* 활성 상태 뱃지 */}
-        <Badge
-          color={node.is_active ? 'lime' : 'zinc'}
-          className="text-xs py-0 px-1.5"
-        >
-          {node.is_active ? '활성' : '비활성'}
-        </Badge>
+        <BuildingOfficeIcon
+          className={`w-4 h-4 flex-shrink-0 ${
+            node.is_active
+              ? 'text-blue-500 dark:text-blue-400'
+              : 'text-zinc-400 dark:text-zinc-500'
+          }`}
+        />
 
         {/* 부서명 */}
-        <span className="text-base font-medium text-zinc-900 dark:text-zinc-100">
+        <span
+          className={`text-sm font-medium flex-1 min-w-0 truncate ${
+            node.is_active
+              ? 'text-zinc-900 dark:text-zinc-100'
+              : 'text-zinc-500 dark:text-zinc-500'
+          }`}
+        >
           {node.name}
         </span>
 
-        {/* 액션 버튼 (부서명 바로 뒤) */}
-        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* 인원수 */}
+        <span className="text-xs text-zinc-400 dark:text-zinc-500 flex-shrink-0">
+          {node.member_count || 0}
+        </span>
+
+        {/* 액션 버튼 (호버 시만) */}
+        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100">
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
               onAddChild(node.department_id, node.name);
             }}
-            className="p-1 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded transition-colors"
-            aria-label={`${node.name}의 하위 부서 추가`}
+            className="p-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded"
             title="하위 부서 추가"
           >
-            <PlusIcon className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
+            <PlusIcon className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" />
           </button>
           <button
             type="button"
@@ -103,24 +103,11 @@ function TreeNode({
               e.stopPropagation();
               onEdit(node.department_id);
             }}
-            className="p-1 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded transition-colors"
-            aria-label={`${node.name} 수정`}
-            title="부서 수정"
+            className="p-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded"
+            title="수정"
           >
-            <PencilIcon className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
+            <PencilIcon className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" />
           </button>
-        </div>
-
-        {/* 통계 정보 (오른쪽으로 밀림) */}
-        <div className="flex items-center gap-1.5 ml-auto flex-shrink-0">
-          <span className="text-sm text-zinc-500 dark:text-zinc-400">
-            {node.member_count || 0}명
-          </span>
-          {hasChildren && (
-            <span className="text-sm text-zinc-400 dark:text-zinc-500">
-              · {node.children.length}개
-            </span>
-          )}
         </div>
       </div>
 
