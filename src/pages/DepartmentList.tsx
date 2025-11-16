@@ -180,8 +180,11 @@ export function DepartmentList() {
   };
 
   const handleDelete = async (departmentId: number, departmentName: string) => {
+    console.log('[DEBUG] 삭제 시작:', { departmentId, departmentName });
     const confirmed = await confirmDelete('부서를 삭제하시겠습니까?', departmentName);
+    console.log('[DEBUG] 확인 결과:', confirmed);
     if (confirmed) {
+      console.log('[DEBUG] deleteMutation.mutate 호출');
       deleteMutation.mutate(departmentId);
     }
   };
