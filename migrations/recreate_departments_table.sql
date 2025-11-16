@@ -73,9 +73,76 @@ CREATE POLICY "부서 조회 허용"
   TO authenticated
   USING (true);
 
-CREATE POLICY "부서 관리 권한"
+CREATE POLICY "부서 생성 권한"
   ON public.departments
-  FOR ALL
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    EXISTS (
+      SELECT 1
+      FROM public.members m
+      JOIN public.roles r ON m.role_id = r.role_id
+      WHERE m.auth_id = auth.uid()
+        AND (
+          r.name = 'ADMIN'
+          OR EXISTS (
+            SELECT 1
+            FROM public.role_permissions rp
+            JOIN public.permissions p ON rp.permission_id = p.permission_id
+            WHERE rp.role_id = r.role_id
+              AND p.key = 'PERM_06'
+              AND rp.write_access = true
+          )
+        )
+    )
+  );
+
+CREATE POLICY "부서 수정 권한"
+  ON public.departments
+  FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1
+      FROM public.members m
+      JOIN public.roles r ON m.role_id = r.role_id
+      WHERE m.auth_id = auth.uid()
+        AND (
+          r.name = 'ADMIN'
+          OR EXISTS (
+            SELECT 1
+            FROM public.role_permissions rp
+            JOIN public.permissions p ON rp.permission_id = p.permission_id
+            WHERE rp.role_id = r.role_id
+              AND p.key = 'PERM_06'
+              AND rp.write_access = true
+          )
+        )
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1
+      FROM public.members m
+      JOIN public.roles r ON m.role_id = r.role_id
+      WHERE m.auth_id = auth.uid()
+        AND (
+          r.name = 'ADMIN'
+          OR EXISTS (
+            SELECT 1
+            FROM public.role_permissions rp
+            JOIN public.permissions p ON rp.permission_id = p.permission_id
+            WHERE rp.role_id = r.role_id
+              AND p.key = 'PERM_06'
+              AND rp.write_access = true
+          )
+        )
+    )
+  );
+
+CREATE POLICY "부서 삭제 권한"
+  ON public.departments
+  FOR DELETE
   TO authenticated
   USING (
     EXISTS (
