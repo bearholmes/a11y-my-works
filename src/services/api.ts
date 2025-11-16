@@ -1,7 +1,11 @@
 import { supabase } from '../lib/supabase';
 import type {
   Database,
+  Department,
+  DepartmentQuery,
+  DepartmentTreeNode,
   Member,
+  MemberQuery,
   PaginationResponse,
   TaskQuery,
 } from '../types/database';
@@ -219,20 +223,23 @@ export const memberAPI = {
   /**
    * 전체 사용자 목록을 조회합니다.
    */
-  async getMembers(params?: {
-    page?: number;
-    pageSize?: number;
-    search?: string;
-    isActive?: boolean;
-  }) {
-    const { page = 1, pageSize = 20, search, isActive } = params || {};
+  async getMembers(params?: MemberQuery) {
+    const {
+      page = 1,
+      pageSize = 20,
+      search,
+      isActive,
+      departmentId,
+      includeSubDepartments = false,
+    } = params || {};
 
     let query = supabase
       .from('members')
       .select(
         `
         *,
-        roles(role_id, name, description)
+        roles(role_id, name, description),
+        departments(department_id, name, code, path)
       `,
         { count: 'exact' }
       )
@@ -246,6 +253,40 @@ export const memberAPI = {
 
     if (isActive !== undefined) {
       query = query.eq('is_active', isActive);
+    }
+
+    // 부서 필터링
+    if (departmentId) {
+      if (includeSubDepartments) {
+        // 하위 부서 포함: path를 사용하여 검색
+        const { data: dept, error: deptError } = await supabase
+          .from('departments')
+          .select('path')
+          .eq('department_id', departmentId)
+          .single();
+
+        if (deptError) throw deptError;
+
+        if (dept) {
+          // 해당 부서 및 하위 부서의 사용자 조회
+          const { data: deptIds, error: deptIdsError } = await supabase
+            .from('departments')
+            .select('department_id')
+            .or(
+              `department_id.eq.${departmentId},path.like.${dept.path}/%`
+            );
+
+          if (deptIdsError) throw deptIdsError;
+
+          const ids = (deptIds || []).map((d) => d.department_id);
+          if (ids.length > 0) {
+            query = query.in('department_id', ids);
+          }
+        }
+      } else {
+        // 특정 부서만
+        query = query.eq('department_id', departmentId);
+      }
     }
 
     const start = (page - 1) * pageSize;
@@ -336,6 +377,487 @@ export const memberAPI = {
 
     if (error) throw error;
     return data;
+  },
+};
+
+// 부서 관리 API
+export const departmentAPI = {
+  /**
+   * 부서 목록을 조회합니다.
+   */
+  async getDepartments(params?: DepartmentQuery) {
+    const {
+      page = 1,
+      pageSize = 50,
+      search,
+      isActive = true,
+      parentId,
+      includeInactive = false,
+    } = params || {};
+
+    let query = supabase
+      .from('departments')
+      .select(
+        `
+        *,
+        parent:departments!parent_department_id(department_id, name, code)
+      `,
+        { count: 'exact' }
+      )
+      .order('sort_order')
+      .order('name');
+
+    if (search) {
+      query = query.or(`name.ilike.%${search}%,code.ilike.%${search}%`);
+    }
+
+    // includeInactive가 false이면 활성 부서만 조회
+    if (!includeInactive) {
+      query = query.eq('is_active', true);
+    } else if (isActive !== undefined) {
+      // includeInactive가 true이고 isActive가 지정된 경우
+      query = query.eq('is_active', isActive);
+    }
+
+    if (parentId !== undefined) {
+      if (parentId === null) {
+        // 최상위 부서만 (parent_department_id가 null)
+        query = query.is('parent_department_id', null);
+      } else {
+        // 특정 부서의 직속 하위 부서만
+        query = query.eq('parent_department_id', parentId);
+      }
+    }
+
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize - 1;
+
+    const { data, error, count } = await query.range(start, end);
+
+    if (error) throw error;
+
+    // 소속 사용자 수 조회
+    const departmentIds = (data || []).map((d) => d.department_id);
+    let memberCounts: Record<number, number> = {};
+
+    if (departmentIds.length > 0) {
+      const { data: memberData } = await supabase
+        .from('members')
+        .select('department_id')
+        .in('department_id', departmentIds);
+
+      memberCounts = (memberData || []).reduce((acc, m) => {
+        acc[m.department_id] = (acc[m.department_id] || 0) + 1;
+        return acc;
+      }, {} as Record<number, number>);
+    }
+
+    // 결과 데이터 조합
+    const result = (data || []).map((dept) => ({
+      ...dept,
+      parent_department_name: dept.parent?.name || null,
+      member_count: memberCounts[dept.department_id] || 0,
+    }));
+
+    return {
+      data: result,
+      pagination: {
+        total: count || 0,
+        page,
+        pageSize,
+        pageCount: Math.ceil((count || 0) / pageSize),
+      } as PaginationResponse,
+    };
+  },
+
+  /**
+   * 특정 부서의 상세 정보를 조회합니다.
+   */
+  async getDepartment(departmentId: number) {
+    const { data, error } = await supabase
+      .from('departments')
+      .select(
+        `
+        *,
+        parent:departments!parent_department_id(department_id, name, code)
+      `
+      )
+      .eq('department_id', departmentId)
+      .single();
+
+    if (error) throw error;
+
+    // 하위 부서 조회
+    const { data: children } = await supabase
+      .from('departments')
+      .select('department_id, name, code')
+      .eq('parent_department_id', departmentId)
+      .order('sort_order')
+      .order('name');
+
+    // 소속 사용자 조회
+    const { data: members } = await supabase
+      .from('members')
+      .select(
+        `
+        member_id,
+        name,
+        account_id,
+        is_active,
+        roles(name)
+      `
+      )
+      .eq('department_id', departmentId)
+      .order('name');
+
+    // 소속 사용자 수 카운트
+    const { data: childrenWithCounts } = await Promise.all(
+      (children || []).map(async (child) => {
+        const { count } = await supabase
+          .from('members')
+          .select('member_id', { count: 'exact', head: true })
+          .eq('department_id', child.department_id);
+
+        return {
+          ...child,
+          member_count: count || 0,
+        };
+      })
+    );
+
+    return {
+      ...data,
+      parent_department_name: data.parent?.name || null,
+      member_count: members?.length || 0,
+      child_departments: childrenWithCounts || [],
+      members: (members || []).map((m: any) => ({
+        member_id: m.member_id,
+        name: m.name,
+        account_id: m.account_id,
+        role_name: m.roles?.name || null,
+        is_active: m.is_active,
+      })),
+    };
+  },
+
+  /**
+   * 부서 계층 구조를 트리 형태로 조회합니다.
+   */
+  async getDepartmentTree(params?: { includeInactive?: boolean }) {
+    const { includeInactive = false } = params || {};
+
+    let query = supabase
+      .from('departments')
+      .select('*')
+      .order('sort_order')
+      .order('name');
+
+    if (!includeInactive) {
+      query = query.eq('is_active', true);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    // 소속 사용자 수 조회
+    const { data: memberData } = await supabase
+      .from('members')
+      .select('department_id');
+
+    const memberCounts = (memberData || []).reduce((acc, m) => {
+      if (m.department_id) {
+        acc[m.department_id] = (acc[m.department_id] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<number, number>);
+
+    // 트리 구조 생성
+    const departments = (data || []).map((dept) => ({
+      ...dept,
+      member_count: memberCounts[dept.department_id] || 0,
+      children: [] as DepartmentTreeNode[],
+    }));
+
+    const deptMap = new Map<number, DepartmentTreeNode>();
+    departments.forEach((dept) => {
+      deptMap.set(dept.department_id, dept);
+    });
+
+    const tree: DepartmentTreeNode[] = [];
+
+    departments.forEach((dept) => {
+      if (dept.parent_department_id === null) {
+        // 최상위 부서
+        tree.push(dept);
+      } else {
+        // 하위 부서
+        const parent = deptMap.get(dept.parent_department_id);
+        if (parent) {
+          parent.children.push(dept);
+        }
+      }
+    });
+
+    return tree;
+  },
+
+  /**
+   * 새로운 부서를 생성합니다.
+   */
+  async createDepartment(
+    department: Database['public']['Tables']['departments']['Insert']
+  ) {
+    // 부서 코드 중복 확인
+    const { data: existing } = await supabase
+      .from('departments')
+      .select('department_id')
+      .eq('code', department.code)
+      .maybeSingle();
+
+    if (existing) {
+      throw new Error('이미 사용 중인 부서 코드입니다.');
+    }
+
+    // 상위 부서가 지정된 경우 존재 여부 확인
+    if (department.parent_department_id) {
+      const { data: parent, error: parentError } = await supabase
+        .from('departments')
+        .select('department_id, depth, path')
+        .eq('department_id', department.parent_department_id)
+        .single();
+
+      if (parentError || !parent) {
+        throw new Error('상위 부서를 찾을 수 없습니다.');
+      }
+
+      // depth와 path 계산
+      department.depth = parent.depth + 1;
+      // path는 insert 후에 부서 ID를 알아야 완성할 수 있으므로 임시값
+      department.path = `${parent.path}/temp`;
+    } else {
+      department.depth = 0;
+      department.path = '/temp';
+    }
+
+    const { data, error } = await supabase
+      .from('departments')
+      .insert(department)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // path 업데이트 (생성된 department_id를 사용)
+    const correctPath = department.parent_department_id
+      ? `${department.path.replace('/temp', '')}/${data.department_id}`
+      : `/${data.department_id}`;
+
+    const { error: updateError } = await supabase
+      .from('departments')
+      .update({ path: correctPath })
+      .eq('department_id', data.department_id);
+
+    if (updateError) throw updateError;
+
+    return { ...data, path: correctPath };
+  },
+
+  /**
+   * 부서 정보를 수정합니다.
+   * 참고: code와 parent_department_id는 생성 후 수정 불가 (데이터 무결성 유지)
+   */
+  async updateDepartment(
+    departmentId: number,
+    updates: Database['public']['Tables']['departments']['Update']
+  ) {
+    // code와 parent_department_id 변경 방지
+    const safeUpdates = { ...updates };
+    delete safeUpdates.code;
+    delete safeUpdates.parent_department_id;
+    delete safeUpdates.depth;
+    delete safeUpdates.path;
+
+    const { data, error } = await supabase
+      .from('departments')
+      .update({ ...safeUpdates, updated_at: new Date().toISOString() })
+      .eq('department_id', departmentId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * 부서를 삭제합니다.
+   * 하위 부서가 있거나 소속 사용자가 있는 경우 삭제할 수 없습니다.
+   */
+  async deleteDepartment(departmentId: number) {
+    // 하위 부서 확인
+    const { data: children, error: childError } = await supabase
+      .from('departments')
+      .select('department_id')
+      .eq('parent_department_id', departmentId)
+      .limit(1);
+
+    if (childError) throw childError;
+
+    if (children && children.length > 0) {
+      const { count } = await supabase
+        .from('departments')
+        .select('department_id', { count: 'exact', head: true })
+        .eq('parent_department_id', departmentId);
+
+      throw new Error(
+        `이 부서에는 ${count}개의 하위 부서가 있습니다. 먼저 하위 부서를 삭제하거나 다른 부서로 이동해주세요.`
+      );
+    }
+
+    // 소속 사용자 확인
+    const { data: members, error: memberError } = await supabase
+      .from('members')
+      .select('member_id')
+      .eq('department_id', departmentId)
+      .limit(1);
+
+    if (memberError) throw memberError;
+
+    if (members && members.length > 0) {
+      const { count } = await supabase
+        .from('members')
+        .select('member_id', { count: 'exact', head: true })
+        .eq('department_id', departmentId);
+
+      throw new Error(
+        `이 부서에는 ${count}명의 소속 사용자가 있습니다. 먼저 사용자를 다른 부서로 이동하거나 비활성화해주세요.`
+      );
+    }
+
+    const { error } = await supabase
+      .from('departments')
+      .delete()
+      .eq('department_id', departmentId);
+
+    if (error) throw error;
+  },
+
+  /**
+   * 부서별 통계를 조회합니다.
+   */
+  async getDepartmentStats(params: {
+    departmentId: number;
+    startDate?: string;
+    endDate?: string;
+    includeSubDepartments?: boolean;
+  }) {
+    const {
+      departmentId,
+      startDate,
+      endDate,
+      includeSubDepartments = false,
+    } = params;
+
+    // 부서 정보 조회
+    const { data: department, error: deptError } = await supabase
+      .from('departments')
+      .select('department_id, name, path')
+      .eq('department_id', departmentId)
+      .single();
+
+    if (deptError) throw deptError;
+
+    // 대상 부서 ID 목록
+    let targetDepartmentIds = [departmentId];
+
+    if (includeSubDepartments) {
+      const { data: subDepts } = await supabase
+        .from('departments')
+        .select('department_id')
+        .like('path', `${department.path}/%`);
+
+      if (subDepts) {
+        targetDepartmentIds = [
+          departmentId,
+          ...subDepts.map((d) => d.department_id),
+        ];
+      }
+    }
+
+    // 소속 사용자 통계
+    const { data: members } = await supabase
+      .from('members')
+      .select('member_id, is_active')
+      .in('department_id', targetDepartmentIds);
+
+    const memberCount = members?.length || 0;
+    const activeMemberCount =
+      members?.filter((m) => m.is_active).length || 0;
+
+    // 업무 통계
+    let taskQuery = supabase
+      .from('tasks')
+      .select('task_id, work_time, member_id')
+      .in(
+        'member_id',
+        members?.map((m) => m.member_id) || []
+      );
+
+    if (startDate) taskQuery = taskQuery.gte('task_date', startDate);
+    if (endDate) taskQuery = taskQuery.lte('task_date', endDate);
+
+    const { data: tasks } = await taskQuery;
+
+    const totalTasks = tasks?.length || 0;
+    const totalWorkHours =
+      tasks?.reduce((sum, t) => sum + (t.work_time || 0) / 60, 0) || 0;
+    const avgWorkHoursPerMember =
+      activeMemberCount > 0
+        ? Math.round((totalWorkHours / activeMemberCount) * 100) / 100
+        : 0;
+
+    // 하위 부서 통계 (includeSubDepartments일 때만)
+    let subDepartments: any[] = [];
+    if (includeSubDepartments) {
+      const { data: children } = await supabase
+        .from('departments')
+        .select('department_id, name')
+        .eq('parent_department_id', departmentId);
+
+      if (children) {
+        subDepartments = await Promise.all(
+          children.map(async (child) => {
+            const childStats = await this.getDepartmentStats({
+              departmentId: child.department_id,
+              startDate,
+              endDate,
+              includeSubDepartments: false,
+            });
+
+            return {
+              department_id: child.department_id,
+              department_name: child.name,
+              member_count: childStats.member_count,
+              total_tasks: childStats.task_stats.total_tasks,
+              total_work_hours: childStats.task_stats.total_work_hours,
+            };
+          })
+        );
+      }
+    }
+
+    return {
+      department_id: departmentId,
+      department_name: department.name,
+      member_count: memberCount,
+      active_member_count: activeMemberCount,
+      task_stats: {
+        total_tasks: totalTasks,
+        total_work_hours: Math.round(totalWorkHours * 10) / 10,
+        avg_work_hours_per_member: avgWorkHoursPerMember,
+      },
+      sub_departments: subDepartments,
+    };
   },
 };
 
