@@ -1,8 +1,7 @@
 import {
+  BuildingOfficeIcon,
   ChevronDownIcon,
   ChevronRightIcon,
-  FolderIcon,
-  FolderOpenIcon,
   PencilIcon,
   PlusIcon,
 } from '@heroicons/react/24/outline';
@@ -38,73 +37,46 @@ function TreeNode({
     <div>
       {/* 현재 노드 */}
       <div
-        className="group relative flex items-center gap-1 px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950/30 cursor-pointer transition-colors select-none"
-        style={{ paddingLeft: `${level * 20 + 8}px` }}
+        className="group relative flex items-center gap-1.5 px-3 py-2 hover:bg-blue-50 dark:hover:bg-blue-950/30 cursor-pointer transition-colors select-none"
+        style={{ paddingLeft: `${level * 24 + 12}px` }}
       >
         {/* 접기/펼치기 버튼 */}
         <button
           type="button"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="w-4 h-4 flex items-center justify-center flex-shrink-0 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded transition-colors"
+          className="w-5 h-5 flex items-center justify-center flex-shrink-0 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded transition-colors"
           aria-label={isExpanded ? '접기' : '펼치기'}
           aria-expanded={isExpanded}
         >
           {hasChildren ? (
             isExpanded ? (
-              <ChevronDownIcon className="w-3 h-3 text-zinc-600 dark:text-zinc-400" />
+              <ChevronDownIcon className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
             ) : (
-              <ChevronRightIcon className="w-3 h-3 text-zinc-600 dark:text-zinc-400" />
+              <ChevronRightIcon className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
             )
           ) : (
-            <span className="w-3 h-3" />
+            <span className="w-4 h-4" />
           )}
         </button>
 
-        {/* 폴더 아이콘 */}
-        <div className="w-4 h-4 flex-shrink-0">
-          {hasChildren ? (
-            isExpanded ? (
-              <FolderOpenIcon className="w-4 h-4 text-blue-500 dark:text-blue-400" />
-            ) : (
-              <FolderIcon className="w-4 h-4 text-blue-500 dark:text-blue-400" />
-            )
-          ) : (
-            <FolderIcon className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
-          )}
+        {/* 조직 아이콘 */}
+        <div className="w-5 h-5 flex-shrink-0">
+          <BuildingOfficeIcon
+            className={`w-5 h-5 ${
+              hasChildren
+                ? 'text-blue-500 dark:text-blue-400'
+                : 'text-zinc-400 dark:text-zinc-500'
+            }`}
+          />
         </div>
 
-        {/* 부서명 및 정보 */}
-        <div className="flex-1 min-w-0 flex items-center gap-2">
-          <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
-            {node.name}
-          </span>
+        {/* 부서명 */}
+        <span className="text-base font-medium text-zinc-900 dark:text-zinc-100">
+          {node.name}
+        </span>
 
-          {/* 뱃지들 */}
-          <div className="flex items-center gap-1.5 flex-shrink-0">
-            <Badge
-              color={node.is_active ? 'lime' : 'zinc'}
-              className="text-xs py-0 px-1.5"
-            >
-              {node.is_active ? '활성' : '비활성'}
-            </Badge>
-            {level === 0 && (
-              <Badge color="blue" className="text-xs py-0 px-1.5">
-                최상위
-              </Badge>
-            )}
-            <span className="text-xs text-zinc-500 dark:text-zinc-400">
-              {node.member_count || 0}명
-            </span>
-            {hasChildren && (
-              <span className="text-xs text-zinc-400 dark:text-zinc-500">
-                · {node.children.length}개
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* 액션 버튼 (호버 시 표시) */}
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* 액션 버튼 (부서명 바로 뒤) */}
+        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             type="button"
             onClick={(e) => {
@@ -129,6 +101,29 @@ function TreeNode({
           >
             <PencilIcon className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
           </button>
+        </div>
+
+        {/* 뱃지들 (오른쪽으로 밀림) */}
+        <div className="flex items-center gap-1.5 ml-auto flex-shrink-0">
+          <Badge
+            color={node.is_active ? 'lime' : 'zinc'}
+            className="text-xs py-0 px-1.5"
+          >
+            {node.is_active ? '활성' : '비활성'}
+          </Badge>
+          {level === 0 && (
+            <Badge color="blue" className="text-xs py-0 px-1.5">
+              최상위
+            </Badge>
+          )}
+          <span className="text-sm text-zinc-500 dark:text-zinc-400">
+            {node.member_count || 0}명
+          </span>
+          {hasChildren && (
+            <span className="text-sm text-zinc-400 dark:text-zinc-500">
+              · {node.children.length}개
+            </span>
+          )}
         </div>
       </div>
 

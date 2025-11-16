@@ -216,6 +216,25 @@ export function DepartmentForm() {
     return [...childIds, ...descendantIds];
   };
 
+  // 부서의 전체 경로를 생성하는 함수
+  const getDepartmentPath = (dept: any, allDepts: any[]): string => {
+    const path: string[] = [];
+    let current = dept;
+
+    while (current) {
+      path.unshift(current.name);
+      if (current.parent_department_id) {
+        current = allDepts.find(
+          (d: any) => d.department_id === current.parent_department_id
+        );
+      } else {
+        current = null;
+      }
+    }
+
+    return path.join(' > ');
+  };
+
   const availableDepartments = isEditMode
     ? departmentsData?.data.filter((d: any) => {
         // 자기 자신 제외
@@ -288,8 +307,7 @@ export function DepartmentForm() {
             <option value="">최상위 부서</option>
             {availableDepartments?.map((dept: any) => (
               <option key={dept.department_id} value={dept.department_id}>
-                {'  '.repeat(dept.depth)}
-                {dept.name}
+                {getDepartmentPath(dept, departmentsData?.data || [])}
               </option>
             ))}
           </Select>
