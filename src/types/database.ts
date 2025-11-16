@@ -55,6 +55,11 @@ export interface Database {
         Insert: Omit<Holiday, 'holiday_id' | 'created_at'>;
         Update: Partial<Omit<Holiday, 'holiday_id' | 'created_at'>>;
       };
+      departments: {
+        Row: Department;
+        Insert: Omit<Department, 'department_id' | 'created_at' | 'updated_at' | 'depth' | 'path'>;
+        Update: Partial<Omit<Department, 'department_id' | 'created_at' | 'code' | 'parent_department_id' | 'depth' | 'path'>>;
+      };
     };
   };
 }
@@ -92,6 +97,7 @@ export interface Member {
   email: string;
   mobile?: string;
   role_id?: number;
+  department_id?: number;
   is_active: boolean;
   requires_daily_report: boolean;
   created_at: string;
@@ -167,6 +173,25 @@ export interface Holiday {
   created_at: string;
 }
 
+export interface Department {
+  department_id: number;
+  name: string;
+  code: string;
+  description?: string;
+  parent_department_id?: number;
+  depth: number;
+  path: string;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DepartmentTreeNode extends Department {
+  children: DepartmentTreeNode[];
+  member_count?: number;
+}
+
 // API 요청/응답 타입
 export interface PaginationQuery {
   page?: number;
@@ -192,4 +217,21 @@ export interface TaskQuery extends PaginationQuery {
   projectId?: string;
   platformId?: string;
   keyword?: string;
+}
+
+export interface DepartmentQuery extends PaginationQuery {
+  isActive?: boolean;
+  search?: string;
+  parentId?: number;
+  includeInactive?: boolean;
+}
+
+export interface MemberQuery extends PaginationQuery {
+  page?: number;
+  pageSize?: number;
+  roleId?: number;
+  isActive?: boolean;
+  search?: string;
+  departmentId?: number;
+  includeSubDepartments?: boolean;
 }

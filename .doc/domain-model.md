@@ -197,6 +197,7 @@ export class Task {
 
 import { Email } from '../value-objects/Email';
 import { Role } from '../value-objects/Role';
+import { DepartmentId } from '../value-objects/DepartmentId';
 
 export class Member {
   private readonly _id: number;
@@ -204,6 +205,7 @@ export class Member {
   private _name: string;
   private _email: Email;
   private _role: Role;
+  private _departmentId?: DepartmentId;
   private _isActive: boolean;
   private readonly _createdAt: Date;
   private _updatedAt: Date;
@@ -214,6 +216,7 @@ export class Member {
     name: string;
     email: Email;
     role: Role;
+    departmentId?: DepartmentId;
     isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -223,6 +226,7 @@ export class Member {
     this._name = props.name;
     this._email = props.email;
     this._role = props.role;
+    this._departmentId = props.departmentId;
     this._isActive = props.isActive ?? true;
     this._createdAt = props.createdAt || new Date();
     this._updatedAt = props.updatedAt || new Date();
@@ -234,6 +238,10 @@ export class Member {
 
   get role(): Role {
     return this._role;
+  }
+
+  get departmentId(): DepartmentId | undefined {
+    return this._departmentId;
   }
 
   /**
@@ -267,6 +275,176 @@ export class Member {
 
     this._isActive = false;
     this._updatedAt = new Date();
+  }
+
+  /**
+   * 비즈니스 규칙: 부서 이동
+   */
+  changeDepartment(newDepartmentId: DepartmentId): void {
+    this._departmentId = newDepartmentId;
+    this._updatedAt = new Date();
+  }
+
+  /**
+   * 비즈니스 규칙: 같은 부서 소속인지 확인
+   */
+  isInDepartment(departmentId: DepartmentId): boolean {
+    return this._departmentId?.equals(departmentId) ?? false;
+  }
+}
+```
+
+### 2.3 Department (부서) 엔티티
+
+```typescript
+// src/domain/entities/Department.ts
+
+import { DepartmentId } from '../value-objects/DepartmentId';
+import { DepartmentCode } from '../value-objects/DepartmentCode';
+import { DepartmentPath } from '../value-objects/DepartmentPath';
+
+export class Department {
+  private readonly _id: DepartmentId;
+  private _name: string;
+  private readonly _code: DepartmentCode;
+  private _description?: string;
+  private _parentDepartmentId?: DepartmentId;
+  private _path: DepartmentPath;
+  private _depth: number;
+  private _isActive: boolean;
+  private _sortOrder: number;
+  private readonly _createdAt: Date;
+  private _updatedAt: Date;
+
+  constructor(props: {
+    id: DepartmentId;
+    name: string;
+    code: DepartmentCode;
+    description?: string;
+    parentDepartmentId?: DepartmentId;
+    path: DepartmentPath;
+    depth: number;
+    isActive?: boolean;
+    sortOrder?: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }) {
+    this._id = props.id;
+    this._name = props.name;
+    this._code = props.code;
+    this._description = props.description;
+    this._parentDepartmentId = props.parentDepartmentId;
+    this._path = props.path;
+    this._depth = props.depth;
+    this._isActive = props.isActive ?? true;
+    this._sortOrder = props.sortOrder ?? 0;
+    this._createdAt = props.createdAt || new Date();
+    this._updatedAt = props.updatedAt || new Date();
+
+    this.validate();
+  }
+
+  get id(): DepartmentId {
+    return this._id;
+  }
+
+  get name(): string {
+    return this._name;
+  }
+
+  get code(): DepartmentCode {
+    return this._code;
+  }
+
+  get path(): DepartmentPath {
+    return this._path;
+  }
+
+  get depth(): number {
+    return this._depth;
+  }
+
+  get isActive(): boolean {
+    return this._isActive;
+  }
+
+  /**
+   * 비즈니스 규칙: 부서명 변경
+   */
+  changeName(newName: string): void {
+    if (!newName || newName.trim().length === 0) {
+      throw new DomainError('부서명은 필수입니다');
+    }
+
+    if (newName.length > 100) {
+      throw new DomainError('부서명은 100자를 초과할 수 없습니다');
+    }
+
+    this._name = newName;
+    this._updatedAt = new Date();
+  }
+
+  /**
+   * 비즈니스 규칙: 부서 비활성화
+   */
+  deactivate(): void {
+    if (!this._isActive) {
+      throw new DomainError('이미 비활성화된 부서입니다');
+    }
+
+    this._isActive = false;
+    this._updatedAt = new Date();
+  }
+
+  /**
+   * 비즈니스 규칙: 부서 활성화
+   */
+  activate(): void {
+    if (this._isActive) {
+      throw new DomainError('이미 활성화된 부서입니다');
+    }
+
+    this._isActive = true;
+    this._updatedAt = new Date();
+  }
+
+  /**
+   * 비즈니스 규칙: 최상위 부서인지 확인
+   */
+  isRootDepartment(): boolean {
+    return this._parentDepartmentId === undefined;
+  }
+
+  /**
+   * 비즈니스 규칙: 하위 부서인지 확인
+   */
+  isChildOf(parentDepartmentId: DepartmentId): boolean {
+    return this._parentDepartmentId?.equals(parentDepartmentId) ?? false;
+  }
+
+  /**
+   * 비즈니스 규칙: 계층 경로 내에 포함되는지 확인
+   */
+  isDescendantOf(ancestorDepartmentId: DepartmentId): boolean {
+    return this._path.contains(ancestorDepartmentId);
+  }
+
+  /**
+   * 유효성 검증
+   */
+  private validate(): void {
+    if (!this._name || this._name.trim().length === 0) {
+      throw new DomainError('부서명은 필수입니다');
+    }
+
+    if (this._depth < 0) {
+      throw new DomainError('부서 계층 깊이는 0 이상이어야 합니다');
+    }
+
+    // 최상위 부서가 아닌 경우 상위 부서 필수
+    if (this._depth > 0 && !this._parentDepartmentId) {
+      throw new DomainError('하위 부서는 상위 부서가 필요합니다');
+    }
   }
 }
 ```
@@ -459,6 +637,229 @@ export class TaskStatus {
 
   equals(other: TaskStatus): boolean {
     return this._status === other._status;
+  }
+}
+```
+
+### 3.4 DepartmentId (부서 식별자)
+
+```typescript
+// src/domain/value-objects/DepartmentId.ts
+
+/**
+ * 부서 식별자 밸류 오브젝트
+ */
+export class DepartmentId {
+  private readonly _value: number;
+
+  private constructor(value: number) {
+    this._value = value;
+  }
+
+  static create(id: number): DepartmentId {
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new DomainError('부서 ID는 양의 정수여야 합니다');
+    }
+
+    return new DepartmentId(id);
+  }
+
+  get value(): number {
+    return this._value;
+  }
+
+  equals(other: DepartmentId): boolean {
+    return this._value === other._value;
+  }
+
+  toString(): string {
+    return this._value.toString();
+  }
+}
+```
+
+### 3.5 DepartmentCode (부서 코드)
+
+```typescript
+// src/domain/value-objects/DepartmentCode.ts
+
+/**
+ * 부서 코드 밸류 오브젝트
+ * 고유한 부서 식별 코드 (예: "DEV", "FE", "BE")
+ */
+export class DepartmentCode {
+  private readonly _value: string;
+
+  private constructor(value: string) {
+    this._value = value;
+  }
+
+  static create(code: string): DepartmentCode {
+    if (!code || code.trim().length === 0) {
+      throw new DomainError('부서 코드는 필수입니다');
+    }
+
+    const trimmed = code.trim().toUpperCase();
+
+    // 2-50자, 영문 대문자 및 언더스코어만 허용
+    if (trimmed.length < 2 || trimmed.length > 50) {
+      throw new DomainError('부서 코드는 2-50자여야 합니다');
+    }
+
+    if (!/^[A-Z_]+$/.test(trimmed)) {
+      throw new DomainError('부서 코드는 영문 대문자와 언더스코어만 사용할 수 있습니다');
+    }
+
+    return new DepartmentCode(trimmed);
+  }
+
+  get value(): string {
+    return this._value;
+  }
+
+  equals(other: DepartmentCode): boolean {
+    return this._value === other._value;
+  }
+
+  toString(): string {
+    return this._value;
+  }
+}
+```
+
+### 3.6 DepartmentPath (부서 계층 경로)
+
+```typescript
+// src/domain/value-objects/DepartmentPath.ts
+
+/**
+ * 부서 계층 경로 밸류 오브젝트 (Materialized Path 패턴)
+ * 예: "/1/2/5" = 부서 1 > 부서 2 > 부서 5
+ */
+export class DepartmentPath {
+  private readonly _value: string;
+  private readonly _segments: number[];
+
+  private constructor(value: string) {
+    this._value = value;
+    this._segments = DepartmentPath.parseSegments(value);
+  }
+
+  /**
+   * 최상위 부서 경로 생성
+   */
+  static createRoot(departmentId: number): DepartmentPath {
+    return new DepartmentPath(`/${departmentId}`);
+  }
+
+  /**
+   * 하위 부서 경로 생성
+   */
+  static createChild(parentPath: DepartmentPath, departmentId: number): DepartmentPath {
+    const newPath = `${parentPath._value}/${departmentId}`;
+    return new DepartmentPath(newPath);
+  }
+
+  /**
+   * 문자열로부터 생성
+   */
+  static fromString(path: string): DepartmentPath {
+    if (!path.startsWith('/')) {
+      throw new DomainError('부서 경로는 "/"로 시작해야 합니다');
+    }
+
+    if (path.length === 1) {
+      throw new DomainError('부서 경로에는 최소 하나의 부서 ID가 필요합니다');
+    }
+
+    return new DepartmentPath(path);
+  }
+
+  /**
+   * 경로 세그먼트 파싱
+   */
+  private static parseSegments(path: string): number[] {
+    return path
+      .split('/')
+      .filter((seg) => seg.length > 0)
+      .map((seg) => {
+        const id = parseInt(seg, 10);
+        if (isNaN(id) || id <= 0) {
+          throw new DomainError('부서 경로의 세그먼트는 양의 정수여야 합니다');
+        }
+        return id;
+      });
+  }
+
+  get value(): string {
+    return this._value;
+  }
+
+  /**
+   * 계층 깊이 (0 = 최상위)
+   */
+  get depth(): number {
+    return this._segments.length - 1;
+  }
+
+  /**
+   * 부서 ID 배열
+   */
+  get segments(): readonly number[] {
+    return this._segments;
+  }
+
+  /**
+   * 마지막 부서 ID (자기 자신)
+   */
+  get currentDepartmentId(): number {
+    return this._segments[this._segments.length - 1];
+  }
+
+  /**
+   * 상위 부서 경로 얻기
+   */
+  getParentPath(): DepartmentPath | null {
+    if (this._segments.length === 1) {
+      return null; // 최상위 부서
+    }
+
+    const parentSegments = this._segments.slice(0, -1);
+    const parentPath = '/' + parentSegments.join('/');
+    return new DepartmentPath(parentPath);
+  }
+
+  /**
+   * 특정 부서 ID가 경로에 포함되는지 확인
+   */
+  contains(departmentId: DepartmentId): boolean {
+    return this._segments.includes(departmentId.value);
+  }
+
+  /**
+   * 하위 부서인지 확인 (직계/방계 모두 포함)
+   */
+  isDescendantOf(ancestorPath: DepartmentPath): boolean {
+    return this._value.startsWith(ancestorPath._value + '/');
+  }
+
+  /**
+   * 직계 하위 부서인지 확인
+   */
+  isDirectChildOf(parentPath: DepartmentPath): boolean {
+    if (this._segments.length !== parentPath._segments.length + 1) {
+      return false;
+    }
+
+    return this._value.startsWith(parentPath._value + '/');
+  }
+
+  equals(other: DepartmentPath): boolean {
+    return this._value === other._value;
+  }
+
+  toString(): string {
+    return this._value;
   }
 }
 ```

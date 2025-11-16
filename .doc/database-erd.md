@@ -19,6 +19,7 @@
    - `pwd`: 암호화된 비밀번호
    - `hash`: 비밀번호 해시 솔트
    - `roleId`: 역할 ID (FK)
+   - `departmentId`: 부서 ID (FK)
    - `isActive`: 활성 상태
 
 2. **Roles** - 역할 정보
@@ -38,9 +39,20 @@
    - `key`: 권한 키
    - `name`: 권한 이름
 
+5. **Departments** - 부서 정보
+   - `departmentId`: 부서 고유 식별자 (PK)
+   - `name`: 부서명
+   - `code`: 부서 코드 (고유)
+   - `description`: 부서 설명
+   - `parentDepartmentId`: 상위 부서 ID (FK, Self-Referencing)
+   - `depth`: 계층 깊이 (0 = 최상위)
+   - `path`: 계층 경로 (Materialized Path)
+   - `isActive`: 활성 상태
+   - `sortOrder`: 표시 순서
+
 ### 업무 보고 관련 테이블
 
-5. **Tasks** - 업무 보고
+6. **Tasks** - 업무 보고
    - `taskId`: 업무 고유 식별자 (PK)
    - `memberId`: 작성자 ID (FK)
    - `taskDate`: 업무 날짜
@@ -58,7 +70,7 @@
 
 ### 프로젝트 관련 테이블
 
-6. **Projects** - 프로젝트
+7. **Projects** - 프로젝트
    - `projectId`: 프로젝트 고유 식별자 (PK)
    - `name`: 프로젝트명
    - `serviceId`: 서비스 ID (FK)
@@ -68,32 +80,32 @@
    - `memo`: 메모
    - `isActive`: 활성 상태
 
-7. **ProjectUrls** - 프로젝트 URL
+8. **ProjectUrls** - 프로젝트 URL
    - `urlId`: URL 고유 식별자 (PK)
    - `projectId`: 프로젝트 ID (FK)
    - `url`: URL 주소
    - `description`: URL 설명
 
-8. **Services** - 서비스
+9. **Services** - 서비스
    - `serviceId`: 서비스 고유 식별자 (PK)
    - `name`: 서비스명
    - `costGroupId`: 청구 그룹 ID (FK)
    - `isActive`: 활성 상태
 
-9. **CostGroups** - 청구 그룹
+10. **CostGroups** - 청구 그룹
    - `costGroupId`: 청구 그룹 고유 식별자 (PK)
    - `name`: 청구 그룹명
    - `isActive`: 활성 상태
 
 ### 코드 관련 테이블
 
-10. **CodeGroups** - 코드 그룹
+11. **CodeGroups** - 코드 그룹
     - `codeGroupId`: 코드 그룹 고유 식별자 (PK)
     - `name`: 코드 그룹명
     - `description`: 코드 그룹 설명
     - `isActive`: 활성 상태
 
-11. **Codes** - 코드 항목
+12. **Codes** - 코드 항목
     - `codeId`: 코드 고유 식별자 (PK)
     - `codeGroupId`: 코드 그룹 ID (FK)
     - `name`: 코드명
@@ -104,13 +116,13 @@
 
 ### 기타 테이블
 
-12. **Holidays** - 공휴일
+13. **Holidays** - 공휴일
     - `holidayId`: 공휴일 고유 식별자 (PK)
     - `holidayDate`: 공휴일 날짜
     - `name`: 공휴일명
     - `description`: 설명
 
-13. **Logs** - 시스템 로그
+14. **Logs** - 시스템 로그
     - `logId`: 로그 고유 식별자 (PK)
     - `memberId`: 사용자 ID (FK)
     - `type`: 로그 유형
@@ -120,13 +132,15 @@
 
 ## 테이블 간 주요 관계
 
-1. Members ↔ Roles: 1:N (한 역할은 여러 사용자에게 할당 가능)
-2. Roles ↔ Permissions: N:M (RolePermissions 테이블을 통해 관계 설정)
-3. Tasks ↔ Members: N:1 (한 사용자는 여러 업무 보고 작성 가능)
-4. Tasks ↔ Projects: N:1 (한 프로젝트에 여러 업무 보고 연결 가능)
-5. Tasks ↔ Services: N:1 (한 서비스에 여러 업무 보고 연결 가능)
-6. Tasks ↔ CostGroups: N:1 (한 청구 그룹에 여러 업무 보고 연결 가능)
-7. Projects ↔ Services: N:1 (한 서비스에 여러 프로젝트 연결 가능)
-8. Services ↔ CostGroups: N:1 (한 청구 그룹에 여러 서비스 연결 가능)
-9. Projects ↔ ProjectUrls: 1:N (한 프로젝트에 여러 URL 연결 가능)
-10. CodeGroups ↔ Codes: 1:N (한 코드 그룹에 여러 코드 항목 연결 가능)
+1. Members ↔ Roles: N:1 (한 역할은 여러 사용자에게 할당 가능)
+2. Members ↔ Departments: N:1 (한 부서에 여러 사용자가 소속 가능)
+3. Departments ↔ Departments: Self-Referencing (부서 계층 구조)
+4. Roles ↔ Permissions: N:M (RolePermissions 테이블을 통해 관계 설정)
+5. Tasks ↔ Members: N:1 (한 사용자는 여러 업무 보고 작성 가능)
+6. Tasks ↔ Projects: N:1 (한 프로젝트에 여러 업무 보고 연결 가능)
+7. Tasks ↔ Services: N:1 (한 서비스에 여러 업무 보고 연결 가능)
+8. Tasks ↔ CostGroups: N:1 (한 청구 그룹에 여러 업무 보고 연결 가능)
+9. Projects ↔ Services: N:1 (한 서비스에 여러 프로젝트 연결 가능)
+10. Services ↔ CostGroups: N:1 (한 청구 그룹에 여러 서비스 연결 가능)
+11. Projects ↔ ProjectUrls: 1:N (한 프로젝트에 여러 URL 연결 가능)
+12. CodeGroups ↔ Codes: 1:N (한 코드 그룹에 여러 코드 항목 연결 가능)
