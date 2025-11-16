@@ -252,10 +252,10 @@ INSERT INTO codes (code_group_id, name, key, value, sort_order) VALUES
 (3, '휴가', '휴가', '휴가', 6);
 
 -- 부서 샘플 데이터
-INSERT INTO departments (name, code, description, parent_department_id, depth, path, is_active, sort_order) VALUES
-('개발팀', 'DEV', '소프트웨어 개발 부서', NULL, 0, '/1', TRUE, 1),
-('기획팀', 'PM', '기획 및 프로젝트 관리', NULL, 0, '/2', TRUE, 2),
-('디자인팀', 'DESIGN', 'UI/UX 디자인', NULL, 0, '/3', TRUE, 3);
+INSERT INTO departments (name, description, parent_department_id, depth, path, is_active, sort_order) VALUES
+('개발팀', '소프트웨어 개발 부서', NULL, 0, '/1', TRUE, 1),
+('기획팀', '기획 및 프로젝트 관리', NULL, 0, '/2', TRUE, 2),
+('디자인팀', 'UI/UX 디자인', NULL, 0, '/3', TRUE, 3);
 
 -- RLS (Row Level Security) 설정
 ALTER TABLE roles ENABLE ROW LEVEL SECURITY;
@@ -771,49 +771,91 @@ CREATE POLICY "departments_select_all" ON departments
 FOR SELECT TO authenticated
 USING (true);
 
--- 관리자/매니저만 부서 생성/수정/삭제 가능
+-- 관리자 또는 PERM_06(사용자관리) 쓰기 권한을 가진 사용자만 부서 생성 가능
 CREATE POLICY "departments_insert_admin" ON departments
 FOR INSERT TO authenticated
 WITH CHECK (
   EXISTS (
-    SELECT 1 FROM members m
-    JOIN roles r ON m.role_id = r.role_id
+    SELECT 1
+    FROM public.members m
+    JOIN public.roles r ON m.role_id = r.role_id
     WHERE m.auth_id = auth.uid()
-      AND r.name IN ('관리자', '매니저')
-      AND m.is_active = true
+      AND (
+        r.name = 'ADMIN'
+        OR EXISTS (
+          SELECT 1
+          FROM public.role_permissions rp
+          JOIN public.permissions p ON rp.permission_id = p.permission_id
+          WHERE rp.role_id = r.role_id
+            AND p.key = 'PERM_06'
+            AND rp.write_access = true
+        )
+      )
   )
 );
 
+-- 관리자 또는 PERM_06(사용자관리) 쓰기 권한을 가진 사용자만 부서 수정 가능
 CREATE POLICY "departments_update_admin" ON departments
 FOR UPDATE TO authenticated
 USING (
   EXISTS (
-    SELECT 1 FROM members m
-    JOIN roles r ON m.role_id = r.role_id
+    SELECT 1
+    FROM public.members m
+    JOIN public.roles r ON m.role_id = r.role_id
     WHERE m.auth_id = auth.uid()
-      AND r.name IN ('관리자', '매니저')
-      AND m.is_active = true
+      AND (
+        r.name = 'ADMIN'
+        OR EXISTS (
+          SELECT 1
+          FROM public.role_permissions rp
+          JOIN public.permissions p ON rp.permission_id = p.permission_id
+          WHERE rp.role_id = r.role_id
+            AND p.key = 'PERM_06'
+            AND rp.write_access = true
+        )
+      )
   )
 )
 WITH CHECK (
   EXISTS (
-    SELECT 1 FROM members m
-    JOIN roles r ON m.role_id = r.role_id
+    SELECT 1
+    FROM public.members m
+    JOIN public.roles r ON m.role_id = r.role_id
     WHERE m.auth_id = auth.uid()
-      AND r.name IN ('관리자', '매니저')
-      AND m.is_active = true
+      AND (
+        r.name = 'ADMIN'
+        OR EXISTS (
+          SELECT 1
+          FROM public.role_permissions rp
+          JOIN public.permissions p ON rp.permission_id = p.permission_id
+          WHERE rp.role_id = r.role_id
+            AND p.key = 'PERM_06'
+            AND rp.write_access = true
+        )
+      )
   )
 );
 
+-- 관리자 또는 PERM_06(사용자관리) 쓰기 권한을 가진 사용자만 부서 삭제 가능
 CREATE POLICY "departments_delete_admin" ON departments
 FOR DELETE TO authenticated
 USING (
   EXISTS (
-    SELECT 1 FROM members m
-    JOIN roles r ON m.role_id = r.role_id
+    SELECT 1
+    FROM public.members m
+    JOIN public.roles r ON m.role_id = r.role_id
     WHERE m.auth_id = auth.uid()
-      AND r.name IN ('관리자', '매니저')
-      AND m.is_active = true
+      AND (
+        r.name = 'ADMIN'
+        OR EXISTS (
+          SELECT 1
+          FROM public.role_permissions rp
+          JOIN public.permissions p ON rp.permission_id = p.permission_id
+          WHERE rp.role_id = r.role_id
+            AND p.key = 'PERM_06'
+            AND rp.write_access = true
+        )
+      )
   )
 );
 
