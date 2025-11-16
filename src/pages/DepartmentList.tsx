@@ -103,7 +103,11 @@ function TreeNode({
           <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <Button
               plain
-              onClick={() => onEdit(node.department_id)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onEdit(node.department_id);
+              }}
               className="text-sm"
               aria-label={`${node.name} 수정`}
             >
@@ -111,7 +115,11 @@ function TreeNode({
             </Button>
             <Button
               plain
-              onClick={() => onDelete(node.department_id, node.name)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onDelete(node.department_id, node.name);
+              }}
               className="text-sm text-red-600 dark:text-red-400"
               aria-label={`${node.name} 삭제`}
             >

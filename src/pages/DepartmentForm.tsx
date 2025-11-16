@@ -119,8 +119,8 @@ export function DepartmentForm() {
       return departmentAPI.updateDepartment(departmentId, {
         name: data.name,
         description: data.description || null,
-        is_active: data.is_active,
-        sort_order: data.sort_order,
+        is_active: data.is_active ?? true,
+        sort_order: data.sort_order ?? 0,
       });
     },
     onSuccess: () => {

@@ -654,15 +654,14 @@ export const departmentAPI = {
 
   /**
    * 부서 정보를 수정합니다.
-   * 참고: code와 parent_department_id는 생성 후 수정 불가 (데이터 무결성 유지)
+   * 참고: parent_department_id는 생성 후 수정 불가 (데이터 무결성 유지)
    */
   async updateDepartment(
     departmentId: number,
     updates: Database['public']['Tables']['departments']['Update']
   ) {
-    // code와 parent_department_id 변경 방지
+    // parent_department_id, depth, path 변경 방지
     const safeUpdates = { ...updates };
-    delete safeUpdates.code;
     delete safeUpdates.parent_department_id;
     delete safeUpdates.depth;
     delete safeUpdates.path;
