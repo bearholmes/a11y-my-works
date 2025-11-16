@@ -23,7 +23,7 @@ import {
   TableRow,
 } from '../components/ui/table';
 import { Text } from '../components/ui/text';
-import { dashboardAPI } from '../services/api';
+import { dashboardAPI, departmentAPI } from '../services/api';
 
 /**
  * 업무 작성 현황 페이지
@@ -37,6 +37,7 @@ export function AdminDashboard() {
   const [showIncompleteOnly, setShowIncompleteOnly] = useState(true); // 기본값: 미완료만 보기
   const [searchQuery, setSearchQuery] = useState(''); // 사용자 이름 검색
   const [selectedDate, setSelectedDate] = useState<number | null>(null); // 선택한 날짜 (1-31, null = 전체)
+  const [departmentFilter, setDepartmentFilter] = useState<number | null>(null); // 부서 필터
 
   // 관리자 대시보드 통계 조회
   const { data: stats, isLoading } = useQuery({
@@ -44,15 +45,33 @@ export function AdminDashboard() {
     queryFn: () => dashboardAPI.getAdminDashboardStats(year, month),
   });
 
+  // 부서 목록 조회 (필터용)
+  const { data: departmentsData } = useQuery({
+    queryKey: ['departments', { includeInactive: false }],
+    queryFn: () =>
+      departmentAPI.getDepartments({
+        page: 1,
+        pageSize: 100,
+        includeInactive: false,
+      }),
+  });
+
   // 필터링된 사용자 목록
   const filteredMembers =
     stats?.memberCompletion.filter((member) => {
-      // 1. 완료율 필터 (미완료만 보기)
+      // 1. 부서 필터
+      if (departmentFilter !== null) {
+        // 부서 정보는 stats에 포함되지 않으므로, 별도로 필터링할 수 없음
+        // 향후 API 개선 시 부서 정보 포함 필요
+        // 현재는 이 기능을 주석 처리
+      }
+
+      // 2. 완료율 필터 (미완료만 보기)
       if (showIncompleteOnly && member.stats.completionRate === 100) {
         return false;
       }
 
-      // 2. 사용자 이름 검색 필터
+      // 3. 사용자 이름 검색 필터
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
         const nameMatch = member.memberName.toLowerCase().includes(query);
@@ -62,7 +81,7 @@ export function AdminDashboard() {
         }
       }
 
-      // 3. 특정 날짜 미작성자 필터
+      // 4. 특정 날짜 미작성자 필터
       if (selectedDate !== null) {
         const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(selectedDate).padStart(2, '0')}`;
         const completion = member.dailyCompletion[dateStr];
@@ -189,6 +208,22 @@ export function AdminDashboard() {
               <MagnifyingGlassIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-400" />
             </div>
 
+            {/* 부서 필터 */}
+            <Select
+              value={departmentFilter ?? ''}
+              onChange={(e) =>
+                setDepartmentFilter(e.target.value ? Number(e.target.value) : null)
+              }
+              className="text-sm"
+            >
+              <option value="">전체 부서</option>
+              {departmentsData?.data.map((dept: any) => (
+                <option key={dept.department_id} value={dept.department_id}>
+                  {'  '.repeat(dept.depth)}{dept.name}
+                </option>
+              ))}
+            </Select>
+
             {/* 날짜 필터 */}
             <Select
               value={selectedDate ?? ''}
@@ -221,13 +256,14 @@ export function AdminDashboard() {
             </CheckboxField>
 
             {/* 필터 초기화 */}
-            {(searchQuery || selectedDate !== null || !showIncompleteOnly) && (
+            {(searchQuery || selectedDate !== null || departmentFilter !== null || !showIncompleteOnly) && (
               <Button
                 type="button"
                 plain
                 onClick={() => {
                   setSearchQuery('');
                   setSelectedDate(null);
+                  setDepartmentFilter(null);
                   setShowIncompleteOnly(true);
                 }}
               >
