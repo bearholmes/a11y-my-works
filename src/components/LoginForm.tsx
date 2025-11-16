@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import { useNotification } from '../hooks/useNotification';
 import { useAuthContext } from '../providers/AuthProvider';
@@ -40,7 +40,8 @@ export function LoginForm() {
   const { user, signIn, signUp, loading } = useAuthContext();
   const [error, setError] = useState<string>('');
   const [submitting, setSubmitting] = useState(false);
-  const { showSuccess } = useNotification();
+  const { showSuccess, showWarning } = useNotification();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -49,6 +50,23 @@ export function LoginForm() {
   const signUpForm = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
   });
+
+  // 세션 타임아웃 알림 처리
+  useEffect(() => {
+    const timeout = searchParams.get('timeout');
+    const sessionExpired = searchParams.get('session_expired');
+
+    if (timeout === 'true' || sessionExpired === 'true') {
+      showWarning(
+        '일정 시간 동안 활동이 없어 자동으로 로그아웃되었습니다. 다시 로그인해주세요.'
+      );
+
+      // URL에서 쿼리 파라미터 제거 (clean URL)
+      searchParams.delete('timeout');
+      searchParams.delete('session_expired');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams, showWarning]);
 
   // 로딩 중에는 아무것도 렌더링하지 않음
   if (loading) {
