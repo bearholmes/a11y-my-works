@@ -1,0 +1,182 @@
+name: Lint Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  lint:
+    name: Run Biome Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run lint
+        id: lint
+        run: |
+          # 린트 결과를 파일로 저장 (JSON 포맷)
+          pnpm biome check --json . > lint-result.json 2>&1 || true
+
+          # 일반 포맷으로도 저장 (에러 메시지용)
+          pnpm biome check . > lint-output.txt 2>&1 || true
+
+          # 린트 실행 (실제 체크 - 실패 시 exit code 반환)
+          pnpm lint
+
+      - name: Comment PR with lint errors
+        if: failure() && steps.lint.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+
+            // lint-output.txt 파일 읽기
+            let lintOutput = '';
+            try {
+              lintOutput = fs.readFileSync('lint-output.txt', 'utf8');
+            } catch (error) {
+              lintOutput = '린트 결과를 읽을 수 없습니다.';
+            }
+
+            // 린트 결과가 너무 길면 truncate
+            const maxLength = 60000; // GitHub 코멘트 제한
+            if (lintOutput.length > maxLength) {
+              lintOutput = lintOutput.substring(0, maxLength) + '\n\n...(결과가 너무 길어 일부만 표시됩니다)';
+            }
+
+            // 기존 봇 코멘트 찾기
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('## 🚨 Lint Check Failed')
+            );
+
+            const commentBody = `## 🚨 Lint Check Failed
+
+**Commit**: ${context.sha.substring(0, 7)}
+**Action Run**: [#${context.runNumber}](${context.payload.repository.html_url}/actions/runs/${context.runId})
+
+린트 검사에서 오류가 발견되었습니다. 아래 오류를 수정한 후 다시 푸시해주세요.
+
+### 오류 내용
+
+\`\`\`
+${lintOutput}
+\`\`\`
+
+### 로컬에서 수정하는 방법
+
+\`\`\`bash
+# 린트 오류 확인
+pnpm lint
+
+# 자동 수정 가능한 오류 수정
+pnpm lint:fix
+\`\`\`
+
+---
+*이 코멘트는 자동으로 생성되었습니다.*`;
+
+            if (botComment) {
+              // 기존 코멘트 업데이트
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody,
+              });
+            } else {
+              // 새 코멘트 생성
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody,
+              });
+            }
+
+      - name: Comment PR on success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // 기존 실패 코멘트 찾기
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('## 🚨 Lint Check Failed')
+            );
+
+            // 성공 코멘트
+            const successBody = `## ✅ Lint Check Passed
+
+**Commit**: ${context.sha.substring(0, 7)}
+**Action Run**: [#${context.runNumber}](${context.payload.repository.html_url}/actions/runs/${context.runId})
+
+모든 린트 검사를 통과했습니다! 🎉
+
+---
+*이 코멘트는 자동으로 생성되었습니다.*`;
+
+            if (botComment) {
+              // 기존 실패 코멘트를 성공 메시지로 업데이트
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: successBody,
+              });
+            } else {
+              // 새 성공 코멘트 생성 (첫 실행인 경우)
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: successBody,
+              });
+            }
