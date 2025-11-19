@@ -8,7 +8,6 @@ import {
   Cog8ToothIcon,
   CreditCardIcon,
   HomeIcon,
-  KeyIcon,
   UserCircleIcon,
   UserGroupIcon,
   UsersIcon,
