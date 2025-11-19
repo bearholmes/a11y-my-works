@@ -122,6 +122,11 @@ const DepartmentForm = lazy(() =>
 const TeamTaskList = lazy(() =>
   import('../pages/TeamTaskList').then((m) => ({ default: m.TeamTaskList }))
 );
+const TeamMonthlyReport = lazy(() =>
+  import('../pages/TeamMonthlyReport').then((m) => ({
+    default: m.TeamMonthlyReport,
+  }))
+);
 const ResourceStats = lazy(() =>
   import('../pages/ResourceStats').then((m) => ({ default: m.ResourceStats }))
 );
@@ -290,6 +295,16 @@ export function AppRouter() {
             <ProtectedRoute>
               <PermissionGuard permission="task.read">
                 <TeamTaskList />
+              </PermissionGuard>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/team/monthly-report"
+          element={
+            <ProtectedRoute>
+              <PermissionGuard permission="task.read">
+                <TeamMonthlyReport />
               </PermissionGuard>
             </ProtectedRoute>
           }

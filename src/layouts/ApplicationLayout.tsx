@@ -112,6 +112,13 @@ const MENU_ITEMS: MenuItem[] = [
         requireReadOnly: true,
       },
       {
+        name: '월별 집계',
+        href: '/team/monthly-report',
+        icon: '📅',
+        requiredPermission: 'task.read',
+        requireReadOnly: true,
+      },
+      {
         name: '리소스 통계',
         href: '/team/stats',
         icon: '📈',

@@ -14,8 +14,8 @@ import type {
 export const taskAPI = {
   async getTasks(query: TaskQuery = {}) {
     const {
-      page = 1,
-      pageSize = 20,
+      page,
+      pageSize,
       startDate,
       endDate,
       keyword,
@@ -73,23 +73,40 @@ export const taskAPI = {
       queryBuilder = queryBuilder.eq('platform_id', platformId);
     }
 
-    // 페이지네이션
-    const start = (page - 1) * pageSize;
-    const end = start + pageSize - 1;
+    // 페이지네이션: page와 pageSize가 모두 있을 때만 적용
+    if (page !== undefined && pageSize !== undefined) {
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize - 1;
 
-    const { data, error, count } = await queryBuilder.range(start, end);
+      const { data, error, count } = await queryBuilder.range(start, end);
 
-    if (error) throw error;
+      if (error) throw error;
 
-    return {
-      data: data || [],
-      pagination: {
-        total: count || 0,
-        page,
-        pageSize,
-        pageCount: Math.ceil((count || 0) / pageSize),
-      } as PaginationResponse,
-    };
+      return {
+        data: data || [],
+        pagination: {
+          total: count || 0,
+          page,
+          pageSize,
+          pageCount: Math.ceil((count || 0) / pageSize),
+        } as PaginationResponse,
+      };
+    } else {
+      // 전체 조회 (페이지네이션 없음)
+      const { data, error, count } = await queryBuilder;
+
+      if (error) throw error;
+
+      return {
+        data: data || [],
+        pagination: {
+          total: count || 0,
+          page: 1,
+          pageSize: count || 0,
+          pageCount: 1,
+        } as PaginationResponse,
+      };
+    }
   },
 
   async createTask(task: Database['public']['Tables']['tasks']['Insert']) {
