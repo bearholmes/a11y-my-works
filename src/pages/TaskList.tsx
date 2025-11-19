@@ -623,7 +623,7 @@ export function TaskList() {
           />
 
           {/* 슬라이드 패널 */}
-          <div className="fixed inset-y-0 right-0 w-full max-w-2xl bg-white dark:bg-zinc-900 shadow-xl z-50 overflow-y-auto">
+          <div className="fixed inset-y-0 right-0 w-[800px] bg-white dark:bg-zinc-900 shadow-xl z-50 overflow-y-auto">
             <div className="sticky top-0 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between">
               <Heading>
                 {editingTaskId ? '업무 보고 수정' : '업무 보고 등록'}
